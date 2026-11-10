@@ -1,20 +1,79 @@
 "use client";
 
-import * as React from "react";
 import { Toast as ToastPrimitive } from "@base-ui/react/toast";
 import { cn } from "cn";
-
-import { Button } from "@/components/ui/button";
 import {
-  XIcon,
   CircleCheckIcon,
   InfoIcon,
-  TriangleAlertIcon,
-  OctagonXIcon,
   Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+  XIcon,
 } from "lucide-react";
+import type * as React from "react";
+import { Button } from "@/components/ui/button";
 
-const toast = ToastPrimitive.createToastManager();
+const baseToastManager = ToastPrimitive.createToastManager();
+
+type BaseToastAddOptions = Parameters<typeof baseToastManager.add>[0];
+
+export interface ToastOptions extends Omit<BaseToastAddOptions, "title"> {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+}
+
+export interface ToastCallable {
+  (titleOrOptions: string | BaseToastAddOptions): string;
+  add: typeof baseToastManager.add;
+  close: typeof baseToastManager.close;
+  update: typeof baseToastManager.update;
+  promise: typeof baseToastManager.promise;
+  success: (
+    title: React.ReactNode,
+    options?: Omit<ToastOptions, "type">,
+  ) => string;
+  error: (
+    title: React.ReactNode,
+    options?: Omit<ToastOptions, "type">,
+  ) => string;
+  info: (
+    title: React.ReactNode,
+    options?: Omit<ToastOptions, "type">,
+  ) => string;
+  warning: (
+    title: React.ReactNode,
+    options?: Omit<ToastOptions, "type">,
+  ) => string;
+  " subscribe": (typeof baseToastManager)[" subscribe"];
+}
+
+function createToastCallable(manager: typeof baseToastManager): ToastCallable {
+  const callable = ((titleOrOptions: string | BaseToastAddOptions) => {
+    if (typeof titleOrOptions === "string") {
+      return manager.add({ title: titleOrOptions });
+    }
+    return manager.add(titleOrOptions);
+  }) as ToastCallable;
+
+  callable.add = manager.add.bind(manager);
+  callable.close = manager.close.bind(manager);
+  callable.update = manager.update.bind(manager);
+  callable.promise = manager.promise.bind(manager);
+  callable[" subscribe"] = manager[" subscribe"].bind(manager);
+
+  callable.success = (title, options) =>
+    manager.add({ title, type: "success", ...options });
+  callable.error = (title, options) =>
+    manager.add({ title, type: "error", ...options });
+  callable.info = (title, options) =>
+    manager.add({ title, type: "info", ...options });
+  callable.warning = (title, options) =>
+    manager.add({ title, type: "warning", ...options });
+
+  return callable;
+}
+
+const toast = createToastCallable(baseToastManager);
 
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
   return <ToastPrimitive.Provider {...props} />;
@@ -141,15 +200,25 @@ function ToastIcon({ type }: { type: string | undefined }) {
   let icon: React.ReactNode = null;
 
   if (type === "success") {
-    icon = <CircleCheckIcon aria-hidden="true" />;
+    icon = (
+      <CircleCheckIcon
+        className="text-emerald-500 dark:text-emerald-400"
+        aria-hidden="true"
+      />
+    );
   }
 
   if (type === "info") {
-    icon = <InfoIcon aria-hidden="true" />;
+    icon = <InfoIcon className="text-primary" aria-hidden="true" />;
   }
 
   if (type === "warning") {
-    icon = <TriangleAlertIcon aria-hidden="true" />;
+    icon = (
+      <TriangleAlertIcon
+        className="text-amber-500 dark:text-amber-400"
+        aria-hidden="true"
+      />
+    );
   }
 
   if (type === "error") {
@@ -157,7 +226,12 @@ function ToastIcon({ type }: { type: string | undefined }) {
   }
 
   if (type === "loading") {
-    icon = <Loader2Icon className="animate-spin" aria-hidden="true" />;
+    icon = (
+      <Loader2Icon
+        className="animate-spin text-muted-foreground"
+        aria-hidden="true"
+      />
+    );
   }
 
   if (!icon) {

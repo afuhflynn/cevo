@@ -36,7 +36,7 @@ Scaffold the Next.js 16 App Router environment with Tailwind CSS v4 OKLCH theme 
 **Done when:** the application boots cleanly with dark and light themes, typography variables load without circular references, and base UI primitives render properly.
 - [x] Configure Tailwind CSS v4 and OKLCH color space
 - [x] Setup Next.js Google font loaders in root layout
-- [ ] Wire global state providers and toast notifications: `/feature-build stack & design system foundation`
+- [x] Wire global state providers and toast notifications: `/feature-build stack & design system foundation`
 Code in `app/globals.css`, `app/layout.tsx`
 
 ### 2. Brand Assets & Central Logo Component · done
