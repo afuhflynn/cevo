@@ -1,17 +1,10 @@
+// use prisma-8
+
 // prisma/schema.prisma
 // Adopted from docs/DATABASE_DESIGN.md (spec 0001, Option 1).
 // Full normalized data model for Cevo: identity, academic hierarchy,
 // templates, projects, research sources, files, AI telemetry, billing,
 // credits, payments, and audit events.
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
 
 enum UserRole {
   STUDENT
@@ -93,7 +86,7 @@ enum TicketStatus {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @onCreate(cuid(2))
   name          String
   email         String    @unique
   emailVerified Boolean   @default(false)
@@ -101,7 +94,7 @@ model User {
   role          UserRole  @default(STUDENT)
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime  @onCreate(now()) @onUpdate(now())
 
   sessions      Session[]
   accounts      Account[]
@@ -116,7 +109,7 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(cuid())
+  id        String   @id @onCreate(cuid(2))
   userId    String
   token     String   @unique
   expiresAt DateTime
@@ -128,7 +121,7 @@ model Session {
 }
 
 model Account {
-  id           String    @id @default(cuid())
+  id           String    @id @onCreate(cuid(2))
   userId       String
   accountId    String
   providerId   String
@@ -144,7 +137,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id @default(cuid())
+  id         String   @id @onCreate(cuid(2))
   identifier String
   value      String
   expiresAt  DateTime
@@ -154,7 +147,7 @@ model Verification {
 }
 
 model StudentProfile {
-  id                  String   @id @default(cuid())
+  id                  String   @id @onCreate(cuid(2))
   userId              String   @unique
   firstName           String
   lastName            String
@@ -164,13 +157,13 @@ model StudentProfile {
   onboardingStep      Int      @default(1)
   referralSource      String?
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @onCreate(now()) @onUpdate(now())
 
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AcademicProfile {
-  id                  String             @id @default(cuid())
+  id                  String             @id @onCreate(cuid(2))
   userId              String             @unique
   institutionId       String?
   facultyId           String?
@@ -181,7 +174,7 @@ model AcademicProfile {
   academicSession     String
   preferredStyle      String             @default("APA_7")
   createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  updatedAt           DateTime           @onCreate(now()) @onUpdate(now())
 
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   institution         Institution?       @relation(fields: [institutionId], references: [id])
@@ -191,7 +184,7 @@ model AcademicProfile {
 }
 
 model Institution {
-  id          String      @id @default(cuid())
+  id          String      @id @onCreate(cuid(2))
   name        String      @unique
   code        String      @unique
   country     String      @default("Cameroon")
@@ -199,7 +192,7 @@ model Institution {
   logoUrl     String?
   isVerified  Boolean     @default(false)
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  updatedAt   DateTime    @onCreate(now()) @onUpdate(now())
 
   faculties   Faculty[]
   templates   ProjectTemplate[]
@@ -207,12 +200,12 @@ model Institution {
 }
 
 model Faculty {
-  id            String       @id @default(cuid())
+  id            String       @id @onCreate(cuid(2))
   institutionId String
   name          String
   code          String?
   createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  updatedAt     DateTime     @onCreate(now()) @onUpdate(now())
 
   institution   Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   departments   Department[]
@@ -223,12 +216,12 @@ model Faculty {
 }
 
 model Department {
-  id          String       @id @default(cuid())
+  id          String       @id @onCreate(cuid(2))
   facultyId   String
   name        String
   code        String?
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @onCreate(now()) @onUpdate(now())
 
   faculty     Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   programmes  Programme[]
@@ -239,13 +232,13 @@ model Department {
 }
 
 model Programme {
-  id            String             @id @default(cuid())
+  id            String             @id @onCreate(cuid(2))
   departmentId  String
   name          String
   qualification QualificationLevel @default(BACHELORS)
   durationYears Int                @default(3)
   createdAt     DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  updatedAt       DateTime           @onCreate(now()) @onUpdate(now())
 
   department    Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   templates     ProjectTemplate[]
@@ -255,7 +248,7 @@ model Programme {
 }
 
 model ProjectTemplate {
-  id            String              @id @default(cuid())
+  id            String              @id @onCreate(cuid(2))
   title         String
   description   String?
   institutionId String?
@@ -267,7 +260,7 @@ model ProjectTemplate {
   isOfficial    Boolean             @default(false)
   isActive      Boolean             @default(true)
   createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  updatedAt     DateTime            @onCreate(now()) @onUpdate(now())
 
   institution   Institution?        @relation(fields: [institutionId], references: [id])
   faculty       Faculty?            @relation(fields: [facultyId], references: [id])
@@ -278,7 +271,7 @@ model ProjectTemplate {
 }
 
 model TemplateVersion {
-  id          String          @id @default(cuid())
+  id          String          @id @onCreate(cuid(2))
   templateId  String
   version     Int             @default(1)
   isPublished Boolean         @default(false)
@@ -295,7 +288,7 @@ model TemplateVersion {
 }
 
 model TemplateRule {
-  id                String          @id @default(cuid())
+  id                String          @id @onCreate(cuid(2))
   templateVersionId String          @unique
   pageSize          String          @default("A4")
   marginTopMm       Float           @default(25.4)
@@ -318,7 +311,7 @@ model TemplateRule {
 }
 
 model TemplateSection {
-  id                String          @id @default(cuid())
+  id                String          @id @onCreate(cuid(2))
   templateVersionId String
   orderIndex        Int
   title             String
@@ -333,7 +326,7 @@ model TemplateSection {
 }
 
 model Project {
-  id                String              @id @default(cuid())
+  id                String              @id @onCreate(cuid(2))
   userId            String
   templateId        String?
   templateVersionId String?
@@ -347,7 +340,7 @@ model Project {
   referencingStyle  String              @default("APA_7")
   isArchived        Boolean             @default(false)
   createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  updatedAt         DateTime            @onCreate(now()) @onUpdate(now())
 
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   template          ProjectTemplate?    @relation(fields: [templateId], references: [id])
@@ -367,38 +360,38 @@ model Project {
 }
 
 model ProjectBrief {
-  id                String   @id @default(cuid())
+  id                String   @id @onCreate(cuid(2))
   projectId         String   @unique
-  background        String   @db.Text
-  problemStatement  String   @db.Text
-  aim               String   @db.Text
+  background        Text
+  problemStatement  Text
+  aim               Text
   objectives        Json
   researchQuestions Json
-  scope             String   @db.Text
-  limitations       String   @db.Text
-  methodology       String   @db.Text
-  expectedOutcomes  String   @db.Text
-  targetEnvironment String?  @db.Text
+  scope             Text
+  limitations       Text
+  methodology       Text
+  expectedOutcomes  Text
+  targetEnvironment Text?
   isApproved        Boolean  @default(false)
   approvedAt        DateTime?
   createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  updatedAt         DateTime @onCreate(now()) @onUpdate(now())
 
   project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model ProjectOutline {
-  id          String   @id @default(cuid())
+  id          String   @id @onCreate(cuid(2))
   projectId   String   @unique
   structure   Json
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @onCreate(now()) @onUpdate(now())
 
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model ProjectSection {
-  id          String   @id @default(cuid())
+  id          String   @id @onCreate(cuid(2))
   projectId   String
   parentId    String?
   orderIndex  Int
@@ -410,7 +403,7 @@ model ProjectSection {
   version     Int      @default(1)
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @onCreate(now()) @onUpdate(now())
 
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   parent      ProjectSection?  @relation("SectionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
@@ -423,7 +416,7 @@ model ProjectSection {
 }
 
 model DocumentVersion {
-  id          String         @id @default(cuid())
+  id          String         @id @onCreate(cuid(2))
   sectionId   String
   versionNumber Int
   content     Json
@@ -437,7 +430,7 @@ model DocumentVersion {
 }
 
 model ProjectTask {
-  id          String    @id @default(cuid())
+  id          String    @id @onCreate(cuid(2))
   projectId   String
   title       String
   description String?
@@ -446,7 +439,7 @@ model ProjectTask {
   dueDate     DateTime?
   orderIndex  Int       @default(0)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime  @onCreate(now()) @onUpdate(now())
 
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -454,7 +447,7 @@ model ProjectTask {
 }
 
 model ProjectActivity {
-  id          String   @id @default(cuid())
+  id          String   @id @onCreate(cuid(2))
   projectId   String
   action      String
   description String
@@ -467,11 +460,11 @@ model ProjectActivity {
 }
 
 model ResearchSource {
-  id                String            @id @default(cuid())
+  id                String            @id @onCreate(cuid(2))
   doi               String?           @unique
   openAlexId        String?           @unique
   semanticScholarId String?           @unique
-  title             String            @db.Text
+  title             Text
   authors           Json
   publicationYear   Int?
   venue             String?
@@ -479,13 +472,13 @@ model ResearchSource {
   issue             String?
   pages             String?
   publisher         String?
-  abstract          String?           @db.Text
+  abstract          Text?
   pdfUrl            String?
   isOpenAccess      Boolean           @default(false)
   verificationState VerificationState @default(METADATA_VERIFIED)
   rawMetadata       Json?
   createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  updatedAt         DateTime          @onCreate(now()) @onUpdate(now())
 
   projectSources    ProjectSource[]
   citations         Citation[]
@@ -495,14 +488,14 @@ model ResearchSource {
 }
 
 model ProjectSource {
-  id          String         @id @default(cuid())
+  id          String         @id @onCreate(cuid(2))
   projectId   String
   sourceId    String
-  studentNote String?        @db.Text
+  studentNote Text?
   tags        Json?
   isPinned    Boolean        @default(false)
   createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  updatedAt   DateTime       @onCreate(now()) @onUpdate(now())
 
   project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   source      ResearchSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
@@ -511,7 +504,7 @@ model ProjectSource {
 }
 
 model Citation {
-  id          String         @id @default(cuid())
+  id          String         @id @onCreate(cuid(2))
   sectionId   String
   sourceId    String
   inlineText  String
@@ -526,14 +519,14 @@ model Citation {
 }
 
 model FileAsset {
-  id           String       @id @default(cuid())
+  id           String       @id @onCreate(cuid(2))
   projectId    String
   fileName     String
   fileSize     Int
   mimeType     String
   s3Key        String       @unique
   category     FileCategory @default(OTHER)
-  extractedText String?     @db.Text
+  extractedText Text?
   isProcessed  Boolean      @default(false)
   createdAt    DateTime     @default(now())
 
@@ -543,7 +536,7 @@ model FileAsset {
 }
 
 model ExportJob {
-  id           String       @id @default(cuid())
+  id           String       @id @onCreate(cuid(2))
   projectId    String
   format       ExportFormat @default(PDF)
   status       JobStatus    @default(QUEUED)
@@ -559,7 +552,7 @@ model ExportJob {
 }
 
 model AiUsage {
-  id            String   @id @default(cuid())
+  id            String   @id @onCreate(cuid(2))
   userId        String
   projectId     String?
   operationType String
@@ -581,28 +574,28 @@ model AiUsage {
 }
 
 model OperationPricing {
-  id            String   @id @default(cuid())
+  id            String   @id @onCreate(cuid(2))
   operationType String   @unique
   displayName   String
   creditCost    Int
   modelTier     String   @default("ECONOMICAL")
   defaultModel  String
   isActive      Boolean  @default(true)
-  updatedAt     DateTime @updatedAt
+  updatedAt     DateTime @onCreate(now()) @onUpdate(now())
 }
 
 model CreditWallet {
-  id        String   @id @default(cuid())
+  id        String   @id @onCreate(cuid(2))
   userId    String   @unique
   balance   Int      @default(50)
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @onCreate(now()) @onUpdate(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   ledgers   CreditLedger[]
 }
 
 model CreditLedger {
-  id          String     @id @default(cuid())
+  id          String     @id @onCreate(cuid(2))
   walletId    String
   type        LedgerType
   amount      Int
@@ -619,7 +612,7 @@ model CreditLedger {
 }
 
 model CreditPackage {
-  id          String   @id @default(cuid())
+  id          String   @id @onCreate(cuid(2))
   name        String
   priceXaf    Int
   credits     Int
@@ -627,13 +620,13 @@ model CreditPackage {
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @onCreate(now()) @onUpdate(now())
 
   payments    Payment[]
 }
 
 model Payment {
-  id              String        @id @default(cuid())
+  id              String        @id @onCreate(cuid(2))
   userId          String
   packageId       String
   amountXaf       Int
@@ -656,7 +649,7 @@ model Payment {
 }
 
 model PaymentWebhookEvent {
-  id          String   @id @default(cuid())
+  id          String   @id @onCreate(cuid(2))
   paymentId   String?
   eventType   String
   payload     Json
@@ -667,7 +660,7 @@ model PaymentWebhookEvent {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String   @id @onCreate(cuid(2))
   userId    String
   title     String
   message   String
@@ -681,14 +674,14 @@ model Notification {
 }
 
 model SupportTicket {
-  id          String           @id @default(cuid())
+  id          String           @id @onCreate(cuid(2))
   userId      String
   subject     String
   category    String
   status      TicketStatus     @default(OPEN)
   priority    String           @default("NORMAL")
   createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  updatedAt   DateTime         @onCreate(now()) @onUpdate(now())
 
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages    SupportMessage[]
@@ -697,18 +690,18 @@ model SupportTicket {
 }
 
 model SupportMessage {
-  id        String        @id @default(cuid())
+  id        String        @id @onCreate(cuid(2))
   ticketId  String
   senderId  String
   isAdmin   Boolean       @default(false)
-  message   String        @db.Text
+  message   Text
   createdAt DateTime      @default(now())
 
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 }
 
 model AuditEvent {
-  id         String   @id @default(cuid())
+  id         String   @id @onCreate(cuid(2))
   userId     String?
   action     String
   targetType String

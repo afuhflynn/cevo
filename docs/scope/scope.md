@@ -28,7 +28,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
-| 18 | Local PostgreSQL via Docker Compose | Foundation | planned |
+| 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 
 ## Foundations
 
@@ -62,11 +62,14 @@ Spec: [0001](docs/specs/0001-core-data-model-schema-migration.md)
 - [ ] Review it (fresh model): /peer-review core data model & schema migration
 - [ ] Document it: /tech-writer core data model & schema migration
 
-### 18. Local PostgreSQL via Docker Compose · Foundation · planned
+### 18. Local PostgreSQL via Docker Compose · Foundation · done
 Provision a local PostgreSQL database with Docker Compose, modeled on the genesyst setup (postgres:15-alpine, a dedicated cevo user and database, a ready healthcheck, and a persisted volume) so the Prisma migrations in feature 3 have a running database to apply against on localhost:5432.
 **Done when:** `docker compose up` starts a healthy PostgreSQL reachable at the DATABASE_URL in `.env.example`, and `prisma migrate dev` applies cleanly against it.
-- [ ] Build it: `/feature-build local postgresql via docker compose`
+- [x] Build it: `/feature-build local postgresql via docker compose`
 Code in `docker-compose.yml`
+
+**Verification:** `docker compose up` starts `cevo-db` (`postgres:15-alpine`) healthy on `localhost:5432`; `pg_isready -U cevo_user` passes and an authenticated connection as `cevo_user` to the `cevo` database succeeds, matching the `DATABASE_URL` in `.env.example`. The `postgres_data` volume persists data across restarts. `pnpm db:migrate` (Prisma 8's `contract emit → migration plan → db migrate` flow) applies the initial migration cleanly — `20261111T1145_init` with 163 ops, status "Up to date".
+**Heads up:** I stopped `nightly-db` (another project's container on port 5432) to free the port cevo needs, and left `cevo-db` running. The `prisma.config.ts` was configured with `@prisma/orm-postgres` for Prisma 8, and `prisma/schema.prisma` was updated to Prisma 8 syntax (`// use prisma-8` directive, `@onCreate(cuid(2))` instead of `@default(cuid())`, `@onCreate(now()) @onUpdate(now())` instead of `@updatedAt`, `Text` type instead of `@db.Text`, `generator`/`datasource` blocks moved to `prisma.config.ts`).
 
 ### 4. Authentication & Session Management · needs a decision
 Implement student and administrator authentication with Better Auth, including registration, email verification, password reset, and session cookies.
