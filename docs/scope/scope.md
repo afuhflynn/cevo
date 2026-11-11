@@ -50,14 +50,15 @@ Code in `components/cevo-logo.tsx`, `public/branding/`, `app/favicon.ico`
 ### 3. Core Data Model & Schema Migration · in-progress
 Define the normalized PostgreSQL schema via Prisma covering users, profiles, academic hierarchy, templates, projects, document sections, research sources, credit ledger, and audit events.
 **Done when:** the Prisma schema passes validation, relations and cascading constraints are enforced, and initial migration applies cleanly to the PostgreSQL database.
-Spec: [0001](docs/specs/0001-core-data-model-schema-migration.md)
+Spec: [0001](docs/specs/0001-core-data-model-schema-migration/index.md)
 - [x] Design it (spec): `/solution-architect core data model & schema migration`
-- [ ] Build it: /feature-build core data model & schema migration
-  - [ ] Create the Prisma schema and validate it (Satisfies AC-1, AC-2)
-  - [ ] Apply the initial migration against local PostgreSQL (Satisfies AC-3)
-  - [ ] Verify FK onDelete rules and financial record retention (Satisfies AC-2)
-  - [ ] Wire up db:validate script and CI deploy step (Satisfies AC-1, AC-3)
-- [ ] Verify it: /verify-release core data model & schema migration
+- [x] Build it: /feature-build core data model & schema migration
+  - [x] Create the Prisma schema and validate it (Satisfies AC-1, AC-2)
+  - [x] Apply the initial migration against local PostgreSQL (Satisfies AC-3)
+  - [x] Verify FK onDelete rules and financial record retention (Satisfies AC-2)
+  - [x] Wire up db:validate script and CI deploy step (Satisfies AC-1, AC-3)
+Code in `prisma/schema.prisma`
+- [x] Verify it: /verify-release core data model & schema migration
 - [ ] Test it: /test-engineer core data model & schema migration
 - [ ] Review it (fresh model): /peer-review core data model & schema migration
 - [ ] Document it: /tech-writer core data model & schema migration

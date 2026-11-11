@@ -1,7 +1,7 @@
-# 0001. Core data model and schema migration
+# 0001 · Core data model and schema migration
 
 **Date**: 2026-11-11
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -27,23 +27,6 @@ Acceptance criteria (the contract, each independently checkable):
 - AC-2: Every relation carries a foreign key with an explicit onDelete rule (Cascade, SetNull, or Restrict), enforced by the database (basis: relational integrity).
 - AC-3: The initial migration applies cleanly against PostgreSQL at DATABASE_URL, using prisma migrate dev locally and prisma migrate deploy in production.
 
-## Options considered
-
-### Option 1: Adopt docs/DATABASE_DESIGN.md as the schema (chosen)
-Use the existing 25 model normalized design in docs/DATABASE_DESIGN.md as the schema.prisma target, exactly as documented (basis: docs/DATABASE_DESIGN.md).
-Pros: single source of truth already aligned with the stack, security, and financial docs; no new design debt; matches the relations, cascades, and invariants the rest of the project assumes.
-Cons: inherits any design gaps in the source doc; the schema is large (25 models) for a first migration.
-
-### Option 2: Design a smaller subset schema now and extend later
-Ship only the tables needed for the next slice (users, profiles, projects) and add the rest incrementally.
-Pros: smaller initial migration, faster to validate.
-Cons: fractures the coherent data model; later additions risk breaking migrations and contradict the one target model principle; duplicate design work.
-
-### Option 3: Use a non relational store for part of the model
-Keep academic hierarchy and credits in PostgreSQL but move documents or research sources to a document store.
-Pros: flexible document storage for rich text.
-Cons: loses relational integrity, ACID transactions, and foreign key cascades across the domain; wrong for a double entry credit ledger and academic relations (basis: relational data needs ACID guarantees and constraints).
-
 ## Decision
 
 Chosen option: Option 1. Adopt docs/DATABASE_DESIGN.md as the schema target in prisma/schema.prisma, with one initial migration named init_core_schema.
@@ -53,10 +36,6 @@ Migration name: init_core_schema (descriptive, not date coupled). Runner up: a t
 Validation script: add "db:validate": "prisma validate" to package.json so prisma validate runs in verification. Runner up: run prisma validate manually only, rejected because a script makes the check repeatable in CI and by the team.
 
 Implementation skills: none (no installed community skill shapes this decision; standard Prisma and PostgreSQL practice).
-
-## Rationale
-
-The project already records the stack and a complete reviewed database design in docs/TECHNICAL_ARCHITECTURE.md, docs/DECISIONS.md, docs/DATABASE_DESIGN.md, and docs/SECURITY_AND_PRIVACY.md (basis: docs/TECHNICAL_ARCHITECTURE.md, docs/DECISIONS.md, docs/DATABASE_DESIGN.md, docs/SECURITY_AND_PRIVACY.md). Adopting that design as the schema avoids re-deciding entities, fields, relations, cascades, and financial invariants the rest of the project already assumes. A smaller subset or a non relational store would either fragment the single source of truth or give up the ACID guarantees and foreign key cascades the credit ledger and tenant scoped ownership model depend on.
 
 ## Feature design
 
@@ -78,7 +57,7 @@ Data model sketch:
 | Templates | TemplateVersion | id (cuid) | templateId to ProjectTemplate.id (Cascade); unique (templateId, version) | N:1 ProjectTemplate; 1:N TemplateRule, TemplateSection, Project |
 | Templates | TemplateRule | id (cuid) | templateVersionId to TemplateVersion.id (Cascade, unique) | 1:1 TemplateVersion |
 | Templates | TemplateSection | id (cuid) | templateVersionId to TemplateVersion.id (Cascade); index (templateVersionId, orderIndex) | N:1 TemplateVersion |
-| Projects | Project | id (cuid) | userId to User.id (onDelete Cascade); templateId to ProjectTemplate.id (onDelete SetNull); templateVersionId to TemplateVersion.id (onDelete SetNull) (both optional) | N:1 User; 1:N sections, tasks, activities, sources, files, export jobs; 1:1 brief, outline |
+| Projects | Project | id (cuid) | userId to User.id (onDelete Cascade); templateId to ProjectTemplate.id (onDelete SetNull); templateVersionId to ProjectTemplate.id (onDelete SetNull) (both optional) | N:1 User; 1:N sections, tasks, activities, sources, files, export jobs; 1:1 brief, outline |
 | Projects | ProjectBrief | id (cuid) | projectId to Project.id (Cascade, unique) | 1:1 Project |
 | Projects | ProjectOutline | id (cuid) | projectId to Project.id (Cascade, unique) | 1:1 Project |
 | Projects | ProjectSection | id (cuid) | projectId to Project.id (Cascade); parentId to ProjectSection.id (Cascade, self relation) | N:1 Project; self hierarchy 1:N children |
@@ -115,7 +94,7 @@ This feature has no HTTP endpoints. Its interface is the Prisma schema file and 
 | Interface | Command | Purpose | Auth | Errors |
 |---|---|---|---|---|
 | prisma/schema.prisma | n/a | The data model target; all 25 models, relations, cascades | n/a | schema validation errors |
-| prisma validate | n/a | Type and relation check; zero errors required | n/a | validation errors |
+| prisma validate | n/a | Type and relation check; zero error result required | n/a | validation errors |
 | prisma migrate dev | prisma migrate dev --name init_core_schema | Creates and applies the initial migration locally | local development DATABASE_URL | migration SQL errors |
 | prisma migrate deploy | prisma migrate deploy | Applies migrations against the target DATABASE_URL | production or CI DATABASE_URL | migration apply errors |
 
@@ -185,18 +164,3 @@ Neutral:
 - Re-run prisma migrate dev whenever the schema changes during the build so migrations stay in sync.
 - Decide later whether a seed script is needed (none in this feature).
 - Capture the stack conventions (Prisma, PostgreSQL, Better Auth, biome) in an AGENTS.md since none exists at the project root.
-
-## References
-
-Project sources (verifiable in this repo):
-- docs/scope/scope.md: feature 3 Core Data Model and Schema Migration, intent, done when criteria, and the Tracer Bullet build approach (basis: docs/scope/scope.md)
-- docs/DATABASE_DESIGN.md: the complete 25 model Prisma schema, relations, cascades, and financial invariants adopted as the schema target (basis: docs/DATABASE_DESIGN.md)
-- docs/TECHNICAL_ARCHITECTURE.md: modular monolith stack, Prisma version 8, PostgreSQL, Better Auth, Inngest, Fapshi choices (basis: docs/TECHNICAL_ARCHITECTURE.md)
-- docs/DECISIONS.md: architecture decision records including Next.js 16 App Router, Prisma, Fapshi, Inngest, and the no build command rule (basis: docs/DECISIONS.md)
-- docs/SECURITY_AND_PRIVACY.md: application layer userId ownership, roles, CUID ids, compliance scope, financial retention (basis: docs/SECURITY_AND_PRIVACY.md)
-- .env.example: DATABASE_URL definition (basis: .env.example)
-
-Practices and standards:
-- double entry ledger accounting with idempotency keys for money operations (basis: idempotency keys for money ops)
-- foreign key cascades and referential integrity enforced by the database (basis: relational integrity)
-- soft delete versus hard delete for financial record retention (basis: audit and tax compliance)
