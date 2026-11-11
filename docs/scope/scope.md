@@ -11,7 +11,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
-| 1 | Stack & Design System Foundation | Foundation | in-progress |
+| 1 | Stack & Design System Foundation | Foundation | done |
 | 2 | Brand Assets & Central Logo Component | Foundation | done |
 | 3 | Core Data Model & Schema Migration | Foundation | in-progress |
 | 4 | Authentication & Session Management | Foundation | planned |
@@ -28,10 +28,11 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
+| 18 | Local PostgreSQL via Docker Compose | Foundation | planned |
 
 ## Foundations
 
-### 1. Stack & Design System Foundation · in-progress
+### 1. Stack & Design System Foundation · done
 Scaffold the Next.js 16 App Router environment with Tailwind CSS v4 OKLCH theme variables, font loaders for Inter, Source Serif 4, and JetBrains Mono, and shadcn component primitives.
 **Done when:** the application boots cleanly with dark and light themes, typography variables load without circular references, and base UI primitives render properly.
 - [x] Configure Tailwind CSS v4 and OKLCH color space
@@ -50,6 +51,12 @@ Code in `components/cevo-logo.tsx`, `public/branding/`, `app/favicon.ico`
 Define the normalized PostgreSQL schema via Prisma covering users, profiles, academic hierarchy, templates, projects, document sections, research sources, credit ledger, and audit events.
 **Done when:** the Prisma schema passes validation, relations and cascading constraints are enforced, and initial migration applies cleanly to the PostgreSQL database.
 - [ ] Design it (spec): `/solution-architect core data model & schema migration`
+
+### 18. Local PostgreSQL via Docker Compose · Foundation · planned
+Provision a local PostgreSQL database with Docker Compose, modeled on the genesyst setup (postgres:15-alpine, a dedicated cevo user and database, a ready healthcheck, and a persisted volume) so the Prisma migrations in feature 3 have a running database to apply against on localhost:5432.
+**Done when:** `docker compose up` starts a healthy PostgreSQL reachable at the DATABASE_URL in `.env.example`, and `prisma migrate dev` applies cleanly against it.
+- [ ] Build it: `/feature-build local postgresql via docker compose`
+Code in `docker-compose.yml`
 
 ### 4. Authentication & Session Management · needs a decision
 Implement student and administrator authentication with Better Auth, including registration, email verification, password reset, and session cookies.
@@ -143,8 +150,8 @@ Provide a protected administrative dashboard to monitor registrations, payments,
 ## Slice 13: Public Website & Marketing Pages
 
 ### 17. Public Website & Marketing Pages · needs a decision
-Deliver the public marketing website, interactive feature walkthroughs, transparent credit pricing cards, and legal terms conforming to Cameroon cyber law.
-**Done when:** public routes load swiftly, communicate the core promise with real interface previews, and guide visitors into registration.
+Deliver the public marketing website: a compelling landing page, transparent credit pricing cards mapped to Fapshi mobile money packages, a well-structured navigation bar, and legal terms conforming to Cameroon cyber law.
+**Done when:** public routes load swiftly, the landing page communicates the core promise with real interface previews, pricing cards guide visitors into buying credits, and the navigation bar routes visitors to registration and key pages.
 - [ ] Design it (spec): `/solution-architect public website & marketing pages`
 
 ## Deferred
