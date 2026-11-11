@@ -1,0 +1,724 @@
+// prisma/schema.prisma
+// Adopted from docs/DATABASE_DESIGN.md (spec 0001, Option 1).
+// Full normalized data model for Cevo: identity, academic hierarchy,
+// templates, projects, research sources, files, AI telemetry, billing,
+// credits, payments, and audit events.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum QualificationLevel {
+  HND
+  BACHELORS
+  MASTERS
+  PHD
+  OTHER
+}
+
+enum ProjectType {
+  APPLIED_SOFTWARE
+  RESEARCH_ACADEMIC
+}
+
+enum ProjectStatus {
+  DRAFT
+  PLANNING
+  IN_PROGRESS
+  READY_FOR_REVIEW
+  COMPLETED
+  ARCHIVED
+}
+
+enum VerificationState {
+  METADATA_VERIFIED
+  DOI_VERIFIED
+  FULL_TEXT_AVAILABLE
+  REQUIRES_REVIEW
+  INCOMPLETE_METADATA
+}
+
+enum FileCategory {
+  GUIDELINE
+  SUPERVISOR_NOTE
+  FIGURE
+  DATASET
+  LITERATURE
+  OTHER
+}
+
+enum ExportFormat {
+  PDF
+  DOCX
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum LedgerType {
+  CREDIT_PURCHASE
+  OPERATION_DEBIT
+  PROMOTIONAL_CREDIT
+  REFUND
+  ADMIN_ADJUSTMENT
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+  EXPIRED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          UserRole  @default(STUDENT)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  studentProfile   StudentProfile?
+  academicProfile  AcademicProfile?
+  projects         Project[]
+  creditWallet     CreditWallet?
+  payments         Payment[]
+  supportTickets   SupportTicket[]
+  notifications    Notification[]
+  auditEvents      AuditEvent[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id           String    @id @default(cuid())
+  userId       String
+  accountId    String
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+  password     String?
+  createdAt    DateTime  @default(now())
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+}
+
+model StudentProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  firstName           String
+  lastName            String
+  preferredLanguage   String   @default("en")
+  country             String   @default("Cameroon")
+  onboardingCompleted Boolean  @default(false)
+  onboardingStep      Int      @default(1)
+  referralSource      String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AcademicProfile {
+  id                  String             @id @default(cuid())
+  userId              String             @unique
+  institutionId       String?
+  facultyId           String?
+  departmentId        String?
+  programmeId         String?
+  customInstitution   String?
+  qualification       QualificationLevel @default(BACHELORS)
+  academicSession     String
+  preferredStyle      String             @default("APA_7")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution         Institution?       @relation(fields: [institutionId], references: [id])
+  faculty             Faculty?           @relation(fields: [facultyId], references: [id])
+  department          Department?        @relation(fields: [departmentId], references: [id])
+  programme           Programme?         @relation(fields: [programmeId], references: [id])
+}
+
+model Institution {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  code        String      @unique
+  country     String      @default("Cameroon")
+  city        String?
+  logoUrl     String?
+  isVerified  Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  faculties   Faculty[]
+  templates   ProjectTemplate[]
+  academicProfiles AcademicProfile[]
+}
+
+model Faculty {
+  id            String       @id @default(cuid())
+  institutionId String
+  name          String
+  code          String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  institution   Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  departments   Department[]
+  templates     ProjectTemplate[]
+  academicProfiles AcademicProfile[]
+
+  @@unique([institutionId, name])
+}
+
+model Department {
+  id          String       @id @default(cuid())
+  facultyId   String
+  name        String
+  code        String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  faculty     Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  programmes  Programme[]
+  templates   ProjectTemplate[]
+  academicProfiles AcademicProfile[]
+
+  @@unique([facultyId, name])
+}
+
+model Programme {
+  id            String             @id @default(cuid())
+  departmentId  String
+  name          String
+  qualification QualificationLevel @default(BACHELORS)
+  durationYears Int                @default(3)
+  createdAt     DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  department    Department         @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  templates     ProjectTemplate[]
+  academicProfiles AcademicProfile[]
+
+  @@unique([departmentId, name, qualification])
+}
+
+model ProjectTemplate {
+  id            String              @id @default(cuid())
+  title         String
+  description   String?
+  institutionId String?
+  facultyId     String?
+  departmentId  String?
+  programmeId   String?
+  qualification QualificationLevel  @default(BACHELORS)
+  projectType   ProjectType         @default(APPLIED_SOFTWARE)
+  isOfficial    Boolean             @default(false)
+  isActive      Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  institution   Institution?        @relation(fields: [institutionId], references: [id])
+  faculty       Faculty?            @relation(fields: [facultyId], references: [id])
+  department    Department?         @relation(fields: [departmentId], references: [id])
+  programme     Programme?          @relation(fields: [programmeId], references: [id])
+  versions      TemplateVersion[]
+  projects      Project[]
+}
+
+model TemplateVersion {
+  id          String          @id @default(cuid())
+  templateId  String
+  version     Int             @default(1)
+  isPublished Boolean         @default(false)
+  changelog   String?
+  createdAt   DateTime        @default(now())
+  publishedAt DateTime?
+
+  template    ProjectTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  rules       TemplateRule?
+  sections    TemplateSection[]
+  projects    Project[]
+
+  @@unique([templateId, version])
+}
+
+model TemplateRule {
+  id                String          @id @default(cuid())
+  templateVersionId String          @unique
+  pageSize          String          @default("A4")
+  marginTopMm       Float           @default(25.4)
+  marginBottomMm    Float           @default(25.4)
+  marginLeftMm      Float           @default(38.1)
+  marginRightMm     Float           @default(25.4)
+  fontFamily        String          @default("Times New Roman")
+  fontSizeBodyPt    Float           @default(12.0)
+  lineSpacing       Float           @default(1.5)
+  paragraphIndentMm Float           @default(12.7)
+  heading1FontPt    Float           @default(16.0)
+  heading1Style     String          @default("BOLD_UPPERCASE")
+  heading2FontPt    Float           @default(14.0)
+  heading2Style     String          @default("BOLD_TITLECASE")
+  citationStyle     String          @default("APA_7")
+  requirePrelims    Json
+  createdAt         DateTime        @default(now())
+
+  templateVersion   TemplateVersion @relation(fields: [templateVersionId], references: [id], onDelete: Cascade)
+}
+
+model TemplateSection {
+  id                String          @id @default(cuid())
+  templateVersionId String
+  orderIndex        Int
+  title             String
+  sectionType       String
+  description       String?
+  requiredSubsections Json?
+  createdAt         DateTime        @default(now())
+
+  templateVersion   TemplateVersion @relation(fields: [templateVersionId], references: [id], onDelete: Cascade)
+
+  @@index([templateVersionId, orderIndex])
+}
+
+model Project {
+  id                String              @id @default(cuid())
+  userId            String
+  templateId        String?
+  templateVersionId String?
+  title             String
+  projectType       ProjectType         @default(APPLIED_SOFTWARE)
+  qualification     QualificationLevel  @default(BACHELORS)
+  programmeName     String?
+  submissionDeadline DateTime?
+  status            ProjectStatus       @default(PLANNING)
+  progressPercent   Int                 @default(0)
+  referencingStyle  String              @default("APA_7")
+  isArchived        Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template          ProjectTemplate?    @relation(fields: [templateId], references: [id])
+  templateVersion   TemplateVersion?    @relation(fields: [templateVersionId], references: [id])
+
+  brief             ProjectBrief?
+  outline           ProjectOutline?
+  sections          ProjectSection[]
+  tasks             ProjectTask[]
+  activities        ProjectActivity[]
+  sources           ProjectSource[]
+  files             FileAsset[]
+  exportJobs        ExportJob[]
+
+  @@index([userId, status])
+  @@index([userId, isArchived])
+}
+
+model ProjectBrief {
+  id                String   @id @default(cuid())
+  projectId         String   @unique
+  background        String   @db.Text
+  problemStatement  String   @db.Text
+  aim               String   @db.Text
+  objectives        Json
+  researchQuestions Json
+  scope             String   @db.Text
+  limitations       String   @db.Text
+  methodology       String   @db.Text
+  expectedOutcomes  String   @db.Text
+  targetEnvironment String?  @db.Text
+  isApproved        Boolean  @default(false)
+  approvedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectOutline {
+  id          String   @id @default(cuid())
+  projectId   String   @unique
+  structure   Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectSection {
+  id          String   @id @default(cuid())
+  projectId   String
+  parentId    String?
+  orderIndex  Int
+  title       String
+  sectionType String   @default("CHAPTER")
+  slug        String
+  content     Json?
+  wordCount   Int      @default(0)
+  version     Int      @default(1)
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent      ProjectSection?  @relation("SectionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    ProjectSection[] @relation("SectionHierarchy")
+  citations   Citation[]
+  versions    DocumentVersion[]
+
+  @@index([projectId, orderIndex])
+  @@index([projectId, parentId])
+}
+
+model DocumentVersion {
+  id          String         @id @default(cuid())
+  sectionId   String
+  versionNumber Int
+  content     Json
+  wordCount   Int
+  changeSummary String?
+  createdAt   DateTime       @default(now())
+
+  section     ProjectSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId, versionNumber])
+}
+
+model ProjectTask {
+  id          String    @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  dueDate     DateTime?
+  orderIndex  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, isCompleted])
+}
+
+model ProjectActivity {
+  id          String   @id @default(cuid())
+  projectId   String
+  action      String
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+}
+
+model ResearchSource {
+  id                String            @id @default(cuid())
+  doi               String?           @unique
+  openAlexId        String?           @unique
+  semanticScholarId String?           @unique
+  title             String            @db.Text
+  authors           Json
+  publicationYear   Int?
+  venue             String?
+  volume            String?
+  issue             String?
+  pages             String?
+  publisher         String?
+  abstract          String?           @db.Text
+  pdfUrl            String?
+  isOpenAccess      Boolean           @default(false)
+  verificationState VerificationState @default(METADATA_VERIFIED)
+  rawMetadata       Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  projectSources    ProjectSource[]
+  citations         Citation[]
+
+  @@index([title])
+  @@index([publicationYear])
+}
+
+model ProjectSource {
+  id          String         @id @default(cuid())
+  projectId   String
+  sourceId    String
+  studentNote String?        @db.Text
+  tags        Json?
+  isPinned    Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  source      ResearchSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, sourceId])
+}
+
+model Citation {
+  id          String         @id @default(cuid())
+  sectionId   String
+  sourceId    String
+  inlineText  String
+  citationKey String
+  createdAt   DateTime       @default(now())
+
+  section     ProjectSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  source      ResearchSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([sourceId])
+}
+
+model FileAsset {
+  id           String       @id @default(cuid())
+  projectId    String
+  fileName     String
+  fileSize     Int
+  mimeType     String
+  s3Key        String       @unique
+  category     FileCategory @default(OTHER)
+  extractedText String?     @db.Text
+  isProcessed  Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, category])
+}
+
+model ExportJob {
+  id           String       @id @default(cuid())
+  projectId    String
+  format       ExportFormat @default(PDF)
+  status       JobStatus    @default(QUEUED)
+  s3Key        String?
+  fileSize     Int?
+  errorMessage String?
+  createdAt    DateTime     @default(now())
+  completedAt  DateTime?
+
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+}
+
+model AiUsage {
+  id            String   @id @default(cuid())
+  userId        String
+  projectId     String?
+  operationType String
+  provider      String   @default("openrouter")
+  modelName     String
+  inputTokens   Int
+  outputTokens  Int
+  totalTokens   Int
+  providerCostUsd Float
+  creditsCharged  Int
+  durationMs    Int
+  status        String
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([operationType])
+  @@index([modelName])
+}
+
+model OperationPricing {
+  id            String   @id @default(cuid())
+  operationType String   @unique
+  displayName   String
+  creditCost    Int
+  modelTier     String   @default("ECONOMICAL")
+  defaultModel  String
+  isActive      Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+}
+
+model CreditWallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(50)
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ledgers   CreditLedger[]
+}
+
+model CreditLedger {
+  id          String     @id @default(cuid())
+  walletId    String
+  type        LedgerType
+  amount      Int
+  balanceAfter Int
+  description String
+  referenceId String?
+  metadata    Json?
+  createdAt   DateTime   @default(now())
+
+  wallet      CreditWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+  @@unique([walletId, referenceId, type])
+}
+
+model CreditPackage {
+  id          String   @id @default(cuid())
+  name        String
+  priceXaf    Int
+  credits     Int
+  isPopular   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  payments    Payment[]
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  packageId       String
+  amountXaf       Int
+  creditsAllocated Int
+  status          PaymentStatus @default(PENDING)
+  provider        String        @default("fapshi")
+  providerTransId String?       @unique
+  payerPhone      String?
+  paymentUrl      String?
+  failureReason   String?
+  createdAt       DateTime      @default(now())
+  completedAt     DateTime?
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package         CreditPackage @relation(fields: [packageId], references: [id])
+  webhookEvents   PaymentWebhookEvent[]
+
+  @@index([userId, status])
+  @@index([providerTransId])
+}
+
+model PaymentWebhookEvent {
+  id          String   @id @default(cuid())
+  paymentId   String?
+  eventType   String
+  payload     Json
+  isProcessed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  linkUrl   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
+
+model SupportTicket {
+  id          String           @id @default(cuid())
+  userId      String
+  subject     String
+  category    String
+  status      TicketStatus     @default(OPEN)
+  priority    String           @default("NORMAL")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    SupportMessage[]
+
+  @@index([userId, status])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  senderId  String
+  isAdmin   Boolean       @default(false)
+  message   String        @db.Text
+  createdAt DateTime      @default(now())
+
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  targetType String
+  targetId   String
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+}

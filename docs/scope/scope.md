@@ -47,10 +47,20 @@ Provision Cevo geometric icon and wordmark brand assets, configure responsive si
 - [x] Create centralized CevoLogo component with size presets and collapsed sidebar support
 Code in `components/cevo-logo.tsx`, `public/branding/`, `app/favicon.ico`
 
-### 3. Core Data Model & Schema Migration · in-progress · needs a decision
+### 3. Core Data Model & Schema Migration · in-progress
 Define the normalized PostgreSQL schema via Prisma covering users, profiles, academic hierarchy, templates, projects, document sections, research sources, credit ledger, and audit events.
 **Done when:** the Prisma schema passes validation, relations and cascading constraints are enforced, and initial migration applies cleanly to the PostgreSQL database.
-- [ ] Design it (spec): `/solution-architect core data model & schema migration`
+Spec: [0001](docs/specs/0001-core-data-model-schema-migration.md)
+- [x] Design it (spec): `/solution-architect core data model & schema migration`
+- [ ] Build it: /feature-build core data model & schema migration
+  - [ ] Create the Prisma schema and validate it (Satisfies AC-1, AC-2)
+  - [ ] Apply the initial migration against local PostgreSQL (Satisfies AC-3)
+  - [ ] Verify FK onDelete rules and financial record retention (Satisfies AC-2)
+  - [ ] Wire up db:validate script and CI deploy step (Satisfies AC-1, AC-3)
+- [ ] Verify it: /verify-release core data model & schema migration
+- [ ] Test it: /test-engineer core data model & schema migration
+- [ ] Review it (fresh model): /peer-review core data model & schema migration
+- [ ] Document it: /tech-writer core data model & schema migration
 
 ### 18. Local PostgreSQL via Docker Compose · Foundation · planned
 Provision a local PostgreSQL database with Docker Compose, modeled on the genesyst setup (postgres:15-alpine, a dedicated cevo user and database, a ready healthcheck, and a persisted volume) so the Prisma migrations in feature 3 have a running database to apply against on localhost:5432.
@@ -160,6 +170,7 @@ Out of scope for initial launch, recorded so the plan remains honest.
 - **Group project collaboration**: multi-student shared editing on capstone projects · needs a decision · GA
 - **Direct Turnitin integration**: institutional plagiarism index similarity scoring · needs a decision · GA
 - **International payment methods**: Stripe and credit cards for overseas students · needs a decision
+- **Capture stack conventions in root AGENTS.md**: Prisma, PostgreSQL, Better Auth, biome conventions · needs a decision · from spec 0001
 
 ## Legend
 
