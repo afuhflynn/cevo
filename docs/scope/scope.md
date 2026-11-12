@@ -29,6 +29,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
+| 19 | Branded Transactional Email Templates | Foundation | planned |
 
 ## Foundations
 
@@ -87,6 +88,11 @@ Code in app/api/auth/[...all]/route.ts, lib/auth.ts, lib/auth-adapter.ts, lib/au
 - [x] Test it: /test-engineer authentication & session management
 - [x] Review it (fresh model): /peer-review authentication & session management
 - [x] Document it: /tech-writer authentication & session management
+
+### 19. Branded Transactional Email Templates · needs a decision
+Build a reusable branded email layout with Cevo logo, primary color, and footer so every transactional email looks like it belongs to the platform and increases trust.
+**Done when:** verification and password reset emails render with logo header, primary action button in Cevo blue, footer with support and legal links, plain text fallback, and inbox safe HTML verified in Mailpit previews.
+- [ ] Design it (spec): `/solution-architect branded transactional email templates`
 
 ## Slice 1: Academic Onboarding & Institution Hierarchy
 
