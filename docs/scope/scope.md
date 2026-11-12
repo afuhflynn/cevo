@@ -29,7 +29,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
-| 19 | Branded Transactional Email Templates | Foundation | planned |
+| 19 | Branded Transactional Email Templates | Foundation | in-progress |
 
 ## Foundations
 
@@ -89,10 +89,20 @@ Code in app/api/auth/[...all]/route.ts, lib/auth.ts, lib/auth-adapter.ts, lib/au
 - [x] Review it (fresh model): /peer-review authentication & session management
 - [x] Document it: /tech-writer authentication & session management
 
-### 19. Branded Transactional Email Templates · needs a decision
+### 19. Branded Transactional Email Templates · in-progress
 Build a reusable branded email layout with Cevo logo, primary color, and footer so every transactional email looks like it belongs to the platform and increases trust.
 **Done when:** verification and password reset emails render with logo header, primary action button in Cevo blue, footer with support and legal links, plain text fallback, and inbox safe HTML verified in Mailpit previews.
-- [ ] Design it (spec): `/solution-architect branded transactional email templates`
+Spec: [0003](../specs/0003-branded-transactional-email-templates/index.md)
+- [x] Design it (spec): `/solution-architect branded transactional email templates`
+- [x] Build it: `/feature-build branded transactional email templates`
+  - [x] Branded verification mail end to end: layout helper, text part, extended send function, Mailpit preview (Satisfies AC-1, AC-3, AC-4)
+  - [x] Branded reset mail plus logo header and footer wiring: support contact, legal links, wordmark fallback (Satisfies AC-1, AC-2, AC-3, AC-4)
+  - [x] Unit asserts plus Mailpit preview checklist and presentation only confirm (Satisfies AC-4, AC-5)
+Code in `lib/email.ts`, `lib/auth.ts`
+- [ ] Verify it: /verify-release branded transactional email templates
+- [ ] Test it: /test-engineer branded transactional email templates
+- [ ] Review it (fresh model): /peer-review branded transactional email templates
+- [ ] Document it: /tech-writer branded transactional email templates
 
 ## Slice 1: Academic Onboarding & Institution Hierarchy
 

@@ -3,8 +3,10 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "./auth-adapter";
 import {
   resetPasswordEmailHtml,
+  resetPasswordEmailText,
   sendAuthEmail,
   verificationEmailHtml,
+  verificationEmailText,
 } from "./email";
 import { db } from "./prisma";
 
@@ -28,6 +30,7 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Reset your Cevo password",
         html: resetPasswordEmailHtml(url),
+        text: resetPasswordEmailText(url),
       });
     },
     resetPasswordTokenExpiresIn: 60 * 60,
@@ -40,6 +43,7 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Verify your Cevo email",
         html: verificationEmailHtml(link.toString()),
+        text: verificationEmailText(link.toString()),
       });
     },
     sendOnSignUp: true,
