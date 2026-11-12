@@ -686,6 +686,16 @@
                   "kind": "scalar"
                 }
               },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
               "userId": {
                 "nullable": false,
                 "type": {
@@ -737,6 +747,9 @@
                 },
                 "refreshToken": {
                   "column": "refreshToken"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 },
                 "userId": {
                   "column": "userId"
@@ -4663,6 +4676,16 @@
                   "kind": "scalar"
                 }
               },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
               "userAgent": {
                 "nullable": true,
                 "type": {
@@ -4712,6 +4735,9 @@
                 },
                 "token": {
                   "column": "token"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 },
                 "userAgent": {
                   "column": "userAgent"
@@ -5869,6 +5895,16 @@
                   "kind": "scalar"
                 }
               },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
               "value": {
                 "nullable": false,
                 "type": {
@@ -5891,6 +5927,9 @@
                 },
                 "identifier": {
                   "column": "identifier"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 },
                 "value": {
                   "column": "value"
@@ -6201,6 +6240,14 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
                 },
                 "userId": {
                   "codecId": "pg/text@1",
@@ -9479,6 +9526,14 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
                 "userAgent": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -10386,6 +10441,14 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
                 "value": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -10408,7 +10471,14 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "identifier",
+                    "value"
+                  ]
+                }
+              ]
             }
           },
           "valueSet": {
@@ -10519,10 +10589,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ed6723f50e679ec00814a8113823a61e7ed7669255dd86e42a6aff93ed98a09d"
+    "storageHash": "ff9d5471816dec3a39c981e1dbdf57b170867c73f252b7d9bd7eb3a60c7a9054"
   },
   "execution": {
-    "executionHash": "a74c13a858ad3a86b72c8ada9bbd6cd325c84fad393a332720fca88a5d36c5bd",
+    "executionHash": "7012de506b37539f852f1b24f7cdcd62bec03f6150ca09c9f1a74a13d24a2066",
     "mutations": {
       "defaults": [
         {
@@ -10565,6 +10635,27 @@
           "ref": {
             "entry": "Account",
             "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "Account",
+            "field": "updatedAt",
             "namespace": "public"
           }
         },
@@ -11182,6 +11273,27 @@
         },
         {
           "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "Session",
+            "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
             "id": "cuid2",
             "kind": "generator"
           },
@@ -11328,6 +11440,27 @@
           "ref": {
             "entry": "Verification",
             "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "Verification",
+            "field": "updatedAt",
             "namespace": "public"
           }
         }

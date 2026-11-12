@@ -116,6 +116,7 @@ model Session {
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @onCreate(now()) @onUpdate(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -130,6 +131,7 @@ model Account {
   expiresAt    DateTime?
   password     String?
   createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @onCreate(now()) @onUpdate(now())
 
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -142,8 +144,10 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @onCreate(now()) @onUpdate(now())
 
   @@index([identifier])
+  @@unique([identifier, value])
 }
 
 model StudentProfile {

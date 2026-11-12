@@ -1,5 +1,6 @@
 "use client";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type * as React from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toast";
@@ -12,7 +13,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <Toaster>{children}</Toaster>
+      <Toaster>
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </Toaster>
     </ThemeProvider>
   );
 }

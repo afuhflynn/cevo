@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'ed6723f50e679ec00814a8113823a61e7ed7669255dd86e42a6aff93ed98a09d'>;
+  StorageHashBase<'ff9d5471816dec3a39c981e1dbdf57b170867c73f252b7d9bd7eb3a60c7a9054'>;
 export type ExecutionHash =
-  ExecutionHashBase<'a74c13a858ad3a86b72c8ada9bbd6cd325c84fad393a332720fca88a5d36c5bd'>;
+  ExecutionHashBase<'7012de506b37539f852f1b24f7cdcd62bec03f6150ca09c9f1a74a13d24a2066'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -552,6 +552,7 @@ export namespace Models {
     password: FieldOutputTypes['public']['Account']['password'];
     providerId: FieldOutputTypes['public']['Account']['providerId'];
     refreshToken: FieldOutputTypes['public']['Account']['refreshToken'];
+    updatedAt: FieldOutputTypes['public']['Account']['updatedAt'];
     userId: FieldOutputTypes['public']['Account']['userId'];
     user: public_User;
     readonly [RelationKeys]?: 'user';
@@ -955,6 +956,7 @@ export namespace Models {
     id: FieldOutputTypes['public']['Session']['id'];
     ipAddress: FieldOutputTypes['public']['Session']['ipAddress'];
     token: FieldOutputTypes['public']['Session']['token'];
+    updatedAt: FieldOutputTypes['public']['Session']['updatedAt'];
     userAgent: FieldOutputTypes['public']['Session']['userAgent'];
     userId: FieldOutputTypes['public']['Session']['userId'];
     user: public_User;
@@ -1083,6 +1085,7 @@ export namespace Models {
     expiresAt: FieldOutputTypes['public']['Verification']['expiresAt'];
     id: FieldOutputTypes['public']['Verification']['id'];
     identifier: FieldOutputTypes['public']['Verification']['identifier'];
+    updatedAt: FieldOutputTypes['public']['Verification']['updatedAt'];
     value: FieldOutputTypes['public']['Verification']['value'];
     readonly [RelationKeys]?: never;
   };
@@ -1376,6 +1379,13 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
                   readonly many: false;
                 };
                 readonly userId: {
@@ -4030,6 +4040,13 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
                 readonly userAgent: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -4795,6 +4812,13 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
                 readonly value: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -4803,7 +4827,7 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
+              uniques: readonly [{ readonly columns: readonly ['identifier', 'value'] }];
               indexes: readonly [
                 {
                   readonly name: 'Verification_identifier_idx_79a0dbb3';
@@ -5196,6 +5220,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
               readonly userId: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -5224,6 +5256,7 @@ type ContractBase = Omit<
                 readonly password: { readonly column: 'password' };
                 readonly providerId: { readonly column: 'providerId' };
                 readonly refreshToken: { readonly column: 'refreshToken' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly userId: { readonly column: 'userId' };
               };
             };
@@ -7634,6 +7667,14 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
               readonly userAgent: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -7663,6 +7704,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly ipAddress: { readonly column: 'ipAddress' };
                 readonly token: { readonly column: 'token' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly userAgent: { readonly column: 'userAgent' };
                 readonly userId: { readonly column: 'userId' };
               };
@@ -8381,6 +8423,14 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
               readonly value: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -8395,6 +8445,7 @@ type ContractBase = Omit<
                 readonly expiresAt: { readonly column: 'expiresAt' };
                 readonly id: { readonly column: 'id' };
                 readonly identifier: { readonly column: 'identifier' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly value: { readonly column: 'value' };
               };
             };
@@ -8639,6 +8690,23 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Account';
             readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Account';
+            readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },
@@ -9114,6 +9182,23 @@ type ContractBase = Omit<
           };
         },
         {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Session';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
           readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'StudentProfile';
@@ -9225,6 +9310,23 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Verification';
             readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Verification';
+            readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },

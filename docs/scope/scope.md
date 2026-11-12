@@ -14,7 +14,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 1 | Stack & Design System Foundation | Foundation | done |
 | 2 | Brand Assets & Central Logo Component | Foundation | done |
 | 3 | Core Data Model & Schema Migration | Foundation | in-progress |
-| 4 | Authentication & Session Management | Foundation | planned |
+| 4 | Authentication & Session Management | Foundation | done |
 | 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | planned |
 | 6 | Student Dashboard & Project Catalog | Slice 2 | planned |
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | planned |
@@ -72,10 +72,21 @@ Code in `docker-compose.yml`
 **Verification:** `docker compose up` starts `cevo-db` (`postgres:15-alpine`) healthy on `localhost:5432`; `pg_isready -U cevo_user` passes and an authenticated connection as `cevo_user` to the `cevo` database succeeds, matching the `DATABASE_URL` in `.env.example`. The `postgres_data` volume persists data across restarts. `pnpm db:migrate` (Prisma 8's `contract emit → migration plan → db migrate` flow) applies the initial migration cleanly — `20261111T1145_init` with 163 ops, status "Up to date".
 **Heads up:** I stopped `nightly-db` (another project's container on port 5432) to free the port cevo needs, and left `cevo-db` running. The `prisma.config.ts` was configured with `@prisma/orm-postgres` for Prisma 8, and `prisma/schema.prisma` was updated to Prisma 8 syntax (`// use prisma-8` directive, `@onCreate(cuid(2))` instead of `@default(cuid())`, `@onCreate(now()) @onUpdate(now())` instead of `@updatedAt`, `Text` type instead of `@db.Text`, `generator`/`datasource` blocks moved to `prisma.config.ts`).
 
-### 4. Authentication & Session Management · needs a decision
+### 4. Authentication & Session Management · done
 Implement student and administrator authentication with Better Auth, including registration, email verification, password reset, and session cookies.
 **Done when:** students can sign up with email and password, receive a verification email, sign in securely, and access role-guarded routes.
-- [ ] Design it (spec): `/solution-architect authentication & session management`
+Spec: [0002](../specs/0002-authentication-session-management/index.md)
+Code in app/api/auth/[...all]/route.ts, lib/auth.ts, lib/auth-adapter.ts, lib/auth-helpers.ts, lib/auth-client.ts, lib/arcjet.ts, lib/email.ts, lib/prisma.ts, lib/search-params.ts, app/(auth)/, app/admin/layout.tsx, app/forbidden.tsx, docker-compose.yml (mailpit), docs/SEARCH_PARAMS.md
+- [x] Design it (spec): `/solution-architect authentication & session management`
+- [x] Build it: `/feature-build authentication & session management`
+  - [x] Foundation & adapter: spike Prisma 8 adapter binding, install nodemailer/@arcjet/next, create the auth route handler (Satisfies AC-1, AC-2, AC-4)
+  - [x] Email verification & password reset: configure emailAndPassword with Argon2id cost 12, session sliding expiry, verification identifier convention and additive migration, single-use tokens (Satisfies AC-1, AC-3, AC-4)
+  - [x] Authorization & rate limiting: requireAdmin guard reading role from DB, AuditEvent logging on denial, Arcjet rate limits with 429 RATE_LIMITED (Satisfies AC-5, AC-6)
+  - [x] UI pages & end-to-end verification: sign in/sign up/forgot/reset pages, Mailpit dev mail capture, full sign up → verify → sign in → guard → reset → sign out flow (Satisfies AC-1, AC-2, AC-3, AC-5, AC-6)
+- [x] Verify it: /verify-release authentication & session management
+- [x] Test it: /test-engineer authentication & session management
+- [x] Review it (fresh model): /peer-review authentication & session management
+- [x] Document it: /tech-writer authentication & session management
 
 ## Slice 1: Academic Onboarding & Institution Hierarchy
 

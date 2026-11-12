@@ -12,6 +12,10 @@
 
 # testing
 /coverage
+/test-results/
+
+# firecrawl scratch output
+.firecrawl/
 
 # next.js
 /.next/
