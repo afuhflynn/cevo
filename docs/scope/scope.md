@@ -18,7 +18,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | in-progress |
 | 6 | Student Dashboard & Project Catalog | Slice 2 | in-progress |
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | in-progress |
-| 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | planned |
+| 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | in-progress |
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | planned |
 | 10 | Verified Research Discovery & Citations | Slice 6 | planned |
 | 11 | File Management & Private Storage | Slice 7 | planned |
@@ -166,10 +166,21 @@ Code in `app/api/wizard/`, `app/dashboard/wizard/`, `app/dashboard/new/`, `compo
 
 ## Slice 4: Document Workspace & Tiptap Editor Canvas
 
-### 8. Document Workspace & Tiptap Editor Canvas · needs a decision
+### 8. Document Workspace & Tiptap Editor Canvas · in-progress
 Implement the primary three panel workspace with a document tree, Tiptap rich text canvas, and debounced autosave.
 **Done when:** students can navigate chapters, format text, insert tables and citations, and experience reliable autosave with local storage safety nets.
-- [ ] Design it (spec): `/solution-architect document workspace & tiptap editor canvas`
+Spec: [0007](../specs/0007-document-workspace-tiptap-editor/index.md)
+- [x] Design it (spec): `/solution-architect document workspace & tiptap editor canvas`
+- [x] Build it: `/feature-build document workspace & tiptap editor canvas`
+  - [x] Thin thread plus editor: workspace shell, tree read, Tiptap copy restyled to theme with fixed and bubble toolbars (Satisfies AC-1, AC-2, AC-7)
+  - [x] Tree operations: add, rename, delete with subtree confirm, reorder, nesting guard, completion toggle (Satisfies AC-1, AC-6)
+  - [x] Autosave plus citations: 800ms save, offline queue, conflict banner, local mirror, placeholder citation marks (Satisfies AC-3, AC-4, AC-5)
+  - [x] Inspector plus guards: outline, word counts, save state, owner scoping, audit, keyboard support (Satisfies AC-7, AC-8)
+Code in `app/dashboard/projects/[id]/workspace/`, `app/api/projects/[projectId]/`, `components/workspace/`, `lib/workspace*.ts` (tiptap 3.33.1, React 19 verified via typecheck plus build)
+- [ ] Verify it: /verify-release document workspace & tiptap editor canvas
+- [ ] Test it: /test-engineer document workspace & tiptap editor canvas
+- [ ] Review it (fresh model): /peer-review document workspace & tiptap editor canvas
+- [ ] Document it: /tech-writer document workspace & tiptap editor canvas
 
 ## Slice 5: Contextual AI Assistant & Diff Previews
 

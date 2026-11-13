@@ -65,6 +65,20 @@ const wizardSynthesisLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 10, window: "1h" })] })
   : null;
 
+const workspaceLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 120, window: "1m" })] })
+  : null;
+
+export async function checkWorkspaceRateLimit(req: Request): Promise<boolean> {
+  if (!workspaceLimiter) return true;
+  const decision = await workspaceLimiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn("[arcjet] decision error on workspace-write, failing open");
+    return true;
+  }
+  return !decision.isDenied();
+}
+
 export type WizardRateLimitKind = "wizard-turn" | "wizard-synthesis";
 
 export async function checkWizardRateLimit(

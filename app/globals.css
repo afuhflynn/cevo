@@ -175,3 +175,77 @@
     @apply bg-background text-foreground;
   }
 }
+
+.cevo-workspace { display: flex; flex-direction: column; gap: 0.75rem; }
+.cevo-ws-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.cevo-muted { color: var(--muted-foreground); font-size: 0.85rem; }
+.cevo-workspace-bar { display: flex; align-items: center; gap: 0.5rem; }
+.cevo-workspace-bar button { border: 1px solid var(--border); background: var(--card); color: var(--card-foreground); border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.85rem; }
+.cevo-workspace-bar button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.cevo-mini { margin-left: auto; font-size: 0.8rem; color: var(--muted-foreground); }
+.cevo-workspace-grid { display: grid; grid-template-columns: 280px minmax(0, 1fr) 300px; gap: 0.75rem; min-height: 60vh; }
+.cevo-rail-left { border: 1px solid var(--border); background: var(--card); border-radius: 0.75rem; padding: 0.6rem; overflow: auto; max-height: 75vh; }
+.cevo-rail-center { border: 1px solid var(--border); background: var(--card); border-radius: 0.75rem; overflow: hidden; display: flex; flex-direction: column; min-height: 60vh; }
+.cevo-inspector { border: 1px solid var(--border); background: var(--card); border-radius: 0.75rem; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.9rem; max-height: 75vh; overflow: auto; }
+.cevo-rail-right { display: contents; }
+.cevo-inspector-block h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted-foreground); margin-bottom: 0.3rem; }
+.cevo-inspector-block ol { display: flex; flex-direction: column; gap: 0.2rem; }
+.cevo-inspector-block ol button { text-align: left; font-size: 0.85rem; color: var(--foreground); }
+.cevo-inspector-block ol button:hover { color: var(--primary); }
+.cevo-tree-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; }
+.cevo-tree-add { font-size: 0.8rem; color: var(--primary); }
+.cevo-tree-row { display: flex; align-items: center; gap: 0.35rem; border-radius: 0.5rem; padding: 0.25rem 0.3rem; }
+.cevo-tree-row.is-active { background: var(--accent); }
+.cevo-tree-row.is-active .cevo-tree-name { color: var(--accent-foreground); font-weight: 600; }
+.cevo-tree-chevron { width: 1.1rem; color: var(--muted-foreground); }
+.cevo-tree-dash { width: 1.1rem; text-align: center; color: var(--muted-foreground); }
+.cevo-bubble-ai { color: var(--primary); font-weight: 600; font-size: 0.8rem; padding: 0.2rem 0.45rem; }
+.cevo-tree-row:focus-within { outline: 2px solid var(--ring); }
+.cevo-tree-title { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 0.4rem; min-width: 0; text-align: left; }
+.cevo-tree-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem; }
+.cevo-tree-count { font-size: 0.7rem; color: var(--muted-foreground); }
+.cevo-tree-input { flex: 1; border: 1px solid var(--input); border-radius: 0.4rem; padding: 0.15rem 0.4rem; background: var(--background); }
+.cevo-tree-actions { display: flex; gap: 0.1rem; opacity: 0.7; }
+.cevo-tree-actions button { padding: 0.1rem 0.25rem; border-radius: 0.3rem; font-size: 0.75rem; }
+.cevo-tree-actions button:hover { background: var(--muted); }
+.cevo-tree-actions button:focus-visible { outline: 2px solid var(--ring); }
+.cevo-tree-empty { font-size: 0.85rem; color: var(--muted-foreground); }
+.cevo-toolbar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); background: var(--card); }
+.cevo-tool-btn { border: 1px solid var(--border); background: var(--background); border-radius: 0.4rem; padding: 0.2rem 0.45rem; font-size: 0.8rem; }
+.cevo-tool-btn[data-active] { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.cevo-tool-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.cevo-tool-sep { width: 1px; height: 1.2rem; background: var(--border); margin: 0 0.2rem; }
+.cevo-bubble { display: flex; gap: 0.2rem; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.3rem; box-shadow: var(--shadow-md); }
+.cevo-bubble button { padding: 0.2rem 0.45rem; border-radius: 0.4rem; font-size: 0.8rem; }
+.cevo-bubble button[data-active] { background: var(--accent); }
+.cevo-canvas-scroll { overflow: auto; max-height: 70vh; }
+.cevo-canvas { outline: none; }
+.cevo-canvas .tiptap { padding: 2rem 2.5rem; min-height: 50vh; font-family: var(--font-serif, Georgia, serif); line-height: 1.7; }
+.cevo-canvas .tiptap:focus { outline: none; }
+.cevo-canvas .tiptap h1 { font-size: 1.6rem; font-weight: 700; margin: 1.2em 0 0.5em; }
+.cevo-canvas .tiptap h2 { font-size: 1.3rem; font-weight: 700; margin: 1em 0 0.4em; }
+.cevo-canvas .tiptap h3 { font-size: 1.1rem; font-weight: 700; margin: 0.9em 0 0.3em; }
+.cevo-canvas .tiptap p { margin: 0.6em 0; }
+.cevo-canvas .tiptap blockquote { border-left: 3px solid var(--border); padding-left: 1rem; color: var(--muted-foreground); margin: 1em 0; }
+.cevo-canvas .tiptap code { background: var(--muted); border-radius: 0.3rem; padding: 0.1rem 0.3rem; font-size: 0.85em; }
+.cevo-canvas .tiptap pre { background: var(--muted); border-radius: 0.6rem; padding: 1rem; overflow: auto; }
+.cevo-canvas .tiptap a { color: var(--primary); text-decoration: underline; }
+.cevo-canvas .tiptap ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+.cevo-canvas .tiptap table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+.cevo-canvas .tiptap th, .cevo-canvas .tiptap td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; }
+.cevo-canvas .tiptap th { background: var(--muted); }
+.cevo-citation { background: var(--accent); color: var(--accent-foreground); border-radius: 0.4rem; padding: 0 0.3rem; font-size: 0.85em; cursor: pointer; }
+.cevo-save { font-size: 0.8rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.1rem 0.6rem; }
+.cevo-save-saved { background: var(--accent); }
+.cevo-save-saving { background: var(--muted); }
+.cevo-save-offline { background: var(--secondary); }
+.cevo-save-error { background: var(--destructive); color: var(--destructive-foreground); }
+.cevo-save-retry { text-decoration: underline; }
+.cevo-conflict { border: 1px solid var(--destructive); background: var(--card); border-radius: 0.6rem; padding: 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.cevo-conflict-actions { display: flex; gap: 0.5rem; }
+.cevo-conflict-actions button { border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.3rem 0.7rem; }
+.cevo-conflict-keep { background: var(--primary); color: var(--primary-foreground); }
+.cevo-empty { padding: 3rem 2rem; text-align: center; display: flex; flex-direction: column; gap: 0.6rem; align-items: center; }
+.cevo-canvas-fallback { padding: 2rem; }
+@media (max-width: 1100px) { .cevo-workspace-grid { grid-template-columns: 280px minmax(0, 1fr); } .cevo-inspector { display: none; } }
+@media (max-width: 760px) { .cevo-workspace-grid { grid-template-columns: minmax(0, 1fr); } .cevo-rail-left { max-height: none; } }

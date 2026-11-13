@@ -35,8 +35,14 @@ export default async function ProjectWorkspacePlaceholder({
         </CardHeader>
         <CardContent className="flex gap-2">
           <Link
-            href="/dashboard"
+            href={`/dashboard/projects/${project.id}/workspace`}
             className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground"
+          >
+            Open workspace
+          </Link>
+          <Link
+            href="/dashboard"
+            className="inline-flex h-8 items-center justify-center rounded-lg border px-2.5 text-sm font-medium"
           >
             Back to dashboard
           </Link>
