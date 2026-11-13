@@ -1,0 +1,989 @@
+[
+  {
+    "id": "table.BriefVersion",
+    "label": "Create table \"BriefVersion\"",
+    "summary": "Creates table \"BriefVersion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "BriefVersion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"BriefVersion\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"BriefVersion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"BriefVersion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"BriefVersion\"",
+        "sql": "CREATE TABLE \"public\".\"BriefVersion\" (\n  \"briefId\" text NOT NULL,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"modelId\" text,\n  \"payload\" json NOT NULL,\n  \"tokenCost\" int4 DEFAULT 0 NOT NULL,\n  \"version\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"BriefVersion\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"BriefVersion\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"BriefVersion\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.WizardSession",
+    "label": "Create table \"WizardSession\"",
+    "summary": "Creates table \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"WizardSession\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"WizardSession\"",
+        "sql": "CREATE TABLE \"public\".\"WizardSession\" (\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"currentBriefVersion\" int4 DEFAULT 0 NOT NULL,\n  \"currentStep\" int4 DEFAULT 1 NOT NULL,\n  \"expiresAt\" timestamptz(3) NOT NULL,\n  \"id\" text NOT NULL,\n  \"idempotencyKey\" text NOT NULL,\n  \"projectId\" text,\n  \"readiness\" json,\n  \"status\" text DEFAULT 'DRAFT' NOT NULL,\n  \"suggestedTemplateId\" text,\n  \"updatedAt\" timestamptz(3) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"WizardSession_status_check_1e195f92\" CHECK (\"status\" IN ('DRAFT', 'CHATTING', 'SYNTHESIZING', 'AWAITING_APPROVAL', 'APPROVED', 'ABANDONED', 'EXPIRED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"WizardSession\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"WizardSession\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.WizardTurn",
+    "label": "Create table \"WizardTurn\"",
+    "summary": "Creates table \"WizardTurn\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "WizardTurn"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"WizardTurn\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"WizardTurn\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"WizardTurn\"",
+        "sql": "CREATE TABLE \"public\".\"WizardTurn\" (\n  \"answerText\" text NOT NULL,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"fieldKey\" text NOT NULL,\n  \"followupText\" text,\n  \"id\" text NOT NULL,\n  \"isSufficient\" bool DEFAULT false NOT NULL,\n  \"promptText\" text NOT NULL,\n  \"sessionId\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"WizardTurn_fieldKey_check_308e774c\" CHECK (\"fieldKey\" IN ('BACKGROUND', 'PROBLEM', 'AIM', 'OBJECTIVES', 'QUESTIONS', 'SCOPE', 'LIMITATIONS', 'METHODOLOGY', 'OUTCOMES'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"WizardTurn\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"WizardTurn\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "column.public.ProjectBrief.modelId",
+    "label": "Add column \"modelId\" to \"ProjectBrief\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "modelId",
+        "table": "ProjectBrief"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"modelId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "modelId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"modelId\" on \"ProjectBrief\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"modelId\"",
+        "sql": "ALTER TABLE \"public\".\"ProjectBrief\" ADD COLUMN \"modelId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"modelId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "modelId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"modelId\" on \"ProjectBrief\""
+        }
+      },
+      {
+        "description": "verify column \"modelId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "modelId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ProjectBrief.synthesisCost",
+    "label": "Add column \"synthesisCost\" to \"ProjectBrief\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "synthesisCost",
+        "table": "ProjectBrief"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"synthesisCost\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "synthesisCost"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"synthesisCost\" on \"ProjectBrief\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"synthesisCost\"",
+        "sql": "ALTER TABLE \"public\".\"ProjectBrief\" ADD COLUMN \"synthesisCost\" int4 DEFAULT 0 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"synthesisCost\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "synthesisCost"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"synthesisCost\" on \"ProjectBrief\""
+        }
+      },
+      {
+        "description": "verify column \"synthesisCost\" has type \"integer\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "synthesisCost",
+          "integer"
+        ]
+      },
+      {
+        "description": "verify column \"synthesisCost\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "synthesisCost",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ProjectBrief.version",
+    "label": "Add column \"version\" to \"ProjectBrief\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "version",
+        "table": "ProjectBrief"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"version\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "version"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"version\" on \"ProjectBrief\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"version\"",
+        "sql": "ALTER TABLE \"public\".\"ProjectBrief\" ADD COLUMN \"version\" int4 DEFAULT 1 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"version\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "version"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"version\" on \"ProjectBrief\""
+        }
+      },
+      {
+        "description": "verify column \"version\" has type \"integer\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "version",
+          "integer"
+        ]
+      },
+      {
+        "description": "verify column \"version\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ProjectBrief",
+          "version",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.BriefVersion.BriefVersion_briefId_version_key",
+    "label": "Add unique constraint on \"BriefVersion\" (briefId, version)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "BriefVersion_briefId_version_key",
+        "table": "BriefVersion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"BriefVersion_briefId_version_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "BriefVersion_briefId_version_key",
+          "public",
+          "\"public\".\"BriefVersion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"BriefVersion_briefId_version_key\" on \"BriefVersion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"BriefVersion_briefId_version_key\"",
+        "sql": "ALTER TABLE \"public\".\"BriefVersion\" ADD CONSTRAINT \"BriefVersion_briefId_version_key\" UNIQUE (\"briefId\", \"version\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"BriefVersion_briefId_version_key\" exists on (briefId, version)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "BriefVersion_briefId_version_key",
+          "public",
+          "\"public\".\"BriefVersion\"",
+          "u",
+          "[\"briefId\",\"version\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.WizardSession.WizardSession_idempotencyKey_key",
+    "label": "Add unique constraint on \"WizardSession\" (idempotencyKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "WizardSession_idempotencyKey_key",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"WizardSession_idempotencyKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "WizardSession_idempotencyKey_key",
+          "public",
+          "\"public\".\"WizardSession\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"WizardSession_idempotencyKey_key\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"WizardSession_idempotencyKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD CONSTRAINT \"WizardSession_idempotencyKey_key\" UNIQUE (\"idempotencyKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"WizardSession_idempotencyKey_key\" exists on (idempotencyKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "WizardSession_idempotencyKey_key",
+          "public",
+          "\"public\".\"WizardSession\"",
+          "u",
+          "[\"idempotencyKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.BriefVersion.BriefVersion_briefId_idx_c24a8d6e",
+    "label": "Create index \"BriefVersion_briefId_idx_c24a8d6e\" on \"BriefVersion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "BriefVersion_briefId_idx_c24a8d6e",
+        "table": "BriefVersion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"BriefVersion_briefId_idx_c24a8d6e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"BriefVersion_briefId_idx_c24a8d6e\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"BriefVersion_briefId_idx_c24a8d6e\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"BriefVersion_briefId_idx_c24a8d6e\"",
+        "sql": "CREATE INDEX \"BriefVersion_briefId_idx_c24a8d6e\" ON \"public\".\"BriefVersion\" (\"briefId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"BriefVersion_briefId_idx_c24a8d6e\" exists on \"BriefVersion\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"BriefVersion_briefId_idx_c24a8d6e\"",
+          "i",
+          "I",
+          "\"public\".\"BriefVersion\"",
+          "btree",
+          "[\"briefId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardSession.WizardSession_projectId_idx_a96e4d92",
+    "label": "Create index \"WizardSession_projectId_idx_a96e4d92\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardSession_projectId_idx_a96e4d92",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardSession_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_projectId_idx_a96e4d92\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardSession_projectId_idx_a96e4d92\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardSession_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"WizardSession_projectId_idx_a96e4d92\" ON \"public\".\"WizardSession\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardSession_projectId_idx_a96e4d92\" exists on \"WizardSession\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_projectId_idx_a96e4d92\"",
+          "i",
+          "I",
+          "\"public\".\"WizardSession\"",
+          "btree",
+          "[\"projectId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardSession.WizardSession_userId_idx_a489d58a",
+    "label": "Create index \"WizardSession_userId_idx_a489d58a\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardSession_userId_idx_a489d58a",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardSession_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_idx_a489d58a\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardSession_userId_idx_a489d58a\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardSession_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"WizardSession_userId_idx_a489d58a\" ON \"public\".\"WizardSession\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardSession_userId_idx_a489d58a\" exists on \"WizardSession\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_idx_a489d58a\"",
+          "i",
+          "I",
+          "\"public\".\"WizardSession\"",
+          "btree",
+          "[\"userId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardSession.WizardSession_userId_status_idx_e4a128ba",
+    "label": "Create index \"WizardSession_userId_status_idx_e4a128ba\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardSession_userId_status_idx_e4a128ba",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardSession_userId_status_idx_e4a128ba\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_status_idx_e4a128ba\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardSession_userId_status_idx_e4a128ba\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardSession_userId_status_idx_e4a128ba\"",
+        "sql": "CREATE INDEX \"WizardSession_userId_status_idx_e4a128ba\" ON \"public\".\"WizardSession\" (\"userId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardSession_userId_status_idx_e4a128ba\" exists on \"WizardSession\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_status_idx_e4a128ba\"",
+          "i",
+          "I",
+          "\"public\".\"WizardSession\"",
+          "btree",
+          "[\"userId\",\"status\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardSession.WizardSession_userId_updatedAt_idx_42f5280d",
+    "label": "Create index \"WizardSession_userId_updatedAt_idx_42f5280d\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardSession_userId_updatedAt_idx_42f5280d",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardSession_userId_updatedAt_idx_42f5280d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_updatedAt_idx_42f5280d\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardSession_userId_updatedAt_idx_42f5280d\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardSession_userId_updatedAt_idx_42f5280d\"",
+        "sql": "CREATE INDEX \"WizardSession_userId_updatedAt_idx_42f5280d\" ON \"public\".\"WizardSession\" (\"userId\", \"updatedAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardSession_userId_updatedAt_idx_42f5280d\" exists on \"WizardSession\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardSession_userId_updatedAt_idx_42f5280d\"",
+          "i",
+          "I",
+          "\"public\".\"WizardSession\"",
+          "btree",
+          "[\"userId\",\"updatedAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardTurn.WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858",
+    "label": "Create index \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\" on \"WizardTurn\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858",
+        "table": "WizardTurn"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\"",
+        "sql": "CREATE INDEX \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\" ON \"public\".\"WizardTurn\" (\"sessionId\", \"fieldKey\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\" exists on \"WizardTurn\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858\"",
+          "i",
+          "I",
+          "\"public\".\"WizardTurn\"",
+          "btree",
+          "[\"sessionId\",\"fieldKey\",\"createdAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.WizardTurn.WizardTurn_sessionId_idx_29f415d4",
+    "label": "Create index \"WizardTurn_sessionId_idx_29f415d4\" on \"WizardTurn\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "WizardTurn_sessionId_idx_29f415d4",
+        "table": "WizardTurn"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"WizardTurn_sessionId_idx_29f415d4\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn_sessionId_idx_29f415d4\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"WizardTurn_sessionId_idx_29f415d4\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"WizardTurn_sessionId_idx_29f415d4\"",
+        "sql": "CREATE INDEX \"WizardTurn_sessionId_idx_29f415d4\" ON \"public\".\"WizardTurn\" (\"sessionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"WizardTurn_sessionId_idx_29f415d4\" exists on \"WizardTurn\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"WizardTurn_sessionId_idx_29f415d4\"",
+          "i",
+          "I",
+          "\"public\".\"WizardTurn\"",
+          "btree",
+          "[\"sessionId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.BriefVersion.BriefVersion_briefId_fkey",
+    "label": "Add foreign key \"BriefVersion_briefId_fkey\" on \"BriefVersion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "BriefVersion_briefId_fkey",
+        "table": "BriefVersion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"BriefVersion_briefId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "BriefVersion_briefId_fkey",
+          "public",
+          "\"public\".\"BriefVersion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"BriefVersion_briefId_fkey\" on \"BriefVersion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"BriefVersion_briefId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"BriefVersion\"\nADD CONSTRAINT \"BriefVersion_briefId_fkey\"\nFOREIGN KEY (\"briefId\")\nREFERENCES \"public\".\"ProjectBrief\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"BriefVersion_briefId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "BriefVersion_briefId_fkey",
+          "public",
+          "\"public\".\"BriefVersion\"",
+          "f",
+          "[\"briefId\"]",
+          "\"public\".\"ProjectBrief\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.WizardSession.WizardSession_userId_fkey",
+    "label": "Add foreign key \"WizardSession_userId_fkey\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "WizardSession_userId_fkey",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"WizardSession_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "WizardSession_userId_fkey",
+          "public",
+          "\"public\".\"WizardSession\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"WizardSession_userId_fkey\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"WizardSession_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\"\nADD CONSTRAINT \"WizardSession_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"WizardSession_userId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "WizardSession_userId_fkey",
+          "public",
+          "\"public\".\"WizardSession\"",
+          "f",
+          "[\"userId\"]",
+          "\"public\".\"User\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.WizardSession.WizardSession_projectId_fkey",
+    "label": "Add foreign key \"WizardSession_projectId_fkey\" on \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "WizardSession_projectId_fkey",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"WizardSession_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "WizardSession_projectId_fkey",
+          "public",
+          "\"public\".\"WizardSession\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"WizardSession_projectId_fkey\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"WizardSession_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\"\nADD CONSTRAINT \"WizardSession_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"Project\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"WizardSession_projectId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "WizardSession_projectId_fkey",
+          "public",
+          "\"public\".\"WizardSession\"",
+          "f",
+          "[\"projectId\"]",
+          "\"public\".\"Project\"",
+          "[\"id\"]",
+          "a",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.WizardTurn.WizardTurn_sessionId_fkey",
+    "label": "Add foreign key \"WizardTurn_sessionId_fkey\" on \"WizardTurn\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "WizardTurn_sessionId_fkey",
+        "table": "WizardTurn"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"WizardTurn_sessionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "WizardTurn_sessionId_fkey",
+          "public",
+          "\"public\".\"WizardTurn\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"WizardTurn_sessionId_fkey\" on \"WizardTurn\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"WizardTurn_sessionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"WizardTurn\"\nADD CONSTRAINT \"WizardTurn_sessionId_fkey\"\nFOREIGN KEY (\"sessionId\")\nREFERENCES \"public\".\"WizardSession\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"WizardTurn_sessionId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "WizardTurn_sessionId_fkey",
+          "public",
+          "\"public\".\"WizardTurn\"",
+          "f",
+          "[\"sessionId\"]",
+          "\"public\".\"WizardSession\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  }
+]

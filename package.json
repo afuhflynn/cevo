@@ -33,9 +33,11 @@
   "dependencies": {
     "@arcjet/next": "^1.15.0",
     "@base-ui/react": "^1.9.0",
+    "@openrouter/ai-sdk-provider": "^3.1.0",
     "@shadcn/react": "^0.3.1",
     "@tanstack/react-query": "^5.107.1",
     "@vercel/speed-insights": "^2.1.0",
+    "ai": "^7.0.170",
     "argon2": "^0.45.2",
     "better-auth": "^1.7.18",
     "class-variance-authority": "^0.7.1",

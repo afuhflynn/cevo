@@ -85,6 +85,28 @@ enum TicketStatus {
   CLOSED
 }
 
+enum WizardSessionStatus {
+  DRAFT
+  CHATTING
+  SYNTHESIZING
+  AWAITING_APPROVAL
+  APPROVED
+  ABANDONED
+  EXPIRED
+}
+
+enum WizardFieldKey {
+  BACKGROUND
+  PROBLEM
+  AIM
+  OBJECTIVES
+  QUESTIONS
+  SCOPE
+  LIMITATIONS
+  METHODOLOGY
+  OUTCOMES
+}
+
 model User {
   id            String    @id @onCreate(cuid(2))
   name          String
@@ -106,6 +128,7 @@ model User {
   supportTickets   SupportTicket[]
   notifications    Notification[]
   auditEvents      AuditEvent[]
+  wizardSessions   WizardSession[]
 }
 
 model Session {
@@ -360,6 +383,7 @@ model Project {
   sources           ProjectSource[]
   files             FileAsset[]
   exportJobs        ExportJob[]
+  wizardSessions    WizardSession[]
 
   @@index([userId, status])
   @@index([userId, isArchived])
@@ -380,10 +404,14 @@ model ProjectBrief {
   targetEnvironment Text?
   isApproved        Boolean  @default(false)
   approvedAt        DateTime?
+  version           Int      @default(1)
+  modelId           String?
+  synthesisCost     Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @onCreate(now()) @onUpdate(now())
 
   project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions          BriefVersion[]
 }
 
 model ProjectOutline {
@@ -720,4 +748,61 @@ model AuditEvent {
 
   @@index([action, createdAt])
   @@index([targetType, targetId])
+}
+
+model WizardSession {
+  id                 String               @id @onCreate(cuid(2))
+  userId             String
+  projectId          String?
+  currentStep        Int                  @default(1)
+  status             WizardSessionStatus  @default(DRAFT)
+  readiness          Json?
+  suggestedTemplateId String?
+  idempotencyKey     String               @unique
+  approvalKey        String?              @unique
+  expiresAt          DateTime
+  currentBriefVersion Int                 @default(0)
+  title              String?
+  qualification      String?
+  departmentName     String?
+  programmeName      String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @onCreate(now()) @onUpdate(now())
+
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project            Project?             @relation(fields: [projectId], references: [id])
+  turns              WizardTurn[]
+
+  @@index([userId, status])
+  @@index([userId, updatedAt])
+}
+
+model WizardTurn {
+  id           String         @id @onCreate(cuid(2))
+  sessionId    String
+  fieldKey     WizardFieldKey
+  promptText   Text
+  answerText   Text
+  followupText Text?
+  isSufficient Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+
+  session      WizardSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, fieldKey, createdAt])
+}
+
+model BriefVersion {
+  id        String       @id @onCreate(cuid(2))
+  briefId   String
+  version   Int
+  payload   Json
+  modelId   String?
+  tokenCost Int          @default(0)
+  createdAt DateTime     @default(now())
+
+  brief     ProjectBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+
+  @@unique([briefId, version])
+  @@index([briefId, version])
 }

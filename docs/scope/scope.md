@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4 | Authentication & Session Management | Foundation | done |
 | 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | in-progress |
 | 6 | Student Dashboard & Project Catalog | Slice 2 | in-progress |
-| 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | planned |
+| 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | in-progress |
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | planned |
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | planned |
 | 10 | Verified Research Discovery & Citations | Slice 6 | planned |
@@ -148,10 +148,21 @@ Code in `app/dashboard/`, `app/api/dashboard/projects/route.ts`, `lib/dashboard.
 
 ## Slice 3: Project Creation Wizard & Conversational Briefing
 
-### 7. Project Creation Wizard & Conversational Briefing · needs a decision
+### 7. Project Creation Wizard & Conversational Briefing · in-progress
 Build a 5-step wizard that turns an initial concept into an approved academic project brief with aims, objectives, research questions, and methodology.
 **Done when:** conversational prompts gather sufficient project detail, the AI synthesizes a structured brief, and student approval provisions the project chapter tree.
-- [ ] Design it (spec): `/solution-architect project creation wizard & conversational briefing`
+Spec: [0006](../specs/0006-project-creation-wizard-briefing/index.md)
+- [x] Design it (spec): `/solution-architect project creation wizard & conversational briefing`
+- [x] Build it: `/feature-build project creation wizard & conversational briefing`
+  - [x] Thin thread plus resume: sessions, turns, server readiness, session list (Satisfies AC-1, AC-2, AC-10)
+  - [x] Synthesis plus versions: OpenRouter Output.object stream, estimate, version list and restore (Satisfies AC-3, AC-4, AC-5)
+  - [x] Credits plus approval: hold and refund, atomic brief plus outline plus chapters, template lock (Satisfies AC-6, AC-7, AC-8)
+  - [x] Guards plus polish: owner scoping, admin read, audit, Arcjet caps, expiry and prune, states (Satisfies AC-9, AC-10)
+- [ ] Verify it: /verify-release project creation wizard & conversational briefing
+- [ ] Test it: /test-engineer project creation wizard & conversational briefing
+- [ ] Review it (fresh model): /peer-review project creation wizard & conversational briefing
+- [ ] Document it: /tech-writer project creation wizard & conversational briefing
+Code in `app/api/wizard/`, `app/dashboard/wizard/`, `app/dashboard/new/`, `components/wizard/`, `lib/wizard*.ts`, `prisma/schema.prisma`
 
 ## Slice 4: Document Workspace & Tiptap Editor Canvas
 

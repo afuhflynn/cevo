@@ -1,0 +1,110 @@
+[
+  {
+    "id": "column.public.WizardSession.approvalKey",
+    "label": "Add column \"approvalKey\" to \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "approvalKey",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"approvalKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "approvalKey"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"approvalKey\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"approvalKey\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD COLUMN \"approvalKey\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"approvalKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "approvalKey"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"approvalKey\" on \"WizardSession\""
+        }
+      },
+      {
+        "description": "verify column \"approvalKey\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "approvalKey",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.WizardSession.WizardSession_approvalKey_key",
+    "label": "Add unique constraint on \"WizardSession\" (approvalKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "WizardSession_approvalKey_key",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"WizardSession_approvalKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "WizardSession_approvalKey_key",
+          "public",
+          "\"public\".\"WizardSession\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"WizardSession_approvalKey_key\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"WizardSession_approvalKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD CONSTRAINT \"WizardSession_approvalKey_key\" UNIQUE (\"approvalKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"WizardSession_approvalKey_key\" exists on (approvalKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "WizardSession_approvalKey_key",
+          "public",
+          "\"public\".\"WizardSession\"",
+          "u",
+          "[\"approvalKey\"]"
+        ]
+      }
+    ]
+  }
+]

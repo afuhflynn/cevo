@@ -57,6 +57,31 @@ const resendLimiter = key
     })
   : null;
 
+const wizardTurnLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
+  : null;
+
+const wizardSynthesisLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 10, window: "1h" })] })
+  : null;
+
+export type WizardRateLimitKind = "wizard-turn" | "wizard-synthesis";
+
+export async function checkWizardRateLimit(
+  req: Request,
+  kind: WizardRateLimitKind,
+): Promise<boolean> {
+  const limiter =
+    kind === "wizard-turn" ? wizardTurnLimiter : wizardSynthesisLimiter;
+  if (!limiter) return true;
+  const decision = await limiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn(`[arcjet] decision error on ${kind}, failing open`);
+    return true;
+  }
+  return !decision.isDenied();
+}
+
 export type AuthRateLimitKind =
   | "sign-in"
   | "sign-up"

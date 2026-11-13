@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'4fcc8d5f33dc5c35a5f68c30bf95c0789a03395898d8ef0112be183644b062d7'>;
+  StorageHashBase<'31dd1dcf645b135093b4f320e520c8ddd81886ec3b230dc33b8185bf7cb04815'>;
 export type ExecutionHash =
-  ExecutionHashBase<'7012de506b37539f852f1b24f7cdcd62bec03f6150ca09c9f1a74a13d24a2066'>;
+  ExecutionHashBase<'88322b61ea2ae66db2b7a066f8ff0445786d5d0bc01ac750c95b04b5440a22e6'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -381,6 +381,50 @@ type FieldTypeOverrides = {
           readonly input: 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN';
         };
       };
+      readonly WizardSession: {
+        readonly status: {
+          readonly output:
+            | 'DRAFT'
+            | 'CHATTING'
+            | 'SYNTHESIZING'
+            | 'AWAITING_APPROVAL'
+            | 'APPROVED'
+            | 'ABANDONED'
+            | 'EXPIRED';
+          readonly input:
+            | 'DRAFT'
+            | 'CHATTING'
+            | 'SYNTHESIZING'
+            | 'AWAITING_APPROVAL'
+            | 'APPROVED'
+            | 'ABANDONED'
+            | 'EXPIRED';
+        };
+      };
+      readonly WizardTurn: {
+        readonly fieldKey: {
+          readonly output:
+            | 'BACKGROUND'
+            | 'PROBLEM'
+            | 'AIM'
+            | 'OBJECTIVES'
+            | 'QUESTIONS'
+            | 'SCOPE'
+            | 'LIMITATIONS'
+            | 'METHODOLOGY'
+            | 'OUTCOMES';
+          readonly input:
+            | 'BACKGROUND'
+            | 'PROBLEM'
+            | 'AIM'
+            | 'OBJECTIVES'
+            | 'QUESTIONS'
+            | 'SCOPE'
+            | 'LIMITATIONS'
+            | 'METHODOLOGY'
+            | 'OUTCOMES';
+        };
+      };
     };
   };
 };
@@ -505,6 +549,50 @@ type ColumnTypeOverrides = {
         readonly input: 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN';
       };
     };
+    readonly WizardSession: {
+      readonly status: {
+        readonly output:
+          | 'DRAFT'
+          | 'CHATTING'
+          | 'SYNTHESIZING'
+          | 'AWAITING_APPROVAL'
+          | 'APPROVED'
+          | 'ABANDONED'
+          | 'EXPIRED';
+        readonly input:
+          | 'DRAFT'
+          | 'CHATTING'
+          | 'SYNTHESIZING'
+          | 'AWAITING_APPROVAL'
+          | 'APPROVED'
+          | 'ABANDONED'
+          | 'EXPIRED';
+      };
+    };
+    readonly WizardTurn: {
+      readonly fieldKey: {
+        readonly output:
+          | 'BACKGROUND'
+          | 'PROBLEM'
+          | 'AIM'
+          | 'OBJECTIVES'
+          | 'QUESTIONS'
+          | 'SCOPE'
+          | 'LIMITATIONS'
+          | 'METHODOLOGY'
+          | 'OUTCOMES';
+        readonly input:
+          | 'BACKGROUND'
+          | 'PROBLEM'
+          | 'AIM'
+          | 'OBJECTIVES'
+          | 'QUESTIONS'
+          | 'SCOPE'
+          | 'LIMITATIONS'
+          | 'METHODOLOGY'
+          | 'OUTCOMES';
+      };
+    };
   };
 };
 export type StorageColumnTypes = ColumnTypesFromStorage<
@@ -588,6 +676,17 @@ export namespace Models {
     userId: FieldOutputTypes['public']['AuditEvent']['userId'];
     user: public_User | null;
     readonly [RelationKeys]?: 'user';
+  };
+  export type public_BriefVersion = {
+    briefId: FieldOutputTypes['public']['BriefVersion']['briefId'];
+    createdAt: FieldOutputTypes['public']['BriefVersion']['createdAt'];
+    id: FieldOutputTypes['public']['BriefVersion']['id'];
+    modelId: FieldOutputTypes['public']['BriefVersion']['modelId'];
+    payload: FieldOutputTypes['public']['BriefVersion']['payload'];
+    tokenCost: FieldOutputTypes['public']['BriefVersion']['tokenCost'];
+    version: FieldOutputTypes['public']['BriefVersion']['version'];
+    brief: public_ProjectBrief;
+    readonly [RelationKeys]?: 'brief';
   };
   export type public_Citation = {
     citationKey: FieldOutputTypes['public']['Citation']['citationKey'];
@@ -805,6 +904,7 @@ export namespace Models {
     template: public_ProjectTemplate | null;
     templateVersion: public_TemplateVersion | null;
     user: public_User;
+    wizardSessions: public_WizardSession[];
     readonly [RelationKeys]?:
       | 'activities'
       | 'brief'
@@ -816,7 +916,8 @@ export namespace Models {
       | 'tasks'
       | 'template'
       | 'templateVersion'
-      | 'user';
+      | 'user'
+      | 'wizardSessions';
   };
   export type public_ProjectActivity = {
     action: FieldOutputTypes['public']['ProjectActivity']['action'];
@@ -838,15 +939,19 @@ export namespace Models {
     isApproved: FieldOutputTypes['public']['ProjectBrief']['isApproved'];
     limitations: FieldOutputTypes['public']['ProjectBrief']['limitations'];
     methodology: FieldOutputTypes['public']['ProjectBrief']['methodology'];
+    modelId: FieldOutputTypes['public']['ProjectBrief']['modelId'];
     objectives: FieldOutputTypes['public']['ProjectBrief']['objectives'];
     problemStatement: FieldOutputTypes['public']['ProjectBrief']['problemStatement'];
     projectId: FieldOutputTypes['public']['ProjectBrief']['projectId'];
     researchQuestions: FieldOutputTypes['public']['ProjectBrief']['researchQuestions'];
     scope: FieldOutputTypes['public']['ProjectBrief']['scope'];
+    synthesisCost: FieldOutputTypes['public']['ProjectBrief']['synthesisCost'];
     targetEnvironment: FieldOutputTypes['public']['ProjectBrief']['targetEnvironment'];
     updatedAt: FieldOutputTypes['public']['ProjectBrief']['updatedAt'];
+    version: FieldOutputTypes['public']['ProjectBrief']['version'];
     project: public_Project;
-    readonly [RelationKeys]?: 'project';
+    versions: public_BriefVersion[];
+    readonly [RelationKeys]?: 'project' | 'versions';
   };
   export type public_ProjectOutline = {
     createdAt: FieldOutputTypes['public']['ProjectOutline']['createdAt'];
@@ -1070,6 +1175,7 @@ export namespace Models {
     sessions: public_Session[];
     studentProfile: public_StudentProfile | null;
     supportTickets: public_SupportTicket[];
+    wizardSessions: public_WizardSession[];
     readonly [RelationKeys]?:
       | 'academicProfile'
       | 'accounts'
@@ -1080,7 +1186,8 @@ export namespace Models {
       | 'projects'
       | 'sessions'
       | 'studentProfile'
-      | 'supportTickets';
+      | 'supportTickets'
+      | 'wizardSessions';
   };
   export type public_Verification = {
     createdAt: FieldOutputTypes['public']['Verification']['createdAt'];
@@ -1091,6 +1198,41 @@ export namespace Models {
     value: FieldOutputTypes['public']['Verification']['value'];
     readonly [RelationKeys]?: never;
   };
+  export type public_WizardSession = {
+    approvalKey: FieldOutputTypes['public']['WizardSession']['approvalKey'];
+    createdAt: FieldOutputTypes['public']['WizardSession']['createdAt'];
+    currentBriefVersion: FieldOutputTypes['public']['WizardSession']['currentBriefVersion'];
+    currentStep: FieldOutputTypes['public']['WizardSession']['currentStep'];
+    departmentName: FieldOutputTypes['public']['WizardSession']['departmentName'];
+    expiresAt: FieldOutputTypes['public']['WizardSession']['expiresAt'];
+    id: FieldOutputTypes['public']['WizardSession']['id'];
+    idempotencyKey: FieldOutputTypes['public']['WizardSession']['idempotencyKey'];
+    programmeName: FieldOutputTypes['public']['WizardSession']['programmeName'];
+    projectId: FieldOutputTypes['public']['WizardSession']['projectId'];
+    qualification: FieldOutputTypes['public']['WizardSession']['qualification'];
+    readiness: FieldOutputTypes['public']['WizardSession']['readiness'];
+    status: FieldOutputTypes['public']['WizardSession']['status'];
+    suggestedTemplateId: FieldOutputTypes['public']['WizardSession']['suggestedTemplateId'];
+    title: FieldOutputTypes['public']['WizardSession']['title'];
+    updatedAt: FieldOutputTypes['public']['WizardSession']['updatedAt'];
+    userId: FieldOutputTypes['public']['WizardSession']['userId'];
+    project: public_Project | null;
+    turns: public_WizardTurn[];
+    user: public_User;
+    readonly [RelationKeys]?: 'project' | 'turns' | 'user';
+  };
+  export type public_WizardTurn = {
+    answerText: FieldOutputTypes['public']['WizardTurn']['answerText'];
+    createdAt: FieldOutputTypes['public']['WizardTurn']['createdAt'];
+    fieldKey: FieldOutputTypes['public']['WizardTurn']['fieldKey'];
+    followupText: FieldOutputTypes['public']['WizardTurn']['followupText'];
+    id: FieldOutputTypes['public']['WizardTurn']['id'];
+    isSufficient: FieldOutputTypes['public']['WizardTurn']['isSufficient'];
+    promptText: FieldOutputTypes['public']['WizardTurn']['promptText'];
+    sessionId: FieldOutputTypes['public']['WizardTurn']['sessionId'];
+    session: public_WizardSession;
+    readonly [RelationKeys]?: 'session';
+  };
 }
 
 export declare const models: {
@@ -1099,6 +1241,7 @@ export declare const models: {
     Account: Models.public_Account;
     AiUsage: Models.public_AiUsage;
     AuditEvent: Models.public_AuditEvent;
+    BriefVersion: Models.public_BriefVersion;
     Citation: Models.public_Citation;
     CreditLedger: Models.public_CreditLedger;
     CreditPackage: Models.public_CreditPackage;
@@ -1132,6 +1275,8 @@ export declare const models: {
     TemplateVersion: Models.public_TemplateVersion;
     User: Models.public_User;
     Verification: Models.public_Verification;
+    WizardSession: Models.public_WizardSession;
+    WizardTurn: Models.public_WizardTurn;
   };
 };
 
@@ -1642,6 +1787,82 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly BriefVersion: {
+              columns: {
+                readonly briefId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly modelId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly payload: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly tokenCost: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['briefId', 'version'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'BriefVersion_briefId_idx_c24a8d6e';
+                  readonly prefix: 'BriefVersion_briefId_idx';
+                  readonly columns: readonly ['briefId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'BriefVersion';
+                    readonly columns: readonly ['briefId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ProjectBrief';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -3211,6 +3432,12 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly modelId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
                 readonly objectives: {
                   readonly dataType: 'pg/json';
                   readonly codecId: 'pg/json@1';
@@ -3241,6 +3468,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly synthesisCost: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
                 readonly targetEnvironment: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -3252,6 +3489,16 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-date@1';
                   readonly nullable: false;
                   readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly version: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 1>;
+                  };
                   readonly many: false;
                 };
               };
@@ -4852,6 +5099,273 @@ type ContractBase = Omit<
               ];
               foreignKeys: readonly [];
             };
+            readonly WizardSession: {
+              columns: {
+                readonly approvalKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly currentBriefVersion: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly currentStep: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 1>;
+                  };
+                  readonly many: false;
+                };
+                readonly departmentName: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly expiresAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly idempotencyKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly programmeName: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly qualification: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly readiness: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'DRAFT'>;
+                  };
+                  readonly many: false;
+                };
+                readonly suggestedTemplateId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly title: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['idempotencyKey'] },
+                { readonly columns: readonly ['approvalKey'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'WizardSession_projectId_idx_a96e4d92';
+                  readonly prefix: 'WizardSession_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WizardSession_userId_idx_a489d58a';
+                  readonly prefix: 'WizardSession_userId_idx';
+                  readonly columns: readonly ['userId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WizardSession_userId_status_idx_e4a128ba';
+                  readonly prefix: 'WizardSession_userId_status_idx';
+                  readonly columns: readonly ['userId', 'status'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WizardSession_userId_updatedAt_idx_42f5280d';
+                  readonly prefix: 'WizardSession_userId_updatedAt_idx';
+                  readonly columns: readonly ['userId', 'updatedAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WizardSession';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WizardSession';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly WizardTurn: {
+              columns: {
+                readonly answerText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly fieldKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly followupText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly isSufficient: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly promptText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly sessionId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'WizardTurn_sessionId_fieldKey_createdAt_idx_1c358858';
+                  readonly prefix: 'WizardTurn_sessionId_fieldKey_createdAt_idx';
+                  readonly columns: readonly ['sessionId', 'fieldKey', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WizardTurn_sessionId_idx_29f415d4';
+                  readonly prefix: 'WizardTurn_sessionId_idx';
+                  readonly columns: readonly ['sessionId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WizardTurn';
+                    readonly columns: readonly ['sessionId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WizardSession';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
           };
           readonly valueSet: {
             readonly ExportFormat: {
@@ -4924,6 +5438,32 @@ type ContractBase = Omit<
                 'INCOMPLETE_METADATA',
               ];
             };
+            readonly WizardFieldKey: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'BACKGROUND',
+                'PROBLEM',
+                'AIM',
+                'OBJECTIVES',
+                'QUESTIONS',
+                'SCOPE',
+                'LIMITATIONS',
+                'METHODOLOGY',
+                'OUTCOMES',
+              ];
+            };
+            readonly WizardSessionStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'DRAFT',
+                'CHATTING',
+                'SYNTHESIZING',
+                'AWAITING_APPROVAL',
+                'APPROVED',
+                'ABANDONED',
+                'EXPIRED',
+              ];
+            };
           };
         };
       };
@@ -4944,6 +5484,10 @@ type ContractBase = Omit<
     readonly AuditEvent: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'AuditEvent';
+    };
+    readonly BriefVersion: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'BriefVersion';
     };
     readonly Citation: { readonly namespace: 'public' & NamespaceId; readonly model: 'Citation' };
     readonly CreditLedger: {
@@ -5049,6 +5593,14 @@ type ContractBase = Omit<
     readonly Verification: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'Verification';
+    };
+    readonly WizardSession: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'WizardSession';
+    };
+    readonly WizardTurn: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'WizardTurn';
     };
   };
   readonly domain: {
@@ -5437,6 +5989,69 @@ type ContractBase = Omit<
                 readonly targetId: { readonly column: 'targetId' };
                 readonly targetType: { readonly column: 'targetType' };
                 readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly BriefVersion: {
+            readonly fields: {
+              readonly briefId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly modelId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly payload: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly tokenCost: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly brief: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectBrief';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['briefId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'BriefVersion';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly briefId: { readonly column: 'briefId' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly modelId: { readonly column: 'modelId' };
+                readonly payload: { readonly column: 'payload' };
+                readonly tokenCost: { readonly column: 'tokenCost' };
+                readonly version: { readonly column: 'version' };
               };
             };
           };
@@ -6799,6 +7414,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly wizardSessions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WizardSession';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'Project';
@@ -6926,6 +7552,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly modelId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly objectives: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
@@ -6946,6 +7576,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly synthesisCost: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
               readonly targetEnvironment: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -6957,6 +7591,10 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-date@1';
                   readonly typeParams: { readonly precision: 3 };
                 };
+              };
+              readonly version: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
             };
             readonly relations: {
@@ -6970,6 +7608,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['projectId'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly versions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'BriefVersion';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['briefId'];
                 };
               };
             };
@@ -6986,13 +7635,16 @@ type ContractBase = Omit<
                 readonly isApproved: { readonly column: 'isApproved' };
                 readonly limitations: { readonly column: 'limitations' };
                 readonly methodology: { readonly column: 'methodology' };
+                readonly modelId: { readonly column: 'modelId' };
                 readonly objectives: { readonly column: 'objectives' };
                 readonly problemStatement: { readonly column: 'problemStatement' };
                 readonly projectId: { readonly column: 'projectId' };
                 readonly researchQuestions: { readonly column: 'researchQuestions' };
                 readonly scope: { readonly column: 'scope' };
+                readonly synthesisCost: { readonly column: 'synthesisCost' };
                 readonly targetEnvironment: { readonly column: 'targetEnvironment' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly version: { readonly column: 'version' };
               };
             };
           };
@@ -8404,6 +9056,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['userId'];
                 };
               };
+              readonly wizardSessions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WizardSession';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'User';
@@ -8471,6 +9134,215 @@ type ContractBase = Omit<
                 readonly identifier: { readonly column: 'identifier' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly value: { readonly column: 'value' };
+              };
+            };
+          };
+          readonly WizardSession: {
+            readonly fields: {
+              readonly approvalKey: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly currentBriefVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly currentStep: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly departmentName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly idempotencyKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly programmeName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly qualification: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly readiness: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly suggestedTemplateId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly title: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly turns: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WizardTurn';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['sessionId'];
+                };
+              };
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'WizardSession';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly approvalKey: { readonly column: 'approvalKey' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly currentBriefVersion: { readonly column: 'currentBriefVersion' };
+                readonly currentStep: { readonly column: 'currentStep' };
+                readonly departmentName: { readonly column: 'departmentName' };
+                readonly expiresAt: { readonly column: 'expiresAt' };
+                readonly id: { readonly column: 'id' };
+                readonly idempotencyKey: { readonly column: 'idempotencyKey' };
+                readonly programmeName: { readonly column: 'programmeName' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly qualification: { readonly column: 'qualification' };
+                readonly readiness: { readonly column: 'readiness' };
+                readonly status: { readonly column: 'status' };
+                readonly suggestedTemplateId: { readonly column: 'suggestedTemplateId' };
+                readonly title: { readonly column: 'title' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly WizardTurn: {
+            readonly fields: {
+              readonly answerText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly fieldKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly followupText: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly isSufficient: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly promptText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sessionId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly session: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WizardSession';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['sessionId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'WizardTurn';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly answerText: { readonly column: 'answerText' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly fieldKey: { readonly column: 'fieldKey' };
+                readonly followupText: { readonly column: 'followupText' };
+                readonly id: { readonly column: 'id' };
+                readonly isSufficient: { readonly column: 'isSufficient' };
+                readonly promptText: { readonly column: 'promptText' };
+                readonly sessionId: { readonly column: 'sessionId' };
               };
             };
           };
@@ -8577,6 +9449,32 @@ type ContractBase = Omit<
               { readonly name: 'INCOMPLETE_METADATA'; readonly value: 'INCOMPLETE_METADATA' },
             ];
           };
+          readonly WizardFieldKey: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'BACKGROUND'; readonly value: 'BACKGROUND' },
+              { readonly name: 'PROBLEM'; readonly value: 'PROBLEM' },
+              { readonly name: 'AIM'; readonly value: 'AIM' },
+              { readonly name: 'OBJECTIVES'; readonly value: 'OBJECTIVES' },
+              { readonly name: 'QUESTIONS'; readonly value: 'QUESTIONS' },
+              { readonly name: 'SCOPE'; readonly value: 'SCOPE' },
+              { readonly name: 'LIMITATIONS'; readonly value: 'LIMITATIONS' },
+              { readonly name: 'METHODOLOGY'; readonly value: 'METHODOLOGY' },
+              { readonly name: 'OUTCOMES'; readonly value: 'OUTCOMES' },
+            ];
+          };
+          readonly WizardSessionStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'DRAFT'; readonly value: 'DRAFT' },
+              { readonly name: 'CHATTING'; readonly value: 'CHATTING' },
+              { readonly name: 'SYNTHESIZING'; readonly value: 'SYNTHESIZING' },
+              { readonly name: 'AWAITING_APPROVAL'; readonly value: 'AWAITING_APPROVAL' },
+              { readonly name: 'APPROVED'; readonly value: 'APPROVED' },
+              { readonly name: 'ABANDONED'; readonly value: 'ABANDONED' },
+              { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
+            ];
+          };
         };
         readonly enumMemberTypes?: {
           readonly ExportFormat: readonly [
@@ -8646,6 +9544,26 @@ type ContractBase = Omit<
             { readonly name: 'FULL_TEXT_AVAILABLE'; readonly value: 'FULL_TEXT_AVAILABLE' },
             { readonly name: 'REQUIRES_REVIEW'; readonly value: 'REQUIRES_REVIEW' },
             { readonly name: 'INCOMPLETE_METADATA'; readonly value: 'INCOMPLETE_METADATA' },
+          ];
+          readonly WizardFieldKey: readonly [
+            { readonly name: 'BACKGROUND'; readonly value: 'BACKGROUND' },
+            { readonly name: 'PROBLEM'; readonly value: 'PROBLEM' },
+            { readonly name: 'AIM'; readonly value: 'AIM' },
+            { readonly name: 'OBJECTIVES'; readonly value: 'OBJECTIVES' },
+            { readonly name: 'QUESTIONS'; readonly value: 'QUESTIONS' },
+            { readonly name: 'SCOPE'; readonly value: 'SCOPE' },
+            { readonly name: 'LIMITATIONS'; readonly value: 'LIMITATIONS' },
+            { readonly name: 'METHODOLOGY'; readonly value: 'METHODOLOGY' },
+            { readonly name: 'OUTCOMES'; readonly value: 'OUTCOMES' },
+          ];
+          readonly WizardSessionStatus: readonly [
+            { readonly name: 'DRAFT'; readonly value: 'DRAFT' },
+            { readonly name: 'CHATTING'; readonly value: 'CHATTING' },
+            { readonly name: 'SYNTHESIZING'; readonly value: 'SYNTHESIZING' },
+            { readonly name: 'AWAITING_APPROVAL'; readonly value: 'AWAITING_APPROVAL' },
+            { readonly name: 'APPROVED'; readonly value: 'APPROVED' },
+            { readonly name: 'ABANDONED'; readonly value: 'ABANDONED' },
+            { readonly name: 'EXPIRED'; readonly value: 'EXPIRED' },
           ];
         };
       };
@@ -8746,6 +9664,14 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'AuditEvent';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'BriefVersion';
             readonly field: 'id';
             readonly namespace: 'public';
           };
@@ -9351,6 +10277,39 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Verification';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'WizardSession';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'WizardSession';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'WizardTurn';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

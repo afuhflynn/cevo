@@ -52,6 +52,13 @@ export const paginationSearchParams = {
   limit: parseAsInteger.withDefault(20),
 };
 
+export const wizardSearchParams = {
+  status: parseAsString.withDefault("all"),
+  page: parseAsInteger.withDefault(1),
+};
+
+export const loadWizardSearchParams = createLoader(wizardSearchParams);
+
 export const textSearchParam = {
   search: parseAsString.withDefault(""),
 };

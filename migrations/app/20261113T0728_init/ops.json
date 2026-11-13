@@ -1,0 +1,242 @@
+[
+  {
+    "id": "column.public.WizardSession.departmentName",
+    "label": "Add column \"departmentName\" to \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "departmentName",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"departmentName\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "departmentName"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"departmentName\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"departmentName\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD COLUMN \"departmentName\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"departmentName\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "departmentName"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"departmentName\" on \"WizardSession\""
+        }
+      },
+      {
+        "description": "verify column \"departmentName\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "departmentName",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.WizardSession.programmeName",
+    "label": "Add column \"programmeName\" to \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "programmeName",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"programmeName\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "programmeName"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"programmeName\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"programmeName\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD COLUMN \"programmeName\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"programmeName\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "programmeName"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"programmeName\" on \"WizardSession\""
+        }
+      },
+      {
+        "description": "verify column \"programmeName\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "programmeName",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.WizardSession.qualification",
+    "label": "Add column \"qualification\" to \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "qualification",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"qualification\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "qualification"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"qualification\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"qualification\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD COLUMN \"qualification\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"qualification\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "qualification"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"qualification\" on \"WizardSession\""
+        }
+      },
+      {
+        "description": "verify column \"qualification\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "qualification",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.WizardSession.title",
+    "label": "Add column \"title\" to \"WizardSession\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "title",
+        "table": "WizardSession"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"title\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "title"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"title\" on \"WizardSession\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"title\"",
+        "sql": "ALTER TABLE \"public\".\"WizardSession\" ADD COLUMN \"title\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"title\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "title"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"title\" on \"WizardSession\""
+        }
+      },
+      {
+        "description": "verify column \"title\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "WizardSession",
+          "title",
+          "text"
+        ]
+      }
+    ]
+  }
+]
