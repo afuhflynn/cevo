@@ -1,71 +1,110 @@
 import Link from "next/link";
+import type { SearchParams } from "nuqs/server";
+import { Suspense } from "react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  CatalogSkeleton,
+  DashboardCatalogClient,
+  DashboardStatsHeader,
+  MilestonesFeed,
+} from "@/components/dashboard/dashboard-catalog";
+import { Card, CardContent } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth-helpers";
+import {
+  getDashboardActivities,
+  getDashboardCatalog,
+  getDashboardStats,
+} from "@/lib/dashboard";
 import { getOnboardingState } from "@/lib/onboarding";
-import { db } from "@/lib/prisma";
+import { loadDashboardSearchParams } from "@/lib/search-params";
 
 export const instant = false;
 
-export default async function DashboardPage() {
+async function DashboardLoader({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const user = await requireUser();
-  const state = await getOnboardingState(user.id);
-  const wallet = await db.orm.public.CreditWallet.where({
-    userId: user.id,
-  }).first();
-  const student = state.student;
+  const { search, status, page } =
+    await loadDashboardSearchParams(searchParams);
+  const [stats, catalog, activities, state] = await Promise.all([
+    getDashboardStats(user.id),
+    getDashboardCatalog({ userId: user.id, search, status, page }),
+    getDashboardActivities(user.id),
+    getOnboardingState(user.id),
+  ]);
+  const firstName = state.student?.firstName;
+
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <div>
-        <h1 className="font-serif text-3xl">
-          Welcome{student?.firstName ? `, ${student.firstName}` : ""}.
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Your academic profile is ready. You hold {wallet?.balance ?? 0}{" "}
-          credits.
-        </p>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-3xl">
+            Welcome{firstName ? `, ${firstName}` : ""}.
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            You hold {stats.walletBalance} credits. Buying more arrives with the
+            payments slice.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            href="/dashboard/archived"
+            className="inline-flex h-8 items-center justify-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium"
+          >
+            Archived
+          </Link>
+          <Link
+            href="/dashboard/new"
+            className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground"
+          >
+            Start a project
+          </Link>
+        </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Start a project</CardTitle>
-            <CardDescription>
-              Create your first academic project brief.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/dashboard"
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground"
-            >
-              Open catalog soon
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Your profile</CardTitle>
-            <CardDescription>
-              {state.academic?.customInstitution ?? "University saved"} ·{" "}
-              {state.academic?.qualification ?? ""} ·{" "}
-              {state.academic?.academicSession ?? ""}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/onboarding?step=1"
-              className="inline-flex h-8 items-center justify-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium"
-            >
-              Review setup
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+
+      <DashboardStatsHeader stats={stats} />
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Your projects</h2>
+        <DashboardCatalogClient
+          initial={{
+            stats,
+            catalog,
+            activities,
+            walletBalance: stats.walletBalance,
+          }}
+          archived={false}
+        />
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Milestones</h2>
+        <MilestonesFeed activities={activities} />
+      </section>
     </div>
+  );
+}
+
+export default function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
+          <Card>
+            <CardContent className="py-6 text-sm text-muted-foreground">
+              Loading your dashboard…
+            </CardContent>
+          </Card>
+          <CatalogSkeleton />
+        </div>
+      }
+    >
+      <DashboardLoader searchParams={searchParams} />
+    </Suspense>
   );
 }

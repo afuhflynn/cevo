@@ -16,7 +16,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Core Data Model & Schema Migration | Foundation | in-progress |
 | 4 | Authentication & Session Management | Foundation | done |
 | 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | in-progress |
-| 6 | Student Dashboard & Project Catalog | Slice 2 | planned |
+| 6 | Student Dashboard & Project Catalog | Slice 2 | in-progress |
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | planned |
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | planned |
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | planned |
@@ -124,10 +124,21 @@ Code in `app/onboarding/`, `app/dashboard/`, `lib/onboarding*.ts`, `proxy.ts`, `
 
 ## Slice 2: Student Dashboard & Project Catalog
 
-### 6. Student Dashboard & Project Catalog · needs a decision
+### 6. Student Dashboard & Project Catalog · in-progress
 Provide a student home displaying active projects, credit balance, recent milestones, and project management controls such as search, filter, duplicate, and archive.
 **Done when:** students can view real project statistics, search and filter projects by status, and navigate directly to active workspaces.
-- [ ] Design it (spec): `/solution-architect student dashboard & project catalog`
+Spec: [0005](../specs/0005-student-dashboard-project-catalog/index.md)
+- [x] Design it (spec): `/solution-architect student dashboard & project catalog`
+- [x] Build it: `/feature-build student dashboard & project catalog`
+  - [x] Read thread with stats, catalog page one, and milestones feed from real rows (Satisfies AC-1, AC-4)
+  - [x] Search, filter, and pagination through nuqs plus cached queries (Satisfies AC-2, AC-3)
+  - [x] Card actions for duplicate, archive, and restore plus the archived page (Satisfies AC-5, AC-6, AC-7)
+  - [x] Polish and guards: credit display, empty states, owner scoping with audit (Satisfies AC-8, AC-9, AC-10)
+Code in `app/dashboard/`, `app/api/dashboard/projects/route.ts`, `lib/dashboard.ts`, `lib/search-params.ts`, `components/dashboard/` (nuqs 2.10.3, @tanstack/react-query 5.107.1; invalidation rule in `components/dashboard/query-provider.tsx`)
+- [ ] Verify it: /verify-release student dashboard & project catalog
+- [ ] Test it: /test-engineer student dashboard & project catalog
+- [ ] Review it (fresh model): /peer-review student dashboard & project catalog
+- [ ] Document it: /tech-writer student dashboard & project catalog
 
 ## Slice 3: Project Creation Wizard & Conversational Briefing
 

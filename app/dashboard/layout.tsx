@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { DashboardQueryProvider } from "@/components/dashboard/query-provider";
 import { requireUser } from "@/lib/auth-helpers";
 import { getOnboardingState } from "@/lib/onboarding";
 
@@ -13,5 +14,5 @@ export default async function DashboardLayout({
     const gap = state.gap ?? 1;
     redirect(`/onboarding?step=${gap}`);
   }
-  return <>{children}</>;
+  return <DashboardQueryProvider>{children}</DashboardQueryProvider>;
 }
