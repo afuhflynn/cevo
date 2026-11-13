@@ -417,6 +417,20 @@
                   }
                 }
               },
+              "customDepartment": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "customFaculty": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "customInstitution": {
                 "nullable": true,
                 "type": {
@@ -586,6 +600,12 @@
                 },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "customDepartment": {
+                  "column": "customDepartment"
+                },
+                "customFaculty": {
+                  "column": "customFaculty"
                 },
                 "customInstitution": {
                   "column": "customInstitution"
@@ -5974,6 +5994,16 @@
                     "precision": 3
                   }
                 },
+                "customDepartment": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "customFaculty": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "customInstitution": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -10589,7 +10619,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ff9d5471816dec3a39c981e1dbdf57b170867c73f252b7d9bd7eb3a60c7a9054"
+    "storageHash": "4fcc8d5f33dc5c35a5f68c30bf95c0789a03395898d8ef0112be183644b062d7"
   },
   "execution": {
     "executionHash": "7012de506b37539f852f1b24f7cdcd62bec03f6150ca09c9f1a74a13d24a2066",

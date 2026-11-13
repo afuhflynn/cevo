@@ -1,0 +1,122 @@
+[
+  {
+    "id": "column.public.AcademicProfile.customDepartment",
+    "label": "Add column \"customDepartment\" to \"AcademicProfile\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "customDepartment",
+        "table": "AcademicProfile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"customDepartment\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customDepartment"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"customDepartment\" on \"AcademicProfile\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"customDepartment\"",
+        "sql": "ALTER TABLE \"public\".\"AcademicProfile\" ADD COLUMN \"customDepartment\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"customDepartment\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customDepartment"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"customDepartment\" on \"AcademicProfile\""
+        }
+      },
+      {
+        "description": "verify column \"customDepartment\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customDepartment",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.AcademicProfile.customFaculty",
+    "label": "Add column \"customFaculty\" to \"AcademicProfile\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "customFaculty",
+        "table": "AcademicProfile"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"customFaculty\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customFaculty"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"customFaculty\" on \"AcademicProfile\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"customFaculty\"",
+        "sql": "ALTER TABLE \"public\".\"AcademicProfile\" ADD COLUMN \"customFaculty\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"customFaculty\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customFaculty"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"customFaculty\" on \"AcademicProfile\""
+        }
+      },
+      {
+        "description": "verify column \"customFaculty\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "AcademicProfile",
+          "customFaculty",
+          "text"
+        ]
+      }
+    ]
+  }
+]

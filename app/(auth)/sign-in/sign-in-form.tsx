@@ -53,7 +53,7 @@ export function SignInForm() {
       setError(friendlyMessage(signInError));
       return;
     }
-    router.push("/");
+    router.push("/onboarding");
     router.refresh();
   }
 

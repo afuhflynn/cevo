@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'ff9d5471816dec3a39c981e1dbdf57b170867c73f252b7d9bd7eb3a60c7a9054'>;
+  StorageHashBase<'4fcc8d5f33dc5c35a5f68c30bf95c0789a03395898d8ef0112be183644b062d7'>;
 export type ExecutionHash =
   ExecutionHashBase<'7012de506b37539f852f1b24f7cdcd62bec03f6150ca09c9f1a74a13d24a2066'>;
 export type ProfileHash =
@@ -526,6 +526,8 @@ export namespace Models {
   export type public_AcademicProfile = {
     academicSession: FieldOutputTypes['public']['AcademicProfile']['academicSession'];
     createdAt: FieldOutputTypes['public']['AcademicProfile']['createdAt'];
+    customDepartment: FieldOutputTypes['public']['AcademicProfile']['customDepartment'];
+    customFaculty: FieldOutputTypes['public']['AcademicProfile']['customFaculty'];
     customInstitution: FieldOutputTypes['public']['AcademicProfile']['customInstitution'];
     departmentId: FieldOutputTypes['public']['AcademicProfile']['departmentId'];
     facultyId: FieldOutputTypes['public']['AcademicProfile']['facultyId'];
@@ -1165,6 +1167,18 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly customDepartment: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly customFaculty: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly customInstitution: {
@@ -5055,6 +5069,14 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly precision: 3 };
                 };
               };
+              readonly customDepartment: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly customFaculty: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly customInstitution: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -5165,6 +5187,8 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly academicSession: { readonly column: 'academicSession' };
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly customDepartment: { readonly column: 'customDepartment' };
+                readonly customFaculty: { readonly column: 'customFaculty' };
                 readonly customInstitution: { readonly column: 'customInstitution' };
                 readonly departmentId: { readonly column: 'departmentId' };
                 readonly facultyId: { readonly column: 'facultyId' };

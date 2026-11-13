@@ -14,6 +14,7 @@
     "db:push:force": "prisma db push --force-reset",
     "db:push:reset": "prisma db push --force-reset",
     "db:studio": "prisma studio",
+    "db:seed": "tsx scripts/seed-institutions.ts",
     "db:migrate": "prisma contract emit && prisma migration plan --name init && prisma db migrate --advance-ref db",
     "db:migrate:deploy": "prisma db migrate",
     "db:migrate:reset": "prisma migrate reset",
@@ -54,7 +55,8 @@
     "recharts": "3.8.0",
     "shadcn": "^4.23.0",
     "shiki": "^4.6.0",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
@@ -74,6 +76,7 @@
     "jsdom": "^31.0.0",
     "prisma": "8.0.0-rc.33",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.1.0"

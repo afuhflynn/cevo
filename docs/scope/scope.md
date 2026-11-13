@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Brand Assets & Central Logo Component | Foundation | done |
 | 3 | Core Data Model & Schema Migration | Foundation | in-progress |
 | 4 | Authentication & Session Management | Foundation | done |
-| 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | planned |
+| 5 | Academic Onboarding & Institution Hierarchy | Slice 1 | in-progress |
 | 6 | Student Dashboard & Project Catalog | Slice 2 | planned |
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | planned |
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | planned |
@@ -106,10 +106,21 @@ Code in `lib/email.ts`, `lib/auth.ts`
 
 ## Slice 1: Academic Onboarding & Institution Hierarchy
 
-### 5. Academic Onboarding & Institution Hierarchy · needs a decision
+### 5. Academic Onboarding & Institution Hierarchy · in-progress
 Guide new students through profile completion, capturing name, country, university, faculty, department, qualification level, and citation style preference.
 **Done when:** onboarding progress saves progressively, students can select or suggest Cameroonian universities, and completing onboarding awards welcome credits and routes to the dashboard.
-- [ ] Design it (spec): `/solution-architect academic onboarding & institution hierarchy`
+Spec: [0004](../specs/0004-academic-onboarding-institution-hierarchy/index.md)
+- [x] Design it (spec): `/solution-architect academic onboarding & institution hierarchy`
+- [x] Build it: `/feature-build academic onboarding & institution hierarchy`
+  - [x] Seed plus search foundation with conditional migration and Cameroonian data (Satisfies AC-3, AC-4)
+  - [x] Wizard shell plus personal step with shared validation and resume (Satisfies AC-2)
+  - [x] Academic pickers plus suggest flow with parent filtering and revalidation (Satisfies AC-3, AC-4, AC-7)
+  - [x] Preferences plus complete transaction with welcome grant and route guards (Satisfies AC-1, AC-5, AC-6, AC-7)
+Code in `app/onboarding/`, `app/dashboard/`, `lib/onboarding*.ts`, `proxy.ts`, `scripts/seed-institutions.ts`, `prisma/schema.prisma`
+- [ ] Verify it: /verify-release academic onboarding & institution hierarchy
+- [ ] Test it: /test-engineer academic onboarding & institution hierarchy
+- [ ] Review it (fresh model): /peer-review academic onboarding & institution hierarchy
+- [ ] Document it: /tech-writer academic onboarding & institution hierarchy
 
 ## Slice 2: Student Dashboard & Project Catalog
 
