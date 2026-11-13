@@ -30,6 +30,12 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 | 19 | Branded Transactional Email Templates | Foundation | in-progress |
+| 20 | UI Foundation Refresh and Primitive Audit | Foundation | planned |
+| 21 | Onboarding Journey Polish | Journey A | planned |
+| 22 | Auth Pages Polish | Journey B | planned |
+| 23 | Dashboard Catalog Journey Polish | Journey C | planned |
+| 24 | Workspace and Future Pages Guardrails | Journey D | planned |
+| 25 | Public Site Polish | Journey E | planned |
 
 ## Foundations
 
@@ -216,6 +222,48 @@ Provide a protected administrative dashboard to monitor registrations, payments,
 Deliver the public marketing website: a compelling landing page, transparent credit pricing cards mapped to Fapshi mobile money packages, a well-structured navigation bar, and legal terms conforming to Cameroon cyber law.
 **Done when:** public routes load swiftly, the landing page communicates the core promise with real interface previews, pricing cards guide visitors into buying credits, and the navigation bar routes visitors to registration and key pages.
 - [ ] Design it (spec): `/solution-architect public website & marketing pages`
+
+## UI Polish Foundation
+
+### 20. UI Foundation Refresh and Primitive Audit · Journey · Beta · needs a decision
+Audit what you own today in `components/ui` plus `app/globals.css` plus `app/layout.tsx` so later journeys share one modern base. Record which primitives stay, which need refresh for inputs plus selects plus date pickers plus dropdowns plus dialogs plus skeletons plus toasts plus empty states, plus motion rules that need your confirm, all while Tailwind setup stays intact.
+**Done when:** audit list exists for each primitive plus token plus radius plus shadow, skeleton and empty and error patterns are agreed, motion allow list is approved by you, and future journeys have a clear base to reuse.
+- [ ] Design it (spec): `/solution-architect ui foundation refresh and primitive audit`
+
+## Journey A: Onboarding Complete
+
+### 21. Onboarding Journey Polish · Journey · Beta · needs a decision
+Rebuild the full onboarding path in `app/onboarding/page.tsx` from start plus personal details plus academic pickers plus preferences to welcome plus resume, with calm progress, clear validation, sane suggest flow, and kind empty plus loading plus error states using shadcn skeletons. Each page spec carries per page Firecrawl notes from ChatGPT plus Claude plus Antigravity style research plus frontend skill guidance.
+**Done when:** a new student can complete onboarding with no confusion, progress saves and resumes, pickers filter cleanly, skeletons feel smooth, and each motion use has your approval recorded in the spec.
+- [ ] Design it (spec): `/solution-architect onboarding journey polish`
+
+## Journey B: Auth Complete
+
+### 22. Auth Pages Polish · Journey · Beta · needs a decision
+Polish the full auth path in `app/(auth)/sign-in/page.tsx` plus sign up plus forgot plus reset plus verify, with consistent inputs plus password feedback plus show and hide plus clear error plus success plus loading states in both themes. Each page spec carries per page Firecrawl notes plus frontend skill guidance.
+**Done when:** sign in plus sign up plus reset plus verify all read as one family, errors guide recovery, loading uses skeletons or spinner patterns from the foundation, and no visual drift remains between auth pages.
+- [ ] Design it (spec): `/solution-architect auth pages polish`
+
+## Journey C: Dashboard Complete
+
+### 23. Dashboard Catalog Journey Polish · Journey · Beta · needs a decision
+Polish the full dashboard path in `app/dashboard/page.tsx` plus new plus archived plus project detail, covering stats plus catalog plus search plus filter plus pagination plus duplicate plus archive plus restore plus milestones plus credit display, with shadcn cards plus tables plus pagination plus skeletons for every loading pause. Each page spec carries per page Firecrawl notes plus frontend skill guidance.
+**Done when:** stats scan fast, search plus filter plus pagination feel instant with URL reflected, card actions confirm kindly, skeletons cover stats plus list plus detail, and empty plus error states guide next action.
+- [ ] Design it (spec): `/solution-architect dashboard catalog journey polish`
+
+## Journey D: Workspace and Future Pages Complete
+
+### 24. Workspace and Future Pages Guardrails · Journey · Beta · needs a decision
+Set guardrails in `components/ui` plus shared layout so creation wizard plus document workspace plus assistant plus research plus files plus review plus export plus billing plus admin all start modern when built, reusing inputs plus pickers plus dialogs plus skeletons plus toasts from the foundation with no new visual language. Each future page spec will carry per page Firecrawl notes plus frontend skill guidance at build time.
+**Done when:** guardrail list names allowed primitives plus patterns plus motion limits, existing planned features point to it, and a new page can start from it with no custom styles.
+- [ ] Design it (spec): `/solution-architect workspace and future pages guardrails`
+
+## Journey E: Public Site Complete
+
+### 25. Public Site Polish · Journey · Beta · needs a decision
+Polish the full public path in `app/page.tsx` covering landing plus pricing plus nav plus legal, with responsive layout, honest previews, clear calls to join, and fast load using foundation patterns. Spec carries per page Firecrawl notes plus frontend skill guidance.
+**Done when:** landing tells the core promise in seconds, pricing guides to credits, nav routes cleanly to sign up, legal reads well on mobile plus desktop, and load feels instant.
+- [ ] Design it (spec): `/solution-architect public site polish`
 
 ## Deferred
 Out of scope for initial launch, recorded so the plan remains honest.
