@@ -84,7 +84,7 @@ export function EditorCanvas({ content, editable, onChange, onInsertCitation }: 
       <EditorToolbar editor={editor} onInsertCitation={onInsertCitation} disabled={!editable} />
       <BubbleMenu editor={editor}>
         <div className="cevo-bubble" role="toolbar" aria-label="Selection formatting">
-          <span className="cevo-bubble-ai" title="Assistant arrives in the next slice">✨ Ask AI</span>
+          <button type="button" className="cevo-bubble-ai" title="Open the writing assistant" onClick={() => window.dispatchEvent(new CustomEvent("cevo:open-assistant"))}>✨ Ask AI</button>
           <span className="cevo-tool-sep" />
           <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} data-active={editor.isActive("bold") || undefined} aria-label="Bold"><strong>B</strong></button>
           <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} data-active={editor.isActive("italic") || undefined} aria-label="Italic"><em>I</em></button>

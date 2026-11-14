@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Student Dashboard & Project Catalog | Slice 2 | in-progress |
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | in-progress |
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | in-progress |
-| 9 | Contextual AI Assistant & Diff Previews | Slice 5 | planned |
+| 9 | Contextual AI Assistant & Diff Previews | Slice 5 | in-progress |
 | 10 | Verified Research Discovery & Citations | Slice 6 | planned |
 | 11 | File Management & Private Storage | Slice 7 | planned |
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | planned |
@@ -184,10 +184,21 @@ Code in `app/dashboard/projects/[id]/workspace/`, `app/api/projects/[projectId]/
 
 ## Slice 5: Contextual AI Assistant & Diff Previews
 
-### 9. Contextual AI Assistant & Diff Previews · needs a decision
+### 9. Contextual AI Assistant & Diff Previews · in-progress
 Provide an in-workspace academic co-pilot for tone revision, paragraph polishing, and consistency review with side-by-side diff previews.
 **Done when:** students can request improvements with pre-calculated credit estimates, preview changes, and accept or discard edits without silent text replacement.
-- [ ] Design it (spec): `/solution-architect contextual ai assistant & diff previews`
+Spec: [0008](../specs/0008-ai-assistant-diff-previews/index.md)
+- [x] Design it (spec): `/solution-architect contextual ai assistant & diff previews`
+- [x] Build it: `/feature-build contextual ai assistant & diff previews`
+  - [x] Migration plus estimate plus runs skeleton with hold and 402 path (Satisfies AC-3, AC-7)
+  - [x] Thin thread with stream, panel diff, and single paragraph accept (Satisfies AC-1, AC-2, AC-4, AC-6)
+  - [x] Review warnings plus bulk actions plus history with pruning (Satisfies AC-4, AC-5, AC-7)
+  - [x] Guards plus panel states plus audit and telemetry (Satisfies AC-8, AC-9, AC-10)
+Code in `prisma/schema.prisma`, `lib/assistant.ts`, `lib/assistant-prompts.ts`, `app/api/projects/[projectId]/assistant/`, `app/api/cron/assistant-prune/`, `components/workspace/assistant-tab.tsx`, `components/workspace/workspace-client.tsx`
+- [ ] Verify it: /verify-release contextual ai assistant & diff previews
+- [ ] Test it: /test-engineer contextual ai assistant & diff previews
+- [ ] Review it (fresh model): /peer-review contextual ai assistant & diff previews
+- [ ] Document it: /tech-writer contextual ai assistant & diff previews
 
 ## Slice 6: Verified Research Discovery & Citations
 

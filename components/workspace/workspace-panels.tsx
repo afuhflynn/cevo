@@ -72,7 +72,7 @@ export function InspectorRail({ headings, liveWords, storedWords, saveState, onJ
       </div>
       <div className="cevo-inspector-block">
         <h3>Assistant</h3>
-        <p className="cevo-muted">Tone and polish dock here in the next slice.</p>
+        <p className="cevo-muted">Tone and polish live in the Assistant tab, with cost shown before each run.</p>
       </div>
       <div className="cevo-inspector-block">
         <h3>Research</h3>

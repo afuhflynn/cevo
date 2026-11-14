@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { countWordsFromTiptap, extractHeadings, type WorkspaceTreeNode } from "@/lib/workspace-shared";
 import { clearDraft, enqueueOp, readDraft, readQueue, removeOpsFor, writeDraft } from "@/lib/workspace-draft";
+import { AssistantTab } from "./assistant-tab";
 import { DocumentTree } from "./document-tree";
 import { EditorCanvas } from "./editor-canvas";
 import { ConflictBanner, InspectorRail, type SaveState } from "./workspace-panels";
@@ -45,6 +46,7 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
   const [readOnly, setReadOnly] = useState(!!initialReadOnly);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
+  const [rightTab, setRightTab] = useState<"inspector" | "assistant">("inspector");
   const versionRef = useRef(1);
   const sectionIdRef = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -183,6 +185,52 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
       window.removeEventListener("focus", onFocus);
     };
   }, [replayQueue]);
+
+  useEffect(() => {
+    const openAssistant = () => {
+      setRightOpen(true);
+      setRightTab("assistant");
+    };
+    window.addEventListener("cevo:open-assistant", openAssistant);
+    return () => window.removeEventListener("cevo:open-assistant", openAssistant);
+  }, []);
+
+  const getScopeText = useCallback(() => {
+    const selection = window.getSelection()?.toString().trim() ?? "";
+    if (selection.length > 0) return { scope: "selection" as const, text: selection.slice(0, 12000) };
+    const texts: string[] = [];
+    function walk(node: unknown) {
+      if (!node || typeof node !== "object") return;
+      const n = node as Record<string, unknown>;
+      if (typeof n["text"] === "string") {
+        texts.push(n["text"] as string);
+        return;
+      }
+      const content = n["content"];
+      if (Array.isArray(content)) {
+        const before = texts.length;
+        for (const c of content) walk(c);
+        if ((n["type"] === "paragraph" || n["type"] === "heading") && texts.length > before) {
+          texts.push("\n\n");
+        }
+      }
+    }
+    walk(draft);
+    const text = texts.join("").replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
+    return { scope: "chapter" as const, text };
+  }, [draft]);
+
+  const handleAssistantApplied = useCallback((content: unknown, version: number, wordCount: number) => {
+    versionRef.current = version;
+    setSection((s) => (s ? { ...s, content, version, wordCount } : s));
+    setDraft(content);
+    if (sectionIdRef.current) {
+      writeDraft(sectionIdRef.current, { content, version, updatedAt: new Date().toISOString() });
+    }
+    setConflict(null);
+    setSaveState("saved");
+    loadTree();
+  }, [loadTree]);
 
   const insertCitation = useCallback(() => {
     const text = window.prompt("Citation note or source id (max 500 chars)", "");
@@ -333,7 +381,38 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
           )}
         </main>
         {rightOpen && (
-          <InspectorRail headings={headings} liveWords={liveWords} storedWords={section?.wordCount ?? 0} saveState={saveState} onJump={() => { document.querySelector(".cevo-canvas-scroll")?.scrollBy({ top: 200, behavior: "smooth" }); }} />
+          <div className="cevo-rail-right">
+            <div className="cevo-rail-tabs" role="tablist" aria-label="Inspector tabs">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={rightTab === "inspector"}
+                onClick={() => setRightTab("inspector")}
+              >
+                Inspector
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={rightTab === "assistant"}
+                onClick={() => setRightTab("assistant")}
+              >
+                Assistant
+              </button>
+            </div>
+            {rightTab === "inspector" ? (
+              <InspectorRail headings={headings} liveWords={liveWords} storedWords={section?.wordCount ?? 0} saveState={saveState} onJump={() => { document.querySelector(".cevo-canvas-scroll")?.scrollBy({ top: 200, behavior: "smooth" }); }} />
+            ) : (
+              <AssistantTab
+                projectId={projectId}
+                sectionId={activeId}
+                sectionVersion={section?.version ?? versionRef.current}
+                getScopeText={getScopeText}
+                onApplied={handleAssistantApplied}
+                readOnly={readOnly}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>

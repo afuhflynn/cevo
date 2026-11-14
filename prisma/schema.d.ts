@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'31dd1dcf645b135093b4f320e520c8ddd81886ec3b230dc33b8185bf7cb04815'>;
+  StorageHashBase<'3cddc7a5fb22161d07fb73e0ac43c5ed5303a9abebf881edf6792120c2035e0c'>;
 export type ExecutionHash =
-  ExecutionHashBase<'88322b61ea2ae66db2b7a066f8ff0445786d5d0bc01ac750c95b04b5440a22e6'>;
+  ExecutionHashBase<'a932af8705bee8d856bbe964ff110d38c0242b048062f11ab69a34b8b48730f8'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -647,6 +647,41 @@ export namespace Models {
     user: public_User;
     readonly [RelationKeys]?: 'user';
   };
+  export type public_AiAssistRun = {
+    actualCredits: FieldOutputTypes['public']['AiAssistRun']['actualCredits'];
+    createdAt: FieldOutputTypes['public']['AiAssistRun']['createdAt'];
+    estimateCredits: FieldOutputTypes['public']['AiAssistRun']['estimateCredits'];
+    expiresAt: FieldOutputTypes['public']['AiAssistRun']['expiresAt'];
+    id: FieldOutputTypes['public']['AiAssistRun']['id'];
+    idempotencyKey: FieldOutputTypes['public']['AiAssistRun']['idempotencyKey'];
+    inputChars: FieldOutputTypes['public']['AiAssistRun']['inputChars'];
+    inputHash: FieldOutputTypes['public']['AiAssistRun']['inputHash'];
+    inputText: FieldOutputTypes['public']['AiAssistRun']['inputText'];
+    modelId: FieldOutputTypes['public']['AiAssistRun']['modelId'];
+    operation: FieldOutputTypes['public']['AiAssistRun']['operation'];
+    projectId: FieldOutputTypes['public']['AiAssistRun']['projectId'];
+    promptVersion: FieldOutputTypes['public']['AiAssistRun']['promptVersion'];
+    scope: FieldOutputTypes['public']['AiAssistRun']['scope'];
+    sectionId: FieldOutputTypes['public']['AiAssistRun']['sectionId'];
+    sectionVersion: FieldOutputTypes['public']['AiAssistRun']['sectionVersion'];
+    status: FieldOutputTypes['public']['AiAssistRun']['status'];
+    tokenCost: FieldOutputTypes['public']['AiAssistRun']['tokenCost'];
+    userId: FieldOutputTypes['public']['AiAssistRun']['userId'];
+    suggestions: public_AiSuggestion[];
+    readonly [RelationKeys]?: 'suggestions';
+  };
+  export type public_AiSuggestion = {
+    createdAt: FieldOutputTypes['public']['AiSuggestion']['createdAt'];
+    id: FieldOutputTypes['public']['AiSuggestion']['id'];
+    originalText: FieldOutputTypes['public']['AiSuggestion']['originalText'];
+    paragraphIndex: FieldOutputTypes['public']['AiSuggestion']['paragraphIndex'];
+    revisedText: FieldOutputTypes['public']['AiSuggestion']['revisedText'];
+    runId: FieldOutputTypes['public']['AiSuggestion']['runId'];
+    status: FieldOutputTypes['public']['AiSuggestion']['status'];
+    warnings: FieldOutputTypes['public']['AiSuggestion']['warnings'];
+    run: public_AiAssistRun;
+    readonly [RelationKeys]?: 'run';
+  };
   export type public_AiUsage = {
     createdAt: FieldOutputTypes['public']['AiUsage']['createdAt'];
     creditsCharged: FieldOutputTypes['public']['AiUsage']['creditsCharged'];
@@ -1239,6 +1274,8 @@ export declare const models: {
   public: {
     AcademicProfile: Models.public_AcademicProfile;
     Account: Models.public_Account;
+    AiAssistRun: Models.public_AiAssistRun;
+    AiSuggestion: Models.public_AiSuggestion;
     AiUsage: Models.public_AiUsage;
     AuditEvent: Models.public_AuditEvent;
     BriefVersion: Models.public_BriefVersion;
@@ -1574,6 +1611,238 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly AiAssistRun: {
+              columns: {
+                readonly actualCredits: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly estimateCredits: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly expiresAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly idempotencyKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly inputChars: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly inputHash: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly inputText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly modelId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly operation: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly promptVersion: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly scope: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly sectionId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly sectionVersion: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'held'>;
+                  };
+                  readonly many: false;
+                };
+                readonly tokenCost: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['idempotencyKey'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'AiAssistRun_projectId_createdAt_idx_d2d6484f';
+                  readonly prefix: 'AiAssistRun_projectId_createdAt_idx';
+                  readonly columns: readonly ['projectId', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'AiAssistRun_sectionId_createdAt_idx_9fabc30e';
+                  readonly prefix: 'AiAssistRun_sectionId_createdAt_idx';
+                  readonly columns: readonly ['sectionId', 'createdAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
+            readonly AiSuggestion: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly originalText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly paragraphIndex: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly revisedText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly runId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'pending'>;
+                  };
+                  readonly many: false;
+                };
+                readonly warnings: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['runId', 'paragraphIndex'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'AiSuggestion_runId_idx_a6016437';
+                  readonly prefix: 'AiSuggestion_runId_idx';
+                  readonly columns: readonly ['runId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'AiSuggestion';
+                    readonly columns: readonly ['runId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'AiAssistRun';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -5480,6 +5749,14 @@ type ContractBase = Omit<
       readonly model: 'AcademicProfile';
     };
     readonly Account: { readonly namespace: 'public' & NamespaceId; readonly model: 'Account' };
+    readonly AiAssistRun: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'AiAssistRun';
+    };
+    readonly AiSuggestion: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'AiSuggestion';
+    };
     readonly AiUsage: { readonly namespace: 'public' & NamespaceId; readonly model: 'AiUsage' };
     readonly AuditEvent: {
       readonly namespace: 'public' & NamespaceId;
@@ -5834,6 +6111,200 @@ type ContractBase = Omit<
                 readonly refreshToken: { readonly column: 'refreshToken' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly AiAssistRun: {
+            readonly fields: {
+              readonly actualCredits: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly estimateCredits: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly idempotencyKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly inputChars: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly inputHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly inputText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly modelId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly operation: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly promptVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly scope: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sectionId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sectionVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly tokenCost: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly suggestions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'AiSuggestion';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['runId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'AiAssistRun';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly actualCredits: { readonly column: 'actualCredits' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly estimateCredits: { readonly column: 'estimateCredits' };
+                readonly expiresAt: { readonly column: 'expiresAt' };
+                readonly id: { readonly column: 'id' };
+                readonly idempotencyKey: { readonly column: 'idempotencyKey' };
+                readonly inputChars: { readonly column: 'inputChars' };
+                readonly inputHash: { readonly column: 'inputHash' };
+                readonly inputText: { readonly column: 'inputText' };
+                readonly modelId: { readonly column: 'modelId' };
+                readonly operation: { readonly column: 'operation' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly promptVersion: { readonly column: 'promptVersion' };
+                readonly scope: { readonly column: 'scope' };
+                readonly sectionId: { readonly column: 'sectionId' };
+                readonly sectionVersion: { readonly column: 'sectionVersion' };
+                readonly status: { readonly column: 'status' };
+                readonly tokenCost: { readonly column: 'tokenCost' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly AiSuggestion: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly originalText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly paragraphIndex: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly revisedText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly runId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly warnings: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+            };
+            readonly relations: {
+              readonly run: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'AiAssistRun';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['runId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'AiSuggestion';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly originalText: { readonly column: 'originalText' };
+                readonly paragraphIndex: { readonly column: 'paragraphIndex' };
+                readonly revisedText: { readonly column: 'revisedText' };
+                readonly runId: { readonly column: 'runId' };
+                readonly status: { readonly column: 'status' };
+                readonly warnings: { readonly column: 'warnings' };
               };
             };
           };
@@ -9649,6 +10120,22 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Account';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'AiAssistRun';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'AiSuggestion';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

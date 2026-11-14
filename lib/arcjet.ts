@@ -69,6 +69,14 @@ const workspaceLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 120, window: "1m" })] })
   : null;
 
+const assistantBurstLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
+  : null;
+
+const assistantHourlyLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 10, window: "1h" })] })
+  : null;
+
 export async function checkWorkspaceRateLimit(req: Request): Promise<boolean> {
   if (!workspaceLimiter) return true;
   const decision = await workspaceLimiter.protect(req);
@@ -77,6 +85,25 @@ export async function checkWorkspaceRateLimit(req: Request): Promise<boolean> {
     return true;
   }
   return !decision.isDenied();
+}
+
+export async function checkAssistantRateLimit(req: Request): Promise<boolean> {
+  if (!assistantBurstLimiter || !assistantHourlyLimiter) return true;
+  const [burst, hourly] = await Promise.all([
+    assistantBurstLimiter.protect(req),
+    assistantHourlyLimiter.protect(req),
+  ]);
+  for (const [decision, label] of [
+    [burst, "assistant-burst"],
+    [hourly, "assistant-hourly"],
+  ] as const) {
+    if (decision.isErrored()) {
+      console.warn(`[arcjet] decision error on ${label}, failing open`);
+      continue;
+    }
+    if (decision.isDenied()) return false;
+  }
+  return true;
 }
 
 export type WizardRateLimitKind = "wizard-turn" | "wizard-synthesis";

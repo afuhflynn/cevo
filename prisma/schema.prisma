@@ -806,3 +806,46 @@ model BriefVersion {
   @@unique([briefId, version])
   @@index([briefId, version])
 }
+
+model AiAssistRun {
+  id              String   @id @onCreate(cuid(2))
+  projectId       String
+  sectionId       String
+  userId          String
+  operation       String
+  promptVersion   String
+  scope           String
+  sectionVersion  Int
+  inputHash       String
+  inputText       Text
+  inputChars      Int
+  estimateCredits Int
+  actualCredits   Int      @default(0)
+  modelId         String?
+  tokenCost       Int      @default(0)
+  status          String   @default("held")
+  idempotencyKey  String   @unique
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+
+  suggestions     AiSuggestion[]
+
+  @@index([sectionId, createdAt])
+  @@index([projectId, createdAt])
+}
+
+model AiSuggestion {
+  id            String   @id @onCreate(cuid(2))
+  runId         String
+  paragraphIndex Int
+  originalText  String
+  revisedText   String
+  warnings      Json?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+
+  run           AiAssistRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@unique([runId, paragraphIndex])
+  @@index([runId, paragraphIndex])
+}
