@@ -43,8 +43,11 @@ async function DashboardLoader({
             Welcome{firstName ? `, ${firstName}` : ""}.
           </h1>
           <p className="text-sm text-muted-foreground">
-            You hold {stats.walletBalance} credits. Buying more arrives with the
-            payments slice.
+            You hold {stats.walletBalance} credits.{" "}
+            <Link href="/dashboard/billing" className="underline">
+              Buy more
+            </Link>
+            .
           </p>
         </div>
         <div className="flex gap-2">

@@ -25,7 +25,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | in-progress |
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | in-progress |
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | in-progress |
-| 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
+| 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | in-progress |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
@@ -289,10 +289,21 @@ Spec: [0013](../specs/0013-pdf-docx-export-engine/index.md)
 
 ## Slice 11: Credit Ledger & Fapshi Mobile Money Checkout
 
-### 15. Credit Ledger & Fapshi Mobile Money Checkout · needs a decision
+### 15. Credit Ledger & Fapshi Mobile Money Checkout · in-progress
 Implement prepaid credit packages in XAF with Fapshi mobile money collections (MTN MoMo and Orange Money), cryptographic webhook verification, and double entry ledger accounting.
 **Done when:** students can purchase credit packages using mobile money, credits allocate exactly once upon payment confirmation, and failed AI runs trigger automatic refunds.
-- [ ] Design it (spec): `/solution-architect credit ledger & fapshi mobile money checkout`
+Spec: [0014](../specs/0014-credit-ledger-fapshi-mobile-money-checkout/index.md)
+- [x] Design it (spec): `/solution-architect credit ledger & fapshi mobile money checkout`
+- [x] Build it: `/feature-build credit ledger & fapshi mobile money checkout`
+  - [x] Thin thread: package seed plus start payment plus HMAC verified webhook allocate (Satisfies AC-1, AC-2, AC-3, AC-9)
+  - [x] Status poll plus expiry job with server side Fapshi query plus retry UX (Satisfies AC-2, AC-4, AC-5)
+  - [x] Balance surfaces plus ledger history plus welcome grant coexistence (Satisfies AC-6, AC-7)
+  - [x] Admin package CRUD plus failed run refunds plus sandbox to live runbook (Satisfies AC-8, AC-10, AC-11)
+Code in `lib/billing.ts`, `app/api/billing/`, `app/api/admin/billing/`, `app/api/cron/payments-expire/`, `app/dashboard/billing/`, `app/admin/billing/`, `components/billing/`, `scripts/seed-billing-packages.ts`, `docs/runbooks/fapshi-sandbox-to-live.md`
+- [ ] Verify it: /verify-release credit ledger & fapshi mobile money checkout
+- [ ] Test it: /test-engineer credit ledger & fapshi mobile money checkout
+- [ ] Review it (fresh model): /peer-review credit ledger & fapshi mobile money checkout
+- [ ] Document it: /tech-writer credit ledger & fapshi mobile money checkout
 
 ## Slice 12: Administration Portal & Platform Telemetry
 

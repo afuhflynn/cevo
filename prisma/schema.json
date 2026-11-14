@@ -3209,6 +3209,13 @@
                   "kind": "scalar"
                 }
               },
+              "clientKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "completedAt": {
                 "nullable": true,
                 "type": {
@@ -3234,6 +3241,16 @@
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
+                }
+              },
+              "expiresAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
                 }
               },
               "failureReason": {
@@ -3304,6 +3321,16 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "webhookVerifiedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
               }
             },
             "relations": {
@@ -3360,6 +3387,9 @@
                 "amountXaf": {
                   "column": "amountXaf"
                 },
+                "clientKey": {
+                  "column": "clientKey"
+                },
                 "completedAt": {
                   "column": "completedAt"
                 },
@@ -3368,6 +3398,9 @@
                 },
                 "creditsAllocated": {
                   "column": "creditsAllocated"
+                },
+                "expiresAt": {
+                  "column": "expiresAt"
                 },
                 "failureReason": {
                   "column": "failureReason"
@@ -3395,6 +3428,9 @@
                 },
                 "userId": {
                   "column": "userId"
+                },
+                "webhookVerifiedAt": {
+                  "column": "webhookVerifiedAt"
                 }
               },
               "namespaceId": "public",
@@ -3447,6 +3483,20 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "providerTransId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "signatureValid": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -3486,6 +3536,12 @@
                 },
                 "paymentId": {
                   "column": "paymentId"
+                },
+                "providerTransId": {
+                  "column": "providerTransId"
+                },
+                "signatureValid": {
+                  "column": "signatureValid"
                 }
               },
               "namespaceId": "public",
@@ -9933,6 +9989,11 @@
                   "dataType": "pg/int4",
                   "nullable": false
                 },
+                "clientKey": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
                 "completedAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
@@ -9957,6 +10018,14 @@
                   "codecId": "pg/int4@1",
                   "dataType": "pg/int4",
                   "nullable": false
+                },
+                "expiresAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
                 },
                 "failureReason": {
                   "codecId": "pg/text@1",
@@ -10016,6 +10085,14 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
+                },
+                "webhookVerifiedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
                 }
               },
               "foreignKeys": [
@@ -10062,6 +10139,14 @@
               "indexes": [
                 {
                   "columns": [
+                    "expiresAt"
+                  ],
+                  "name": "Payment_expiresAt_idx_6b6b8c10",
+                  "prefix": "Payment_expiresAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "packageId"
                   ],
                   "name": "Payment_packageId_idx_51f866f4",
@@ -10095,6 +10180,12 @@
                 {
                   "columns": [
                     "providerTransId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "userId",
+                    "clientKey"
                   ]
                 }
               ]
@@ -10141,6 +10232,20 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "providerTransId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "signatureValid": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -10171,6 +10276,14 @@
                   ],
                   "name": "PaymentWebhookEvent_paymentId_idx_b2fe9a10",
                   "prefix": "PaymentWebhookEvent_paymentId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "providerTransId"
+                  ],
+                  "name": "PaymentWebhookEvent_providerTransId_idx_93e3c66d",
+                  "prefix": "PaymentWebhookEvent_providerTransId_idx",
                   "unique": false
                 }
               ],
@@ -13612,7 +13725,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b7977eae0a63b092d41fd8f6b2c7e7f9dc4b4ae3dd6be8744ba2d6f54220a8ea"
+    "storageHash": "b421e3294171b5b9ad93e8345f3a7472dd0067dad063e01cb1f8494e42ee1946"
   },
   "execution": {
     "executionHash": "c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145",

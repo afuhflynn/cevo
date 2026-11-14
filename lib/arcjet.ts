@@ -105,6 +105,14 @@ const exportLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
   : null;
 
+const billingStartLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 10, window: "1m" })] })
+  : null;
+
+const billingWebhookLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 120, window: "1m" })] })
+  : null;
+
 export async function checkExportRateLimit(req: Request): Promise<boolean> {
   if (!exportLimiter) return true;
   const decision = await exportLimiter.protect(req);
@@ -185,6 +193,23 @@ export async function checkReviewRateLimit(req: Request): Promise<boolean> {
   const decision = await reviewBurstLimiter.protect(req);
   if (decision.isErrored()) {
     console.warn("[arcjet] decision error on review, failing open");
+    return true;
+  }
+  return !decision.isDenied();
+}
+
+export type BillingRateLimitKind = "start" | "webhook";
+
+export async function checkBillingRateLimit(
+  req: Request,
+  kind: BillingRateLimitKind,
+): Promise<boolean> {
+  const limiter =
+    kind === "start" ? billingStartLimiter : billingWebhookLimiter;
+  if (!limiter) return true;
+  const decision = await limiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn(`[arcjet] decision error on billing-${kind}, failing open`);
     return true;
   }
   return !decision.isDenied();

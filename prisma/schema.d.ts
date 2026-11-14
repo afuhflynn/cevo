@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'b7977eae0a63b092d41fd8f6b2c7e7f9dc4b4ae3dd6be8744ba2d6f54220a8ea'>;
+  StorageHashBase<'b421e3294171b5b9ad93e8345f3a7472dd0067dad063e01cb1f8494e42ee1946'>;
 export type ExecutionHash =
   ExecutionHashBase<'c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145'>;
 export type ProfileHash =
@@ -887,9 +887,11 @@ export namespace Models {
   };
   export type public_Payment = {
     amountXaf: FieldOutputTypes['public']['Payment']['amountXaf'];
+    clientKey: FieldOutputTypes['public']['Payment']['clientKey'];
     completedAt: FieldOutputTypes['public']['Payment']['completedAt'];
     createdAt: FieldOutputTypes['public']['Payment']['createdAt'];
     creditsAllocated: FieldOutputTypes['public']['Payment']['creditsAllocated'];
+    expiresAt: FieldOutputTypes['public']['Payment']['expiresAt'];
     failureReason: FieldOutputTypes['public']['Payment']['failureReason'];
     id: FieldOutputTypes['public']['Payment']['id'];
     packageId: FieldOutputTypes['public']['Payment']['packageId'];
@@ -899,6 +901,7 @@ export namespace Models {
     providerTransId: FieldOutputTypes['public']['Payment']['providerTransId'];
     status: FieldOutputTypes['public']['Payment']['status'];
     userId: FieldOutputTypes['public']['Payment']['userId'];
+    webhookVerifiedAt: FieldOutputTypes['public']['Payment']['webhookVerifiedAt'];
     package: public_CreditPackage;
     user: public_User;
     webhookEvents: public_PaymentWebhookEvent[];
@@ -911,6 +914,8 @@ export namespace Models {
     isProcessed: FieldOutputTypes['public']['PaymentWebhookEvent']['isProcessed'];
     payload: FieldOutputTypes['public']['PaymentWebhookEvent']['payload'];
     paymentId: FieldOutputTypes['public']['PaymentWebhookEvent']['paymentId'];
+    providerTransId: FieldOutputTypes['public']['PaymentWebhookEvent']['providerTransId'];
+    signatureValid: FieldOutputTypes['public']['PaymentWebhookEvent']['signatureValid'];
     payment: public_Payment | null;
     readonly [RelationKeys]?: 'payment';
   };
@@ -3307,6 +3312,12 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly clientKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
                 readonly completedAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
@@ -3326,6 +3337,13 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/int4';
                   readonly codecId: 'pg/int4@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly expiresAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
                   readonly many: false;
                 };
                 readonly failureReason: {
@@ -3390,10 +3408,26 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly webhookVerifiedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['providerTransId'] }];
+              uniques: readonly [
+                { readonly columns: readonly ['providerTransId'] },
+                { readonly columns: readonly ['userId', 'clientKey'] },
+              ];
               indexes: readonly [
+                {
+                  readonly name: 'Payment_expiresAt_idx_6b6b8c10';
+                  readonly prefix: 'Payment_expiresAt_idx';
+                  readonly columns: readonly ['expiresAt'];
+                  readonly unique: false;
+                },
                 {
                   readonly name: 'Payment_packageId_idx_51f866f4';
                   readonly prefix: 'Payment_packageId_idx';
@@ -3484,6 +3518,22 @@ type ContractBase = Omit<
                   readonly nullable: true;
                   readonly many: false;
                 };
+                readonly providerTransId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly signatureValid: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
@@ -3492,6 +3542,12 @@ type ContractBase = Omit<
                   readonly name: 'PaymentWebhookEvent_paymentId_idx_b2fe9a10';
                   readonly prefix: 'PaymentWebhookEvent_paymentId_idx';
                   readonly columns: readonly ['paymentId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'PaymentWebhookEvent_providerTransId_idx_93e3c66d';
+                  readonly prefix: 'PaymentWebhookEvent_providerTransId_idx';
+                  readonly columns: readonly ['providerTransId'];
                   readonly unique: false;
                 },
               ];
@@ -8118,6 +8174,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly clientKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly completedAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -8137,6 +8197,14 @@ type ContractBase = Omit<
               readonly creditsAllocated: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
               };
               readonly failureReason: {
                 readonly nullable: true;
@@ -8173,6 +8241,14 @@ type ContractBase = Omit<
               readonly userId: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly webhookVerifiedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
               };
             };
             readonly relations: {
@@ -8214,9 +8290,11 @@ type ContractBase = Omit<
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly amountXaf: { readonly column: 'amountXaf' };
+                readonly clientKey: { readonly column: 'clientKey' };
                 readonly completedAt: { readonly column: 'completedAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly creditsAllocated: { readonly column: 'creditsAllocated' };
+                readonly expiresAt: { readonly column: 'expiresAt' };
                 readonly failureReason: { readonly column: 'failureReason' };
                 readonly id: { readonly column: 'id' };
                 readonly packageId: { readonly column: 'packageId' };
@@ -8226,6 +8304,7 @@ type ContractBase = Omit<
                 readonly providerTransId: { readonly column: 'providerTransId' };
                 readonly status: { readonly column: 'status' };
                 readonly userId: { readonly column: 'userId' };
+                readonly webhookVerifiedAt: { readonly column: 'webhookVerifiedAt' };
               };
             };
           };
@@ -8259,6 +8338,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly providerTransId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly signatureValid: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
             };
             readonly relations: {
               readonly payment: {
@@ -8284,6 +8371,8 @@ type ContractBase = Omit<
                 readonly isProcessed: { readonly column: 'isProcessed' };
                 readonly payload: { readonly column: 'payload' };
                 readonly paymentId: { readonly column: 'paymentId' };
+                readonly providerTransId: { readonly column: 'providerTransId' };
+                readonly signatureValid: { readonly column: 'signatureValid' };
               };
             };
           };

@@ -753,6 +753,9 @@ model Payment {
   payerPhone      String?
   paymentUrl      String?
   failureReason   String?
+  clientKey       String
+  expiresAt       DateTime
+  webhookVerifiedAt DateTime?
   createdAt       DateTime      @default(now())
   completedAt     DateTime?
 
@@ -762,6 +765,8 @@ model Payment {
 
   @@index([userId, status])
   @@index([providerTransId])
+  @@index([expiresAt])
+  @@unique([userId, clientKey])
 }
 
 model PaymentWebhookEvent {
@@ -770,9 +775,13 @@ model PaymentWebhookEvent {
   eventType   String
   payload     Json
   isProcessed Boolean  @default(false)
+  signatureValid Boolean @default(false)
+  providerTransId String?
   createdAt   DateTime @default(now())
 
   payment     Payment? @relation(fields: [paymentId], references: [id])
+
+  @@index([providerTransId])
 }
 
 model Notification {
