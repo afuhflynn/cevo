@@ -2310,6 +2310,20 @@
           },
           "ExportJob": {
             "fields": {
+              "attemptCount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "clientKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "completedAt": {
                 "nullable": true,
                 "type": {
@@ -2335,6 +2349,16 @@
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
+                }
+              },
+              "expiresAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
                 }
               },
               "fileSize": {
@@ -2371,6 +2395,13 @@
                   "kind": "scalar"
                 }
               },
+              "requestedBy": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "s3Key": {
                 "nullable": true,
                 "type": {
@@ -2389,6 +2420,13 @@
                   "entityName": "JobStatus",
                   "namespaceId": "public",
                   "plane": "domain"
+                }
+              },
+              "templateVersionId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               }
             },
@@ -2412,6 +2450,12 @@
             },
             "storage": {
               "fields": {
+                "attemptCount": {
+                  "column": "attemptCount"
+                },
+                "clientKey": {
+                  "column": "clientKey"
+                },
                 "completedAt": {
                   "column": "completedAt"
                 },
@@ -2420,6 +2464,9 @@
                 },
                 "errorMessage": {
                   "column": "errorMessage"
+                },
+                "expiresAt": {
+                  "column": "expiresAt"
                 },
                 "fileSize": {
                   "column": "fileSize"
@@ -2433,11 +2480,17 @@
                 "projectId": {
                   "column": "projectId"
                 },
+                "requestedBy": {
+                  "column": "requestedBy"
+                },
                 "s3Key": {
                   "column": "s3Key"
                 },
                 "status": {
                   "column": "status"
+                },
+                "templateVersionId": {
+                  "column": "templateVersionId"
                 }
               },
               "namespaceId": "public",
@@ -9126,6 +9179,24 @@
                 }
               ],
               "columns": {
+                "attemptCount": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nullable": false
+                },
+                "clientKey": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "legacy"
+                  },
+                  "nullable": false
+                },
                 "completedAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
@@ -9150,6 +9221,18 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "expiresAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
                 },
                 "fileSize": {
                   "codecId": "pg/int4@1",
@@ -9181,6 +9264,15 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "requestedBy": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "unknown"
+                  },
+                  "nullable": false
+                },
                 "s3Key": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -9200,6 +9292,11 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "templateVersionId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -9227,6 +9324,14 @@
               "indexes": [
                 {
                   "columns": [
+                    "expiresAt"
+                  ],
+                  "name": "ExportJob_expiresAt_idx_6b6b8c10",
+                  "prefix": "ExportJob_expiresAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "projectId"
                   ],
                   "name": "ExportJob_projectId_idx_a96e4d92",
@@ -9248,7 +9353,15 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "projectId",
+                    "format",
+                    "clientKey"
+                  ]
+                }
+              ]
             },
             "Faculty": {
               "columns": {
@@ -13499,7 +13612,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6f49f4cde23bd0456469d3960aa13daa72ee43a07f6ba630fb92fab2957cb50b"
+    "storageHash": "b7977eae0a63b092d41fd8f6b2c7e7f9dc4b4ae3dd6be8744ba2d6f54220a8ea"
   },
   "execution": {
     "executionHash": "c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145",

@@ -645,19 +645,26 @@ model FileAsset {
 }
 
 model ExportJob {
-  id           String       @id @onCreate(cuid(2))
-  projectId    String
-  format       ExportFormat @default(PDF)
-  status       JobStatus    @default(QUEUED)
-  s3Key        String?
-  fileSize     Int?
-  errorMessage String?
-  createdAt    DateTime     @default(now())
-  completedAt  DateTime?
+  id                String       @id @onCreate(cuid(2))
+  projectId         String
+  format            ExportFormat @default(PDF)
+  status            JobStatus    @default(QUEUED)
+  s3Key             String?
+  fileSize          Int?
+  errorMessage      String?
+  requestedBy       String       @default("unknown")
+  templateVersionId String?
+  clientKey         String       @default("legacy")
+  attemptCount      Int          @default(0)
+  expiresAt         DateTime     @default(now())
+  createdAt         DateTime     @default(now())
+  completedAt       DateTime?
 
-  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project           Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, status])
+  @@index([expiresAt])
+  @@unique([projectId, format, clientKey])
 }
 
 model AiUsage {

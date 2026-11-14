@@ -168,3 +168,38 @@ export async function deleteStorageObject(key: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function putObjectBytes(
+  key: string,
+  bytes: Uint8Array | Buffer,
+  mimeType: string,
+): Promise<void> {
+  await storageClient().send(
+    new PutObjectCommand({
+      Bucket: bucketName(),
+      Key: key,
+      Body: bytes as Uint8Array,
+      ContentType: mimeType,
+    }),
+  );
+}
+
+export async function presignDownloadUrl(
+  key: string,
+  fileName: string,
+  mimeType: string,
+  ttlSec = 900,
+): Promise<{ url: string; expiresInSec: number }> {
+  const safe = sanitizeDownloadName(fileName);
+  const url = await getSignedUrl(
+    storageClient(),
+    new GetObjectCommand({
+      Bucket: bucketName(),
+      Key: key,
+      ResponseContentDisposition: `attachment; filename="${safe}"`,
+      ResponseContentType: mimeType,
+    }),
+    { expiresIn: ttlSec },
+  );
+  return { url, expiresInSec: ttlSec };
+}

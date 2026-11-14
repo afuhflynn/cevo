@@ -24,7 +24,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 11 | File Management & Private Storage | Slice 7 | in-progress |
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | in-progress |
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | in-progress |
-| 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | planned |
+| 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | in-progress |
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
@@ -272,10 +272,20 @@ Code in `lib/review.ts`, `lib/review-scan.ts`, `app/api/projects/[projectId]/rev
 
 ## Slice 10: High-Fidelity PDF & DOCX Export Engine
 
-### 14. High-Fidelity PDF & DOCX Export Engine · needs a decision
+### 14. High-Fidelity PDF & DOCX Export Engine · in-progress
 Compile complete academic reports into publication quality PDF and Microsoft Word DOCX formats with exact institutional margins, headers, and numbering.
 **Done when:** background export jobs compile documents without server timeouts and deliver downloadable files with correct pagination.
-- [ ] Design it (spec): `/solution-architect high-fidelity pdf & docx export engine`
+Spec: [0013](../specs/0013-pdf-docx-export-engine/index.md)
+- [x] Design it (spec): `/solution-architect high-fidelity pdf & docx export engine`
+- [ ] Build it: `/feature-build high-fidelity pdf & docx export engine`
+  - [x] Thin PDF thread: migration plus start plus worker plus status plus download (Satisfies AC-1, AC-4, AC-7, AC-8)
+  - [x] Full fidelity PDF plus DOCX builder from the shared model (Satisfies AC-2, AC-3, AC-10)
+  - [x] Guards plus life cycle plus Export tab UI (Satisfies AC-4, AC-5, AC-6, AC-8, AC-9)
+  - code in `app/api/projects/[projectId]/exports/`, `inngest/functions/export-run.ts`, `lib/exports.ts`, `lib/export-html.ts`, `components/workspace/export-tab.tsx`
+- [ ] Verify it: /verify-release high-fidelity pdf & docx export engine
+- [ ] Test it: /test-engineer high-fidelity pdf & docx export engine
+- [ ] Review it (fresh model): /peer-review high-fidelity pdf & docx export engine
+- [ ] Document it: /tech-writer high-fidelity pdf & docx export engine
 
 ## Slice 11: Credit Ledger & Fapshi Mobile Money Checkout
 

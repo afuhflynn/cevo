@@ -17,6 +17,7 @@ import {
 import { AssistantTab } from "./assistant-tab";
 import { DocumentTree } from "./document-tree";
 import { EditorCanvas } from "./editor-canvas";
+import { ExportTab } from "./export-tab";
 import { FilesTab } from "./files-tab";
 import { ResearchTab } from "./research-tab";
 import { ReviewTab } from "./review-tab";
@@ -77,7 +78,7 @@ export function WorkspaceClient({
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [rightTab, setRightTab] = useState<
-    "inspector" | "assistant" | "research" | "files" | "review"
+    "inspector" | "assistant" | "research" | "files" | "review" | "export"
   >("inspector");
   const versionRef = useRef(1);
   const sectionIdRef = useRef<string | null>(null);
@@ -691,6 +692,14 @@ export function WorkspaceClient({
               >
                 Review
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={rightTab === "export"}
+                onClick={() => setRightTab("export")}
+              >
+                Export
+              </button>
             </div>
             {rightTab === "inspector" ? (
               <InspectorRail
@@ -722,6 +731,8 @@ export function WorkspaceClient({
               />
             ) : rightTab === "review" ? (
               <ReviewTab projectId={projectId} readOnly={readOnly} />
+            ) : rightTab === "export" ? (
+              <ExportTab projectId={projectId} readOnly={readOnly} />
             ) : (
               <FilesTab projectId={projectId} readOnly={readOnly} />
             )}

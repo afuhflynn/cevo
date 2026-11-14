@@ -101,6 +101,20 @@ const reviewBurstLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
   : null;
 
+const exportLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
+  : null;
+
+export async function checkExportRateLimit(req: Request): Promise<boolean> {
+  if (!exportLimiter) return true;
+  const decision = await exportLimiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn("[arcjet] decision error on export, failing open");
+    return true;
+  }
+  return !decision.isDenied();
+}
+
 export type FilesRateLimitKind = "request" | "complete" | "preview";
 
 export async function checkFilesRateLimit(

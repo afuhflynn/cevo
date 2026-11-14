@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6f49f4cde23bd0456469d3960aa13daa72ee43a07f6ba630fb92fab2957cb50b'>;
+  StorageHashBase<'b7977eae0a63b092d41fd8f6b2c7e7f9dc4b4ae3dd6be8744ba2d6f54220a8ea'>;
 export type ExecutionHash =
   ExecutionHashBase<'c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145'>;
 export type ProfileHash =
@@ -797,15 +797,20 @@ export namespace Models {
     readonly [RelationKeys]?: 'section';
   };
   export type public_ExportJob = {
+    attemptCount: FieldOutputTypes['public']['ExportJob']['attemptCount'];
+    clientKey: FieldOutputTypes['public']['ExportJob']['clientKey'];
     completedAt: FieldOutputTypes['public']['ExportJob']['completedAt'];
     createdAt: FieldOutputTypes['public']['ExportJob']['createdAt'];
     errorMessage: FieldOutputTypes['public']['ExportJob']['errorMessage'];
+    expiresAt: FieldOutputTypes['public']['ExportJob']['expiresAt'];
     fileSize: FieldOutputTypes['public']['ExportJob']['fileSize'];
     format: FieldOutputTypes['public']['ExportJob']['format'];
     id: FieldOutputTypes['public']['ExportJob']['id'];
     projectId: FieldOutputTypes['public']['ExportJob']['projectId'];
+    requestedBy: FieldOutputTypes['public']['ExportJob']['requestedBy'];
     s3Key: FieldOutputTypes['public']['ExportJob']['s3Key'];
     status: FieldOutputTypes['public']['ExportJob']['status'];
+    templateVersionId: FieldOutputTypes['public']['ExportJob']['templateVersionId'];
     project: public_Project;
     readonly [RelationKeys]?: 'project';
   };
@@ -2683,6 +2688,26 @@ type ContractBase = Omit<
             };
             readonly ExportJob: {
               columns: {
+                readonly attemptCount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly clientKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'legacy'>;
+                  };
+                  readonly many: false;
+                };
                 readonly completedAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
@@ -2702,6 +2727,14 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly expiresAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
                   readonly many: false;
                 };
                 readonly fileSize: {
@@ -2732,6 +2765,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly requestedBy: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'unknown'>;
+                  };
+                  readonly many: false;
+                };
                 readonly s3Key: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -2748,10 +2791,24 @@ type ContractBase = Omit<
                   };
                   readonly many: false;
                 };
+                readonly templateVersionId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
+              uniques: readonly [
+                { readonly columns: readonly ['projectId', 'format', 'clientKey'] },
+              ];
               indexes: readonly [
+                {
+                  readonly name: 'ExportJob_expiresAt_idx_6b6b8c10';
+                  readonly prefix: 'ExportJob_expiresAt_idx';
+                  readonly columns: readonly ['expiresAt'];
+                  readonly unique: false;
+                },
                 {
                   readonly name: 'ExportJob_projectId_idx_a96e4d92';
                   readonly prefix: 'ExportJob_projectId_idx';
@@ -7522,6 +7579,14 @@ type ContractBase = Omit<
           };
           readonly ExportJob: {
             readonly fields: {
+              readonly attemptCount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly clientKey: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly completedAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -7542,6 +7607,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly expiresAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
               readonly fileSize: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -7558,12 +7631,20 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly requestedBy: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly s3Key: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly status: {
                 readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly templateVersionId: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
             };
@@ -7585,15 +7666,20 @@ type ContractBase = Omit<
               readonly table: 'ExportJob';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly attemptCount: { readonly column: 'attemptCount' };
+                readonly clientKey: { readonly column: 'clientKey' };
                 readonly completedAt: { readonly column: 'completedAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly errorMessage: { readonly column: 'errorMessage' };
+                readonly expiresAt: { readonly column: 'expiresAt' };
                 readonly fileSize: { readonly column: 'fileSize' };
                 readonly format: { readonly column: 'format' };
                 readonly id: { readonly column: 'id' };
                 readonly projectId: { readonly column: 'projectId' };
+                readonly requestedBy: { readonly column: 'requestedBy' };
                 readonly s3Key: { readonly column: 's3Key' };
                 readonly status: { readonly column: 'status' };
+                readonly templateVersionId: { readonly column: 'templateVersionId' };
               };
             };
           };
