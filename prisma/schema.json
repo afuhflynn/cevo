@@ -144,6 +144,10 @@
       "model": "SupportTicket",
       "namespace": "public"
     },
+    "TemplateDraft": {
+      "model": "TemplateDraft",
+      "namespace": "public"
+    },
     "TemplateRule": {
       "model": "TemplateRule",
       "namespace": "public"
@@ -5871,6 +5875,117 @@
               "table": "SupportTicket"
             }
           },
+          "TemplateDraft": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "createdBy": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "payload": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceFileId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceText": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "templateId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "template": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "templateId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ProjectTemplate",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "createdBy": {
+                  "column": "createdBy"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "payload": {
+                  "column": "payload"
+                },
+                "sourceFileId": {
+                  "column": "sourceFileId"
+                },
+                "sourceText": {
+                  "column": "sourceText"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "templateId": {
+                  "column": "templateId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "TemplateDraft"
+            }
+          },
           "TemplateRule": {
             "fields": {
               "citationStyle": {
@@ -11573,6 +11688,108 @@
               },
               "uniques": []
             },
+            "TemplateDraft": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "createdBy": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "payload": {
+                  "codecId": "pg/json@1",
+                  "dataType": "pg/json",
+                  "nullable": true
+                },
+                "sourceFileId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "sourceText": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "open"
+                  },
+                  "nullable": false
+                },
+                "templateId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "TemplateDraft_templateId_idx_19e0d972"
+                  },
+                  "onDelete": "setNull",
+                  "source": {
+                    "columns": [
+                      "templateId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "TemplateDraft"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "ProjectTemplate"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "status",
+                    "createdAt"
+                  ],
+                  "name": "TemplateDraft_status_createdAt_idx_58610442",
+                  "prefix": "TemplateDraft_status_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "templateId"
+                  ],
+                  "name": "TemplateDraft_templateId_idx_19e0d972",
+                  "prefix": "TemplateDraft_templateId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "TemplateRule": {
               "columns": {
                 "citationStyle": {
@@ -12608,10 +12825,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "37a2b500fb48911c11d9548057d5d4f24531fabc82f285cf7a726054e4bf44a9"
+    "storageHash": "e75ee564aaf2ab13ed6c8e09e217cbcffcafb50ca6c69c0ea8e536ffa8904cb6"
   },
   "execution": {
-    "executionHash": "16bb9e09765036827f3f548752359687f4e71cc9cd583b89e9321a40edf2d966",
+    "executionHash": "ce72c34a8f72e41cd5afa5dcdd3d6c68a9b2b97db5636bf0f75c96bd706952b7",
     "mutations": {
       "defaults": [
         {
@@ -13437,6 +13654,17 @@
           "ref": {
             "entry": "SupportTicket",
             "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "cuid2",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "TemplateDraft",
+            "field": "id",
             "namespace": "public"
           }
         },

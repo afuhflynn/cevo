@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { db } from "@/lib/prisma";
+import { matchTemplateForUser } from "@/lib/templates";
 import { computeReadiness, readinessBlockedFields } from "@/lib/wizard";
 import { logWizardAudit } from "@/lib/wizard-credits";
 import { clientIp, loadOwnedWizardSession } from "@/lib/wizard-guards";
-import { suggestTemplateSafe } from "@/lib/wizard-session-view";
 import { approveSchema } from "@/lib/wizard-validation";
 
 const DEFAULT_CHAPTERS = [
@@ -137,8 +137,28 @@ export async function POST(
 
   let templateVersionId = parsed.data.templateVersionId;
   if (!templateVersionId) {
-    const suggestion = await suggestTemplateSafe(session.id, user.id);
-    templateVersionId = suggestion?.templateVersionId;
+    const match = await matchTemplateForUser(user.id);
+    templateVersionId = match.templateVersionId ?? undefined;
+  } else {
+    const chosen = await db.orm.public.TemplateVersion.where({
+      id: templateVersionId,
+    }).first();
+    const stillValid = await (async () => {
+      if (!chosen) return false;
+      const c = chosen as unknown as {
+        isPublished: boolean;
+        templateId: string;
+      };
+      if (!c.isPublished) return false;
+      const t = await db.orm.public.ProjectTemplate.where({
+        id: c.templateId,
+      }).first();
+      return !!t && (t as unknown as { isActive: boolean }).isActive === true;
+    })();
+    if (!stillValid) {
+      const rematch = await matchTemplateForUser(user.id);
+      templateVersionId = rematch.templateVersionId ?? undefined;
+    }
   }
   let templateSections: {
     orderIndex: number;

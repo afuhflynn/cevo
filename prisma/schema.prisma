@@ -355,6 +355,21 @@ model TemplateSection {
   @@index([templateVersionId, orderIndex])
 }
 
+model TemplateDraft {
+  id           String   @id @onCreate(cuid(2))
+  templateId   String?
+  sourceText   Text?
+  sourceFileId String?
+  payload      Json?
+  status       String   @default("open")
+  createdBy    String
+  createdAt    DateTime @default(now())
+
+  template     ProjectTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
 model Project {
   id                String              @id @onCreate(cuid(2))
   userId            String

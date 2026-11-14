@@ -22,7 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | in-progress |
 | 10 | Verified Research Discovery & Citations | Slice 6 | in-progress |
 | 11 | File Management & Private Storage | Slice 7 | in-progress |
-| 12 | Institutional Template Engine & Rule Extraction | Slice 8 | planned |
+| 12 | Institutional Template Engine & Rule Extraction | Slice 8 | in-progress |
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | planned |
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | planned |
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
@@ -237,10 +237,21 @@ Code in `app/api/projects/[projectId]/files/`, `components/workspace/files-tab.t
 
 ## Slice 8: Institutional Template Engine & Rule Extraction
 
-### 12. Institutional Template Engine & Rule Extraction · needs a decision
+### 12. Institutional Template Engine & Rule Extraction · in-progress
 Maintain versioned academic formatting rules for universities, including margins, fonts, line spacing, and required preliminary pages.
 **Done when:** templates match student qualification and department, extracted guideline rules are reviewable by administrators, and active projects stay locked to their chosen version.
-- [ ] Design it (spec): `/solution-architect institutional template engine & rule extraction`
+Spec: [0011](docs/specs/0011-institutional-template-engine-rule-extraction/index.md)
+- [x] Design it (spec): `/solution-architect institutional template engine & rule extraction`
+- [x] Build it: `/feature-build institutional template engine & rule extraction`
+  - [x] Migration plus matcher thread: TemplateDraft table, platform default seed, shared hierarchy match, student read routes (Satisfies AC-2, AC-4, AC-5)
+  - [x] Admin lifecycle: template CRUD plus version create and edit plus admin UI (Satisfies AC-1, AC-8)
+  - [x] Extraction plus review: extract route, draft apply and discard, publish guards, audit events, rate limits (Satisfies AC-2, AC-3, AC-6, AC-7)
+  - [x] Polish: pagination, empty plus loading plus error states in both themes (Satisfies AC-1, AC-2, AC-6, AC-8)
+Code in `lib/templates.ts`, `lib/admin-api.ts`, `app/api/templates/`, `app/api/admin/templates/`, `app/admin/templates/`, `prisma/schema.prisma`, `scripts/seed-platform-template.ts`
+- [ ] Verify it: /verify-release institutional template engine & rule extraction
+- [ ] Test it: /test-engineer institutional template engine & rule extraction
+- [ ] Review it (fresh model): /peer-review institutional template engine & rule extraction
+- [ ] Document it: /tech-writer institutional template engine & rule extraction
 
 ## Slice 9: Pre-Submission Review & Academic Consistency
 

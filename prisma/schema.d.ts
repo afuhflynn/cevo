@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'37a2b500fb48911c11d9548057d5d4f24531fabc82f285cf7a726054e4bf44a9'>;
+  StorageHashBase<'e75ee564aaf2ab13ed6c8e09e217cbcffcafb50ca6c69c0ea8e536ffa8904cb6'>;
 export type ExecutionHash =
-  ExecutionHashBase<'16bb9e09765036827f3f548752359687f4e71cc9cd583b89e9321a40edf2d966'>;
+  ExecutionHashBase<'ce72c34a8f72e41cd5afa5dcdd3d6c68a9b2b97db5636bf0f75c96bd706952b7'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -1155,6 +1155,18 @@ export namespace Models {
     user: public_User;
     readonly [RelationKeys]?: 'messages' | 'user';
   };
+  export type public_TemplateDraft = {
+    createdAt: FieldOutputTypes['public']['TemplateDraft']['createdAt'];
+    createdBy: FieldOutputTypes['public']['TemplateDraft']['createdBy'];
+    id: FieldOutputTypes['public']['TemplateDraft']['id'];
+    payload: FieldOutputTypes['public']['TemplateDraft']['payload'];
+    sourceFileId: FieldOutputTypes['public']['TemplateDraft']['sourceFileId'];
+    sourceText: FieldOutputTypes['public']['TemplateDraft']['sourceText'];
+    status: FieldOutputTypes['public']['TemplateDraft']['status'];
+    templateId: FieldOutputTypes['public']['TemplateDraft']['templateId'];
+    template: public_ProjectTemplate | null;
+    readonly [RelationKeys]?: 'template';
+  };
   export type public_TemplateRule = {
     citationStyle: FieldOutputTypes['public']['TemplateRule']['citationStyle'];
     createdAt: FieldOutputTypes['public']['TemplateRule']['createdAt'];
@@ -1322,6 +1334,7 @@ export declare const models: {
     StudentProfile: Models.public_StudentProfile;
     SupportMessage: Models.public_SupportMessage;
     SupportTicket: Models.public_SupportTicket;
+    TemplateDraft: Models.public_TemplateDraft;
     TemplateRule: Models.public_TemplateRule;
     TemplateSection: Models.public_TemplateSection;
     TemplateVersion: Models.public_TemplateVersion;
@@ -5014,6 +5027,94 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly TemplateDraft: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly createdBy: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly payload: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly sourceFileId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly sourceText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'open'>;
+                  };
+                  readonly many: false;
+                };
+                readonly templateId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'TemplateDraft_status_createdAt_idx_58610442';
+                  readonly prefix: 'TemplateDraft_status_createdAt_idx';
+                  readonly columns: readonly ['status', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'TemplateDraft_templateId_idx_19e0d972';
+                  readonly prefix: 'TemplateDraft_templateId_idx';
+                  readonly columns: readonly ['templateId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'TemplateDraft';
+                    readonly columns: readonly ['templateId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ProjectTemplate';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly TemplateRule: {
               columns: {
                 readonly citationStyle: {
@@ -5983,6 +6084,10 @@ type ContractBase = Omit<
     readonly SupportTicket: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'SupportTicket';
+    };
+    readonly TemplateDraft: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'TemplateDraft';
     };
     readonly TemplateRule: {
       readonly namespace: 'public' & NamespaceId;
@@ -9286,6 +9391,74 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly TemplateDraft: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly createdBy: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly payload: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly sourceFileId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sourceText: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly templateId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly template: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectTemplate';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['templateId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'TemplateDraft';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly createdBy: { readonly column: 'createdBy' };
+                readonly id: { readonly column: 'id' };
+                readonly payload: { readonly column: 'payload' };
+                readonly sourceFileId: { readonly column: 'sourceFileId' };
+                readonly sourceText: { readonly column: 'sourceText' };
+                readonly status: { readonly column: 'status' };
+                readonly templateId: { readonly column: 'templateId' };
+              };
+            };
+          };
           readonly TemplateRule: {
             readonly fields: {
               readonly citationStyle: {
@@ -10925,6 +11098,14 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'SupportTicket';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'TemplateDraft';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

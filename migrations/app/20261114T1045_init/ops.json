@@ -1,0 +1,199 @@
+[
+  {
+    "id": "table.TemplateDraft",
+    "label": "Create table \"TemplateDraft\"",
+    "summary": "Creates table \"TemplateDraft\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "TemplateDraft"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"TemplateDraft\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"TemplateDraft\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"TemplateDraft\"",
+        "sql": "CREATE TABLE \"public\".\"TemplateDraft\" (\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"createdBy\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"payload\" json,\n  \"sourceFileId\" text,\n  \"sourceText\" text,\n  \"status\" text DEFAULT 'open' NOT NULL,\n  \"templateId\" text,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"TemplateDraft\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"TemplateDraft\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "index.TemplateDraft.TemplateDraft_status_createdAt_idx_58610442",
+    "label": "Create index \"TemplateDraft_status_createdAt_idx_58610442\" on \"TemplateDraft\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "TemplateDraft_status_createdAt_idx_58610442",
+        "table": "TemplateDraft"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"TemplateDraft_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft_status_createdAt_idx_58610442\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"TemplateDraft_status_createdAt_idx_58610442\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"TemplateDraft_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"TemplateDraft_status_createdAt_idx_58610442\" ON \"public\".\"TemplateDraft\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"TemplateDraft_status_createdAt_idx_58610442\" exists on \"TemplateDraft\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft_status_createdAt_idx_58610442\"",
+          "i",
+          "I",
+          "\"public\".\"TemplateDraft\"",
+          "btree",
+          "[\"status\",\"createdAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.TemplateDraft.TemplateDraft_templateId_idx_19e0d972",
+    "label": "Create index \"TemplateDraft_templateId_idx_19e0d972\" on \"TemplateDraft\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "TemplateDraft_templateId_idx_19e0d972",
+        "table": "TemplateDraft"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"TemplateDraft_templateId_idx_19e0d972\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft_templateId_idx_19e0d972\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"TemplateDraft_templateId_idx_19e0d972\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"TemplateDraft_templateId_idx_19e0d972\"",
+        "sql": "CREATE INDEX \"TemplateDraft_templateId_idx_19e0d972\" ON \"public\".\"TemplateDraft\" (\"templateId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"TemplateDraft_templateId_idx_19e0d972\" exists on \"TemplateDraft\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"TemplateDraft_templateId_idx_19e0d972\"",
+          "i",
+          "I",
+          "\"public\".\"TemplateDraft\"",
+          "btree",
+          "[\"templateId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TemplateDraft.TemplateDraft_templateId_fkey",
+    "label": "Add foreign key \"TemplateDraft_templateId_fkey\" on \"TemplateDraft\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TemplateDraft_templateId_fkey",
+        "table": "TemplateDraft"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TemplateDraft_templateId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TemplateDraft_templateId_fkey",
+          "public",
+          "\"public\".\"TemplateDraft\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"TemplateDraft_templateId_fkey\" on \"TemplateDraft\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TemplateDraft_templateId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TemplateDraft\"\nADD CONSTRAINT \"TemplateDraft_templateId_fkey\"\nFOREIGN KEY (\"templateId\")\nREFERENCES \"public\".\"ProjectTemplate\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TemplateDraft_templateId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "TemplateDraft_templateId_fkey",
+          "public",
+          "\"public\".\"TemplateDraft\"",
+          "f",
+          "[\"templateId\"]",
+          "\"public\".\"ProjectTemplate\"",
+          "[\"id\"]",
+          "n",
+          "a"
+        ]
+      }
+    ]
+  }
+]
