@@ -27,7 +27,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | in-progress |
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | in-progress |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | in-progress |
-| 17 | Public Website & Marketing Pages | Slice 13 | planned |
+| 17 | Public Website & Marketing Pages | Slice 13 | in-progress |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 | 19 | Branded Transactional Email Templates | Foundation | in-progress |
 | 20 | UI Foundation Refresh and Primitive Audit | Foundation | planned |
@@ -325,10 +325,19 @@ Code in `app/admin/`, `app/api/admin/overview/`, `app/api/admin/users/`, `app/ap
 
 ## Slice 13: Public Website & Marketing Pages
 
-### 17. Public Website & Marketing Pages · needs a decision
+### 17. Public Website & Marketing Pages · in-progress
 Deliver the public marketing website: a compelling landing page, transparent credit pricing cards mapped to Fapshi mobile money packages, a well-structured navigation bar, and legal terms conforming to Cameroon cyber law.
 **Done when:** public routes load swiftly, the landing page communicates the core promise with real interface previews, pricing cards guide visitors into buying credits, and the navigation bar routes visitors to registration and key pages.
-- [ ] Design it (spec): `/solution-architect public website & marketing pages`
+Spec: [0016](../specs/0016-public-website-marketing-pages.md)
+- [x] Design it (spec): `/solution-architect public website & marketing pages`
+- [x] Build it: `/feature-build public website & marketing pages`
+  - [x] Thin thread plus pricing with live package read and Buy routing (Satisfies AC-1, AC-2, AC-3, AC-4)
+  - [x] Legal plus SEO plus edge states with last known good cache (Satisfies AC-5, AC-6, AC-7)
+Code in `app/page.tsx`, `app/pricing/`, `app/terms/`, `app/privacy/`, `app/refunds/`, `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.tsx`, `components/public/`, `lib/public-pricing.ts`, `lib/public-links.ts`, `proxy.ts`
+- [ ] Verify it: /verify-release public website & marketing pages
+- [ ] Test it: /test-engineer public website & marketing pages
+- [ ] Review it (fresh model): /peer-review public website & marketing pages
+- [ ] Document it: /tech-writer public website & marketing pages
 
 ## UI Polish Foundation
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BillingCheckout } from "@/components/billing/billing-checkout";
 import { requireUser } from "@/lib/auth-helpers";
 import { getBalance, listActivePackages } from "@/lib/billing";
@@ -65,12 +66,24 @@ async function LedgerPreview({ userId }: { userId: string }) {
   );
 }
 
-export default async function BillingPage() {
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await requireUser();
   const [packages, { balance, lowBalance }] = await Promise.all([
     listActivePackages(),
     getBalance(user.id),
   ]);
+  const params = searchParams ? await searchParams : undefined;
+  const rawPackageId = params?.["packageId"];
+  const initialPackageId =
+    typeof rawPackageId === "string"
+      ? rawPackageId
+      : Array.isArray(rawPackageId)
+        ? (rawPackageId[0] ?? null)
+        : null;
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -99,7 +112,12 @@ export default async function BillingPage() {
         </p>
       )}
 
-      <BillingCheckout packages={packages} />
+      <Suspense fallback={null}>
+        <BillingCheckout
+          packages={packages}
+          initialPackageId={initialPackageId}
+        />
+      </Suspense>
 
       <LedgerPreview userId={user.id} />
     </div>

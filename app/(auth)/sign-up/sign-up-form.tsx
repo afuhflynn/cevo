@@ -26,7 +26,33 @@ function friendlyMessage(error: unknown): string {
   return message ?? "Something went wrong. Try again.";
 }
 
-export function SignUpForm() {
+export function SignUpForm({
+  next: nextProp,
+  packageId: packageIdProp,
+}: {
+  next?: string | null;
+  packageId?: string | null;
+} = {}) {
+  const rawNext = nextProp ?? null;
+  const safeNext =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
+      ? rawNext
+      : null;
+  const packageId = packageIdProp ?? null;
+  const nextWithPackage =
+    safeNext && packageId && !safeNext.includes("packageId")
+      ? `${safeNext}${safeNext.includes("?") ? "&" : "?"}packageId=${encodeURIComponent(packageId)}`
+      : safeNext;
+  const callbackURL = nextWithPackage ?? "/sign-in?verified=1";
+  const signInHref =
+    safeNext || packageId
+      ? `/sign-in?${[
+          safeNext ? `next=${encodeURIComponent(safeNext)}` : null,
+          packageId ? `packageId=${encodeURIComponent(packageId)}` : null,
+        ]
+          .filter(Boolean)
+          .join("&")}`
+      : "/sign-in";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +70,7 @@ export function SignUpForm() {
       name: name.trim(),
       email: email.trim(),
       password,
-      callbackURL: "/sign-in?verified=1",
+      callbackURL,
     });
     setPending(false);
     if (signUpError) {
@@ -59,7 +85,7 @@ export function SignUpForm() {
     setResent(false);
     await authClient.sendVerificationEmail({
       email: email.trim(),
-      callbackURL: "/sign-in?verified=1",
+      callbackURL,
     });
     setResending(false);
     setResent(true);
@@ -102,7 +128,7 @@ export function SignUpForm() {
         </CardContent>
         <CardFooter className="justify-center">
           <Link
-            href="/sign-in"
+            href={signInHref}
             className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             Go to sign in
@@ -186,7 +212,7 @@ export function SignUpForm() {
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
-            href="/sign-in"
+            href={signInHref}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Sign in

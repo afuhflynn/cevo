@@ -19,6 +19,29 @@ async function SignInNoticeLoader({
   return <SignInNotice verified={verified} error={error} />;
 }
 
+async function SignInFormLoader({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const rawNext = params["next"];
+  const rawPackageId = params["packageId"];
+  const next =
+    typeof rawNext === "string"
+      ? rawNext
+      : Array.isArray(rawNext)
+        ? (rawNext[0] ?? null)
+        : null;
+  const packageId =
+    typeof rawPackageId === "string"
+      ? rawPackageId
+      : Array.isArray(rawPackageId)
+        ? (rawPackageId[0] ?? null)
+        : null;
+  return <SignInForm next={next} packageId={packageId} />;
+}
+
 export default function SignInPage({
   searchParams,
 }: {
@@ -29,7 +52,9 @@ export default function SignInPage({
       <Suspense fallback={null}>
         <SignInNoticeLoader searchParams={searchParams} />
       </Suspense>
-      <SignInForm />
+      <Suspense fallback={null}>
+        <SignInFormLoader searchParams={searchParams} />
+      </Suspense>
     </>
   );
 }

@@ -33,8 +33,25 @@ function friendlyMessage(error: unknown): string {
   return message ?? "Something went wrong. Try again.";
 }
 
-export function SignInForm() {
+export function SignInForm({
+  next: nextProp,
+  packageId: packageIdProp,
+}: {
+  next?: string | null;
+  packageId?: string | null;
+} = {}) {
   const router = useRouter();
+  const rawNext = nextProp ?? null;
+  const next =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
+      ? rawNext
+      : "/onboarding";
+  const packageId = packageIdProp ?? null;
+  const signUpHref = packageId
+    ? `/sign-up?next=${encodeURIComponent(rawNext ?? "/dashboard/billing")}&packageId=${encodeURIComponent(packageId)}`
+    : rawNext
+      ? `/sign-up?next=${encodeURIComponent(rawNext)}`
+      : "/sign-up";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +70,11 @@ export function SignInForm() {
       setError(friendlyMessage(signInError));
       return;
     }
-    router.push("/onboarding");
+    const target =
+      packageId && next.includes("billing") && !next.includes("packageId")
+        ? `${next}${next.includes("?") ? "&" : "?"}packageId=${encodeURIComponent(packageId)}`
+        : next;
+    router.push(target);
     router.refresh();
   }
 
@@ -125,7 +146,7 @@ export function SignInForm() {
         <p className="text-sm text-muted-foreground">
           New to Cevo?{" "}
           <Link
-            href="/sign-up"
+            href={signUpHref}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Create an account

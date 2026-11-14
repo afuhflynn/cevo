@@ -35,9 +35,24 @@ function newClientKey(): string {
 
 const POLL_INTERVAL_MS = 5000;
 
-export function BillingCheckout({ packages }: { packages: Package[] }) {
-  const [selected, setSelected] = useState<Package | null>(
-    packages.find((p) => p.isPopular) ?? packages[0] ?? null,
+export function BillingCheckout({
+  packages,
+  initialPackageId,
+}: {
+  packages: Package[];
+  initialPackageId?: string | null;
+}) {
+  const requestedId = initialPackageId ?? null;
+  const initial =
+    (requestedId && packages.find((p) => p.id === requestedId)) ||
+    packages.find((p) => p.isPopular) ||
+    packages[0] ||
+    null;
+  const [selected, setSelected] = useState<Package | null>(initial);
+  const [unknownPackage, setUnknownPackage] = useState(
+    requestedId && !packages.some((p) => p.id === requestedId)
+      ? requestedId
+      : null,
   );
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
@@ -167,6 +182,14 @@ export function BillingCheckout({ packages }: { packages: Package[] }) {
 
   return (
     <div className="flex flex-col gap-6">
+      {unknownPackage && (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm"
+        >
+          That package is no longer available. Pick another package below.
+        </p>
+      )}
       <fieldset>
         <legend className="text-sm font-medium">Choose a package</legend>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -176,7 +199,10 @@ export function BillingCheckout({ packages }: { packages: Package[] }) {
               <button
                 key={p.id}
                 type="button"
-                onClick={() => setSelected(p)}
+                onClick={() => {
+                  setSelected(p);
+                  setUnknownPackage(null);
+                }}
                 aria-pressed={active}
                 className={`relative flex flex-col gap-1 rounded-xl border p-4 text-left transition-colors ${
                   active
