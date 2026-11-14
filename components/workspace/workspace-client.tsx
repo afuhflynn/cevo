@@ -19,6 +19,7 @@ import { DocumentTree } from "./document-tree";
 import { EditorCanvas } from "./editor-canvas";
 import { FilesTab } from "./files-tab";
 import { ResearchTab } from "./research-tab";
+import { ReviewTab } from "./review-tab";
 import {
   ConflictBanner,
   InspectorRail,
@@ -76,7 +77,7 @@ export function WorkspaceClient({
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [rightTab, setRightTab] = useState<
-    "inspector" | "assistant" | "research" | "files"
+    "inspector" | "assistant" | "research" | "files" | "review"
   >("inspector");
   const versionRef = useRef(1);
   const sectionIdRef = useRef<string | null>(null);
@@ -269,9 +270,31 @@ export function WorkspaceClient({
       setRightOpen(true);
       setRightTab("assistant");
     };
+    const jumpToReview = (e: Event) => {
+      const detail = (e as CustomEvent).detail as {
+        sectionId?: string;
+        blockIndex?: number;
+      };
+      if (!detail?.sectionId) return;
+      setActiveId(detail.sectionId);
+      // Let the chapter load, then scroll the canvas to the paragraph.
+      window.setTimeout(() => {
+        const nodes = document.querySelectorAll(
+          ".cevo-canvas p, .cevo-canvas h1, .cevo-canvas h2, .cevo-canvas h3",
+        );
+        const idx = Math.max(0, Number(detail.blockIndex ?? 0));
+        const target = nodes[idx] ?? nodes[0];
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 600);
+    };
     window.addEventListener("cevo:open-assistant", openAssistant);
-    return () =>
+    window.addEventListener("cevo:review-jump", jumpToReview);
+    return () => {
       window.removeEventListener("cevo:open-assistant", openAssistant);
+      window.removeEventListener("cevo:review-jump", jumpToReview);
+    };
   }, []);
 
   const getScopeText = useCallback(() => {
@@ -660,6 +683,14 @@ export function WorkspaceClient({
               >
                 Files
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={rightTab === "review"}
+                onClick={() => setRightTab("review")}
+              >
+                Review
+              </button>
             </div>
             {rightTab === "inspector" ? (
               <InspectorRail
@@ -689,6 +720,8 @@ export function WorkspaceClient({
                 onInsertCitation={insertResearchCitation}
                 readOnly={readOnly}
               />
+            ) : rightTab === "review" ? (
+              <ReviewTab projectId={projectId} readOnly={readOnly} />
             ) : (
               <FilesTab projectId={projectId} readOnly={readOnly} />
             )}

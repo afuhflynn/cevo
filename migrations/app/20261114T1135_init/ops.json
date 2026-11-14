@@ -1,0 +1,544 @@
+[
+  {
+    "id": "table.ReviewRun",
+    "label": "Create table \"ReviewRun\"",
+    "summary": "Creates table \"ReviewRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ReviewRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ReviewRun\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"ReviewRun\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ReviewRun\"",
+        "sql": "CREATE TABLE \"public\".\"ReviewRun\" (\n  \"clientRunKey\" text,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"createdBy\" text NOT NULL,\n  \"driftCount\" int4 DEFAULT 0 NOT NULL,\n  \"formattingCount\" int4 DEFAULT 0 NOT NULL,\n  \"id\" text NOT NULL,\n  \"missingCount\" int4 DEFAULT 0 NOT NULL,\n  \"projectId\" text NOT NULL,\n  \"skipReason\" text,\n  \"skippedSemantic\" bool DEFAULT false NOT NULL,\n  \"status\" text DEFAULT 'running' NOT NULL,\n  \"templateVersionId\" text,\n  \"truncated\" bool DEFAULT false NOT NULL,\n  \"uncitedCount\" int4 DEFAULT 0 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ReviewRun\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"ReviewRun\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.ReviewWarning",
+    "label": "Create table \"ReviewWarning\"",
+    "summary": "Creates table \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ReviewWarning\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"ReviewWarning\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ReviewWarning\"",
+        "sql": "CREATE TABLE \"public\".\"ReviewWarning\" (\n  \"blockIndex\" int4,\n  \"checkType\" text NOT NULL,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"excerpt\" text,\n  \"id\" text NOT NULL,\n  \"message\" text NOT NULL,\n  \"runId\" text NOT NULL,\n  \"sectionId\" text,\n  \"sectionVersion\" int4,\n  \"severity\" text DEFAULT 'warn' NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ReviewWarning\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"ReviewWarning\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.ReviewRun.ReviewRun_projectId_clientRunKey_key",
+    "label": "Add unique constraint on \"ReviewRun\" (projectId, clientRunKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ReviewRun_projectId_clientRunKey_key",
+        "table": "ReviewRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ReviewRun_projectId_clientRunKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ReviewRun_projectId_clientRunKey_key",
+          "public",
+          "\"public\".\"ReviewRun\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"ReviewRun_projectId_clientRunKey_key\" on \"ReviewRun\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ReviewRun_projectId_clientRunKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"ReviewRun\" ADD CONSTRAINT \"ReviewRun_projectId_clientRunKey_key\" UNIQUE (\"projectId\", \"clientRunKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"ReviewRun_projectId_clientRunKey_key\" exists on (projectId, clientRunKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "ReviewRun_projectId_clientRunKey_key",
+          "public",
+          "\"public\".\"ReviewRun\"",
+          "u",
+          "[\"projectId\",\"clientRunKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ReviewRun.ReviewRun_projectId_createdAt_idx_d2d6484f",
+    "label": "Create index \"ReviewRun_projectId_createdAt_idx_d2d6484f\" on \"ReviewRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ReviewRun_projectId_createdAt_idx_d2d6484f",
+        "table": "ReviewRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ReviewRun_projectId_createdAt_idx_d2d6484f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun_projectId_createdAt_idx_d2d6484f\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ReviewRun_projectId_createdAt_idx_d2d6484f\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ReviewRun_projectId_createdAt_idx_d2d6484f\"",
+        "sql": "CREATE INDEX \"ReviewRun_projectId_createdAt_idx_d2d6484f\" ON \"public\".\"ReviewRun\" (\"projectId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ReviewRun_projectId_createdAt_idx_d2d6484f\" exists on \"ReviewRun\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun_projectId_createdAt_idx_d2d6484f\"",
+          "i",
+          "I",
+          "\"public\".\"ReviewRun\"",
+          "btree",
+          "[\"projectId\",\"createdAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ReviewRun.ReviewRun_projectId_idx_a96e4d92",
+    "label": "Create index \"ReviewRun_projectId_idx_a96e4d92\" on \"ReviewRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ReviewRun_projectId_idx_a96e4d92",
+        "table": "ReviewRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ReviewRun_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun_projectId_idx_a96e4d92\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ReviewRun_projectId_idx_a96e4d92\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ReviewRun_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"ReviewRun_projectId_idx_a96e4d92\" ON \"public\".\"ReviewRun\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ReviewRun_projectId_idx_a96e4d92\" exists on \"ReviewRun\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewRun_projectId_idx_a96e4d92\"",
+          "i",
+          "I",
+          "\"public\".\"ReviewRun\"",
+          "btree",
+          "[\"projectId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ReviewWarning.ReviewWarning_runId_checkType_idx_eb85c1e9",
+    "label": "Create index \"ReviewWarning_runId_checkType_idx_eb85c1e9\" on \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ReviewWarning_runId_checkType_idx_eb85c1e9",
+        "table": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ReviewWarning_runId_checkType_idx_eb85c1e9\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_runId_checkType_idx_eb85c1e9\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ReviewWarning_runId_checkType_idx_eb85c1e9\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ReviewWarning_runId_checkType_idx_eb85c1e9\"",
+        "sql": "CREATE INDEX \"ReviewWarning_runId_checkType_idx_eb85c1e9\" ON \"public\".\"ReviewWarning\" (\"runId\", \"checkType\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ReviewWarning_runId_checkType_idx_eb85c1e9\" exists on \"ReviewWarning\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_runId_checkType_idx_eb85c1e9\"",
+          "i",
+          "I",
+          "\"public\".\"ReviewWarning\"",
+          "btree",
+          "[\"runId\",\"checkType\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ReviewWarning.ReviewWarning_runId_idx_a6016437",
+    "label": "Create index \"ReviewWarning_runId_idx_a6016437\" on \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ReviewWarning_runId_idx_a6016437",
+        "table": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ReviewWarning_runId_idx_a6016437\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_runId_idx_a6016437\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ReviewWarning_runId_idx_a6016437\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ReviewWarning_runId_idx_a6016437\"",
+        "sql": "CREATE INDEX \"ReviewWarning_runId_idx_a6016437\" ON \"public\".\"ReviewWarning\" (\"runId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ReviewWarning_runId_idx_a6016437\" exists on \"ReviewWarning\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_runId_idx_a6016437\"",
+          "i",
+          "I",
+          "\"public\".\"ReviewWarning\"",
+          "btree",
+          "[\"runId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ReviewWarning.ReviewWarning_sectionId_idx_5d1ea56b",
+    "label": "Create index \"ReviewWarning_sectionId_idx_5d1ea56b\" on \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ReviewWarning_sectionId_idx_5d1ea56b",
+        "table": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ReviewWarning_sectionId_idx_5d1ea56b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_sectionId_idx_5d1ea56b\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ReviewWarning_sectionId_idx_5d1ea56b\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ReviewWarning_sectionId_idx_5d1ea56b\"",
+        "sql": "CREATE INDEX \"ReviewWarning_sectionId_idx_5d1ea56b\" ON \"public\".\"ReviewWarning\" (\"sectionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ReviewWarning_sectionId_idx_5d1ea56b\" exists on \"ReviewWarning\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ReviewWarning_sectionId_idx_5d1ea56b\"",
+          "i",
+          "I",
+          "\"public\".\"ReviewWarning\"",
+          "btree",
+          "[\"sectionId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ReviewRun.ReviewRun_projectId_fkey",
+    "label": "Add foreign key \"ReviewRun_projectId_fkey\" on \"ReviewRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ReviewRun_projectId_fkey",
+        "table": "ReviewRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ReviewRun_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ReviewRun_projectId_fkey",
+          "public",
+          "\"public\".\"ReviewRun\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"ReviewRun_projectId_fkey\" on \"ReviewRun\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ReviewRun_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ReviewRun\"\nADD CONSTRAINT \"ReviewRun_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"Project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ReviewRun_projectId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "ReviewRun_projectId_fkey",
+          "public",
+          "\"public\".\"ReviewRun\"",
+          "f",
+          "[\"projectId\"]",
+          "\"public\".\"Project\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ReviewWarning.ReviewWarning_runId_fkey",
+    "label": "Add foreign key \"ReviewWarning_runId_fkey\" on \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ReviewWarning_runId_fkey",
+        "table": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ReviewWarning_runId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ReviewWarning_runId_fkey",
+          "public",
+          "\"public\".\"ReviewWarning\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"ReviewWarning_runId_fkey\" on \"ReviewWarning\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ReviewWarning_runId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ReviewWarning\"\nADD CONSTRAINT \"ReviewWarning_runId_fkey\"\nFOREIGN KEY (\"runId\")\nREFERENCES \"public\".\"ReviewRun\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ReviewWarning_runId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "ReviewWarning_runId_fkey",
+          "public",
+          "\"public\".\"ReviewWarning\"",
+          "f",
+          "[\"runId\"]",
+          "\"public\".\"ReviewRun\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ReviewWarning.ReviewWarning_sectionId_fkey",
+    "label": "Add foreign key \"ReviewWarning_sectionId_fkey\" on \"ReviewWarning\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ReviewWarning_sectionId_fkey",
+        "table": "ReviewWarning"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ReviewWarning_sectionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ReviewWarning_sectionId_fkey",
+          "public",
+          "\"public\".\"ReviewWarning\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"ReviewWarning_sectionId_fkey\" on \"ReviewWarning\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ReviewWarning_sectionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ReviewWarning\"\nADD CONSTRAINT \"ReviewWarning_sectionId_fkey\"\nFOREIGN KEY (\"sectionId\")\nREFERENCES \"public\".\"ProjectSection\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ReviewWarning_sectionId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "ReviewWarning_sectionId_fkey",
+          "public",
+          "\"public\".\"ReviewWarning\"",
+          "f",
+          "[\"sectionId\"]",
+          "\"public\".\"ProjectSection\"",
+          "[\"id\"]",
+          "n",
+          "a"
+        ]
+      }
+    ]
+  }
+]

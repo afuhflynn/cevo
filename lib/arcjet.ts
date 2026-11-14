@@ -97,6 +97,10 @@ const filesPreviewLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
   : null;
 
+const reviewBurstLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
+  : null;
+
 export type FilesRateLimitKind = "request" | "complete" | "preview";
 
 export async function checkFilesRateLimit(
@@ -157,6 +161,16 @@ export async function checkResearchRateLimit(
   const decision = await limiter.protect(req);
   if (decision.isErrored()) {
     console.warn(`[arcjet] decision error on research-${kind}, failing open`);
+    return true;
+  }
+  return !decision.isDenied();
+}
+
+export async function checkReviewRateLimit(req: Request): Promise<boolean> {
+  if (!reviewBurstLimiter) return true;
+  const decision = await reviewBurstLimiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn("[arcjet] decision error on review, failing open");
     return true;
   }
   return !decision.isDenied();

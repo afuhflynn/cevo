@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e75ee564aaf2ab13ed6c8e09e217cbcffcafb50ca6c69c0ea8e536ffa8904cb6'>;
+  StorageHashBase<'6f49f4cde23bd0456469d3960aa13daa72ee43a07f6ba630fb92fab2957cb50b'>;
 export type ExecutionHash =
-  ExecutionHashBase<'ce72c34a8f72e41cd5afa5dcdd3d6c68a9b2b97db5636bf0f75c96bd706952b7'>;
+  ExecutionHashBase<'c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -943,6 +943,7 @@ export namespace Models {
     exportJobs: public_ExportJob[];
     files: public_FileAsset[];
     outline: public_ProjectOutline | null;
+    reviewRuns: public_ReviewRun[];
     sections: public_ProjectSection[];
     sources: public_ProjectSource[];
     tasks: public_ProjectTask[];
@@ -956,6 +957,7 @@ export namespace Models {
       | 'exportJobs'
       | 'files'
       | 'outline'
+      | 'reviewRuns'
       | 'sections'
       | 'sources'
       | 'tasks'
@@ -1025,8 +1027,10 @@ export namespace Models {
     citations: public_Citation[];
     parent: public_ProjectSection | null;
     project: public_Project;
+    reviewWarnings: public_ReviewWarning[];
     versions: public_DocumentVersion[];
-    readonly [RelationKeys]?: 'children' | 'citations' | 'parent' | 'project' | 'versions';
+    readonly [RelationKeys]?:
+      'children' | 'citations' | 'parent' | 'project' | 'reviewWarnings' | 'versions';
   };
   export type public_ProjectSource = {
     createdAt: FieldOutputTypes['public']['ProjectSource']['createdAt'];
@@ -1104,6 +1108,40 @@ export namespace Models {
     citations: public_Citation[];
     projectSources: public_ProjectSource[];
     readonly [RelationKeys]?: 'citations' | 'projectSources';
+  };
+  export type public_ReviewRun = {
+    clientRunKey: FieldOutputTypes['public']['ReviewRun']['clientRunKey'];
+    createdAt: FieldOutputTypes['public']['ReviewRun']['createdAt'];
+    createdBy: FieldOutputTypes['public']['ReviewRun']['createdBy'];
+    driftCount: FieldOutputTypes['public']['ReviewRun']['driftCount'];
+    formattingCount: FieldOutputTypes['public']['ReviewRun']['formattingCount'];
+    id: FieldOutputTypes['public']['ReviewRun']['id'];
+    missingCount: FieldOutputTypes['public']['ReviewRun']['missingCount'];
+    projectId: FieldOutputTypes['public']['ReviewRun']['projectId'];
+    skipReason: FieldOutputTypes['public']['ReviewRun']['skipReason'];
+    skippedSemantic: FieldOutputTypes['public']['ReviewRun']['skippedSemantic'];
+    status: FieldOutputTypes['public']['ReviewRun']['status'];
+    templateVersionId: FieldOutputTypes['public']['ReviewRun']['templateVersionId'];
+    truncated: FieldOutputTypes['public']['ReviewRun']['truncated'];
+    uncitedCount: FieldOutputTypes['public']['ReviewRun']['uncitedCount'];
+    project: public_Project;
+    warnings: public_ReviewWarning[];
+    readonly [RelationKeys]?: 'project' | 'warnings';
+  };
+  export type public_ReviewWarning = {
+    blockIndex: FieldOutputTypes['public']['ReviewWarning']['blockIndex'];
+    checkType: FieldOutputTypes['public']['ReviewWarning']['checkType'];
+    createdAt: FieldOutputTypes['public']['ReviewWarning']['createdAt'];
+    excerpt: FieldOutputTypes['public']['ReviewWarning']['excerpt'];
+    id: FieldOutputTypes['public']['ReviewWarning']['id'];
+    message: FieldOutputTypes['public']['ReviewWarning']['message'];
+    runId: FieldOutputTypes['public']['ReviewWarning']['runId'];
+    sectionId: FieldOutputTypes['public']['ReviewWarning']['sectionId'];
+    sectionVersion: FieldOutputTypes['public']['ReviewWarning']['sectionVersion'];
+    severity: FieldOutputTypes['public']['ReviewWarning']['severity'];
+    run: public_ReviewRun;
+    section: public_ProjectSection | null;
+    readonly [RelationKeys]?: 'run' | 'section';
   };
   export type public_Session = {
     createdAt: FieldOutputTypes['public']['Session']['createdAt'];
@@ -1330,6 +1368,8 @@ export declare const models: {
     ProjectTask: Models.public_ProjectTask;
     ProjectTemplate: Models.public_ProjectTemplate;
     ResearchSource: Models.public_ResearchSource;
+    ReviewRun: Models.public_ReviewRun;
+    ReviewWarning: Models.public_ReviewWarning;
     Session: Models.public_Session;
     StudentProfile: Models.public_StudentProfile;
     SupportMessage: Models.public_SupportMessage;
@@ -4678,6 +4718,272 @@ type ContractBase = Omit<
               ];
               foreignKeys: readonly [];
             };
+            readonly ReviewRun: {
+              columns: {
+                readonly clientRunKey: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly createdBy: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly driftCount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly formattingCount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly missingCount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly projectId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly skipReason: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly skippedSemantic: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'running'>;
+                  };
+                  readonly many: false;
+                };
+                readonly templateVersionId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly truncated: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly uncitedCount: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['projectId', 'clientRunKey'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'ReviewRun_projectId_createdAt_idx_d2d6484f';
+                  readonly prefix: 'ReviewRun_projectId_createdAt_idx';
+                  readonly columns: readonly ['projectId', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'ReviewRun_projectId_idx_a96e4d92';
+                  readonly prefix: 'ReviewRun_projectId_idx';
+                  readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ReviewRun';
+                    readonly columns: readonly ['projectId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly ReviewWarning: {
+              columns: {
+                readonly blockIndex: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly checkType: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly excerpt: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly message: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly runId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly sectionId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly sectionVersion: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly severity: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'warn'>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'ReviewWarning_runId_checkType_idx_eb85c1e9';
+                  readonly prefix: 'ReviewWarning_runId_checkType_idx';
+                  readonly columns: readonly ['runId', 'checkType'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'ReviewWarning_runId_idx_a6016437';
+                  readonly prefix: 'ReviewWarning_runId_idx';
+                  readonly columns: readonly ['runId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'ReviewWarning_sectionId_idx_5d1ea56b';
+                  readonly prefix: 'ReviewWarning_sectionId_idx';
+                  readonly columns: readonly ['sectionId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ReviewWarning';
+                    readonly columns: readonly ['runId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ReviewRun';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ReviewWarning';
+                    readonly columns: readonly ['sectionId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'ProjectSection';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly Session: {
               columns: {
                 readonly createdAt: {
@@ -6071,6 +6377,11 @@ type ContractBase = Omit<
     readonly ResearchSource: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'ResearchSource';
+    };
+    readonly ReviewRun: { readonly namespace: 'public' & NamespaceId; readonly model: 'ReviewRun' };
+    readonly ReviewWarning: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'ReviewWarning';
     };
     readonly Session: { readonly namespace: 'public' & NamespaceId; readonly model: 'Session' };
     readonly StudentProfile: {
@@ -8112,6 +8423,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['projectId'];
                 };
               };
+              readonly reviewRuns: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ReviewRun';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['projectId'];
+                };
+              };
               readonly sections: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -8577,6 +8899,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['projectId'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly reviewWarnings: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ReviewWarning';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['sectionId'];
                 };
               };
               readonly versions: {
@@ -9093,6 +9426,205 @@ type ContractBase = Omit<
                 readonly venue: { readonly column: 'venue' };
                 readonly verificationState: { readonly column: 'verificationState' };
                 readonly volume: { readonly column: 'volume' };
+              };
+            };
+          };
+          readonly ReviewRun: {
+            readonly fields: {
+              readonly clientRunKey: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly createdBy: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly driftCount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly formattingCount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly missingCount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly projectId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly skipReason: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly skippedSemantic: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly templateVersionId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly truncated: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly uncitedCount: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly project: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Project';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['projectId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly warnings: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ReviewWarning';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['runId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'ReviewRun';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly clientRunKey: { readonly column: 'clientRunKey' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly createdBy: { readonly column: 'createdBy' };
+                readonly driftCount: { readonly column: 'driftCount' };
+                readonly formattingCount: { readonly column: 'formattingCount' };
+                readonly id: { readonly column: 'id' };
+                readonly missingCount: { readonly column: 'missingCount' };
+                readonly projectId: { readonly column: 'projectId' };
+                readonly skipReason: { readonly column: 'skipReason' };
+                readonly skippedSemantic: { readonly column: 'skippedSemantic' };
+                readonly status: { readonly column: 'status' };
+                readonly templateVersionId: { readonly column: 'templateVersionId' };
+                readonly truncated: { readonly column: 'truncated' };
+                readonly uncitedCount: { readonly column: 'uncitedCount' };
+              };
+            };
+          };
+          readonly ReviewWarning: {
+            readonly fields: {
+              readonly blockIndex: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly checkType: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly excerpt: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly message: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly runId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sectionId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sectionVersion: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly severity: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly run: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ReviewRun';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['runId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly section: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'ProjectSection';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['sectionId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'ReviewWarning';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly blockIndex: { readonly column: 'blockIndex' };
+                readonly checkType: { readonly column: 'checkType' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly excerpt: { readonly column: 'excerpt' };
+                readonly id: { readonly column: 'id' };
+                readonly message: { readonly column: 'message' };
+                readonly runId: { readonly column: 'runId' };
+                readonly sectionId: { readonly column: 'sectionId' };
+                readonly sectionVersion: { readonly column: 'sectionVersion' };
+                readonly severity: { readonly column: 'severity' };
               };
             };
           };
@@ -11015,6 +11547,22 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'ResearchSource';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'ReviewRun';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'ReviewWarning';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

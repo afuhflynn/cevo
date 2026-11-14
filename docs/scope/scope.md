@@ -23,7 +23,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 10 | Verified Research Discovery & Citations | Slice 6 | in-progress |
 | 11 | File Management & Private Storage | Slice 7 | in-progress |
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | in-progress |
-| 13 | Pre-Submission Review & Academic Consistency | Slice 9 | planned |
+| 13 | Pre-Submission Review & Academic Consistency | Slice 9 | in-progress |
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | planned |
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | planned |
 | 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
@@ -255,10 +255,20 @@ Code in `lib/templates.ts`, `lib/admin-api.ts`, `app/api/templates/`, `app/api/a
 
 ## Slice 9: Pre-Submission Review & Academic Consistency
 
-### 13. Pre-Submission Review & Academic Consistency · needs a decision
+### 13. Pre-Submission Review & Academic Consistency · in-progress
 Scan draft documents for missing required sections, uncited references, mismatched objectives, and formatting violations.
 **Done when:** the scanner returns actionable warnings linked directly to the offending chapter paragraphs.
-- [ ] Design it (spec): `/solution-architect pre-submission review & academic consistency`
+Spec: [0012](../specs/0012-pre-submission-review-consistency/index.md)
+- [x] Design it (spec): `/solution-architect pre-submission review & academic consistency`
+- [x] Build it: `/feature-build pre-submission review & academic consistency`
+  - [x] Thin thread plus history: migration, POST run with missing check, run list plus detail (Satisfies AC-1, AC-2, AC-8)
+  - [x] Local checks plus tab: uncited plus formatting with anchors, Review tab with paragraph jumps (Satisfies AC-3, AC-5, AC-6)
+  - [x] Semantic plus guards: drift via OpenRouter, caps plus retry plus limits, audit and advisory guarantee (Satisfies AC-4, AC-7, AC-9, AC-10)
+Code in `lib/review.ts`, `lib/review-scan.ts`, `app/api/projects/[projectId]/review/`, `components/workspace/review-tab.tsx`, `components/workspace/workspace-client.tsx`, `prisma/schema.prisma`
+- [ ] Verify it: /verify-release pre-submission review & academic consistency
+- [ ] Test it: /test-engineer pre-submission review & academic consistency
+- [ ] Review it (fresh model): /peer-review pre-submission review & academic consistency
+- [ ] Document it: /tech-writer pre-submission review & academic consistency
 
 ## Slice 10: High-Fidelity PDF & DOCX Export Engine
 
