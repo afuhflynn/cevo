@@ -1,0 +1,116 @@
+{
+  "project": {
+    "id": "cevo",
+    "name": "cevo",
+    "repo": "afuhflynn/cevo",
+    "hqPort": 7420,
+    "officeName": "Cevo Port",
+    "exportPlan": false,
+    "path": ""
+  },
+  "team": [
+    {
+      "id": "flynn",
+      "name": "Flynn",
+      "role": "Lead",
+      "isLead": true,
+      "cli": "opencode",
+      "model": "meta/muse-spark-1.3",
+      "mode": "sandbox",
+      "color": "#ff77a8",
+      "skills": [],
+      "roleMd": "You are Flynn, the lead. You plan and assign work. You never write app code.",
+      "sandbox": {
+        "resources": {
+          "cpus": 4,
+          "memoryGb": 4
+        },
+        "allow": [],
+        "deny": []
+      },
+      "workspacePath": null,
+      "mcp": []
+    },
+    {
+      "id": "dwight",
+      "name": "Dwight",
+      "role": "Developer",
+      "isLead": false,
+      "cli": "opencode",
+      "model": "",
+      "mode": "sandbox",
+      "color": "#29adff",
+      "skills": [],
+      "roleMd": "You are Dwight, a developer on the team. You build the tasks assigned to you.",
+      "sandbox": {
+        "resources": {
+          "cpus": null,
+          "memoryGb": null
+        },
+        "allow": [],
+        "deny": []
+      },
+      "workspacePath": null,
+      "mcp": []
+    },
+    {
+      "id": "zenith",
+      "name": "Zenith",
+      "role": "Developer",
+      "isLead": false,
+      "cli": "opencode",
+      "model": "",
+      "mode": "sandbox",
+      "color": "#ffd23a",
+      "skills": [],
+      "roleMd": "You are Zenith, a developer on the team. You build the tasks assigned to you.",
+      "sandbox": {
+        "resources": {
+          "cpus": null,
+          "memoryGb": null
+        },
+        "allow": [],
+        "deny": []
+      },
+      "workspacePath": null,
+      "mcp": []
+    }
+  ],
+  "workflow": {
+    "review": {
+      "enabled": true,
+      "tool": "human",
+      "command": ""
+    },
+    "merge": {
+      "by": "human"
+    },
+    "deploy": {
+      "enabled": false,
+      "tool": "instacloud",
+      "command": "",
+      "perAgentEnvironments": false
+    }
+  },
+  "stack": {
+    "frameworks": [
+      {
+        "id": "nextjs"
+      }
+    ],
+    "tools": {
+      "auth": {
+        "id": "better-auth"
+      },
+      "database": {
+        "id": "prisma-postgres"
+      },
+      "analytics": {
+        "id": "vercel-analytics"
+      },
+      "security": {
+        "id": "arcjet"
+      }
+    }
+  }
+}

@@ -30,7 +30,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 17 | Public Website & Marketing Pages | Slice 13 | in-progress |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 | 19 | Branded Transactional Email Templates | Foundation | in-progress |
-| 20 | UI Foundation Refresh and Primitive Audit | Foundation | planned |
+| 20 | UI Foundation Refresh and Primitive Audit | Foundation | in-progress |
 | 21 | Onboarding Journey Polish | Journey A | planned |
 | 22 | Auth Pages Polish | Journey B | planned |
 | 23 | Dashboard Catalog Journey Polish | Journey C | planned |
@@ -341,10 +341,13 @@ Code in `app/page.tsx`, `app/pricing/`, `app/terms/`, `app/privacy/`, `app/refun
 
 ## UI Polish Foundation
 
-### 20. UI Foundation Refresh and Primitive Audit · Journey · Beta · needs a decision
+### 20. UI Foundation Refresh and Primitive Audit · Journey · Beta · in-progress
 Audit what you own today in `components/ui` plus `app/globals.css` plus `app/layout.tsx` so later journeys share one modern base. Record which primitives stay, which need refresh for inputs plus selects plus date pickers plus dropdowns plus dialogs plus skeletons plus toasts plus empty states, plus motion rules that need your confirm, all while Tailwind setup stays intact.
 **Done when:** audit list exists for each primitive plus token plus radius plus shadow, skeleton and empty and error patterns are agreed, motion allow list is approved by you, and future journeys have a clear base to reuse.
-- [ ] Design it (spec): `/solution-architect ui foundation refresh and primitive audit`
+Spec: [0017](../specs/0017-ui-foundation-refresh-audit.md)
+- [x] Design it (spec): `/solution-architect ui foundation refresh and primitive audit`
+- [ ] Verify it: /verify-release ui foundation refresh and primitive audit
+- [ ] Test it: /test-engineer ui foundation refresh and primitive audit
 
 ## Journey A: Onboarding Complete
 
