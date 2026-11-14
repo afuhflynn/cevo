@@ -129,6 +129,7 @@ model User {
   notifications    Notification[]
   auditEvents      AuditEvent[]
   wizardSessions   WizardSession[]
+  fileAssets       FileAsset[]
 }
 
 model Session {
@@ -561,20 +562,28 @@ model Citation {
 }
 
 model FileAsset {
-  id           String       @id @onCreate(cuid(2))
-  projectId    String
-  fileName     String
-  fileSize     Int
-  mimeType     String
-  s3Key        String       @unique
-  category     FileCategory @default(OTHER)
-  extractedText Text?
-  isProcessed  Boolean      @default(false)
-  createdAt    DateTime     @default(now())
+  id               String       @id @onCreate(cuid(2))
+  projectId        String
+  uploadedByUserId String
+  fileName         String
+  fileSize         Int
+  mimeType         String
+  s3Key            String       @unique
+  category         FileCategory @default(OTHER)
+  checksumSha256   String?
+  clientToken      String       @unique
+  extractionStatus String       @default("PENDING")
+  extractionError  String?
+  extractedText    Text?
+  isProcessed      Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @onCreate(now()) @onUpdate(now())
 
   project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploader     User         @relation(fields: [uploadedByUserId], references: [id], onDelete: Restrict)
 
   @@index([projectId, category])
+  @@index([projectId, createdAt, id])
 }
 
 model ExportJob {

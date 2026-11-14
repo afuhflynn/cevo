@@ -21,7 +21,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | in-progress |
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | in-progress |
 | 10 | Verified Research Discovery & Citations | Slice 6 | in-progress |
-| 11 | File Management & Private Storage | Slice 7 | planned |
+| 11 | File Management & Private Storage | Slice 7 | in-progress |
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | planned |
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | planned |
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | planned |
@@ -220,10 +220,20 @@ Code in `lib/research.ts`, `lib/research.test.ts`, `app/api/projects/[projectId]
 
 ## Slice 7: File Management & Private Storage
 
-### 11. File Management & Private Storage · needs a decision
+### 11. File Management & Private Storage · in-progress
 Enable uploading supervisor instructions, datasets, figures, and guidelines into private S3 storage with presigned URLs and background text extraction.
 **Done when:** files upload safely with type validation, previews render using temporary signed links, and text extracts in the background.
-- [ ] Design it (spec): `/solution-architect file management & private storage`
+Spec: [0010](../specs/0010-file-management-private-storage/index.md)
+- [x] Design it (spec): `/solution-architect file management & private storage`
+- [ ] Build it: `/feature-build file management & private storage`
+  - [x] Thin thread plus list and preview (Satisfies AC-1, AC-2, AC-4, AC-6)
+  - [x] Extraction plus quota plus guards (Satisfies AC-3, AC-5, AC-6, AC-7)
+  - [ ] Delete plus cleanup plus UI polish (Satisfies AC-4, AC-7, AC-8)
+Code in `app/api/projects/[projectId]/files/`, `components/workspace/files-tab.tsx`, `lib/files.ts`, `lib/storage.ts`, `inngest/functions/file-extract.ts`, `prisma/schema.prisma`
+- [ ] Verify it: `/verify-release file management & private storage`
+- [ ] Test it: `/test-engineer file management & private storage`
+- [ ] Review it (fresh model): `/peer-review file management & private storage`
+- [ ] Document it: `/tech-writer file management & private storage`
 
 ## Slice 8: Institutional Template Engine & Rule Extraction
 

@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'3277f2a2f8a7fad263f4393bd4385a068de04ebecf7419477b9cc8b5efa1a8b7'>;
+  StorageHashBase<'37a2b500fb48911c11d9548057d5d4f24531fabc82f285cf7a726054e4bf44a9'>;
 export type ExecutionHash =
-  ExecutionHashBase<'a932af8705bee8d856bbe964ff110d38c0242b048062f11ab69a34b8b48730f8'>;
+  ExecutionHashBase<'16bb9e09765036827f3f548752359687f4e71cc9cd583b89e9321a40edf2d966'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -824,8 +824,12 @@ export namespace Models {
   };
   export type public_FileAsset = {
     category: FieldOutputTypes['public']['FileAsset']['category'];
+    checksumSha256: FieldOutputTypes['public']['FileAsset']['checksumSha256'];
+    clientToken: FieldOutputTypes['public']['FileAsset']['clientToken'];
     createdAt: FieldOutputTypes['public']['FileAsset']['createdAt'];
     extractedText: FieldOutputTypes['public']['FileAsset']['extractedText'];
+    extractionError: FieldOutputTypes['public']['FileAsset']['extractionError'];
+    extractionStatus: FieldOutputTypes['public']['FileAsset']['extractionStatus'];
     fileName: FieldOutputTypes['public']['FileAsset']['fileName'];
     fileSize: FieldOutputTypes['public']['FileAsset']['fileSize'];
     id: FieldOutputTypes['public']['FileAsset']['id'];
@@ -833,8 +837,11 @@ export namespace Models {
     mimeType: FieldOutputTypes['public']['FileAsset']['mimeType'];
     projectId: FieldOutputTypes['public']['FileAsset']['projectId'];
     s3Key: FieldOutputTypes['public']['FileAsset']['s3Key'];
+    updatedAt: FieldOutputTypes['public']['FileAsset']['updatedAt'];
+    uploadedByUserId: FieldOutputTypes['public']['FileAsset']['uploadedByUserId'];
     project: public_Project;
-    readonly [RelationKeys]?: 'project';
+    uploader: public_User;
+    readonly [RelationKeys]?: 'project' | 'uploader';
   };
   export type public_Institution = {
     city: FieldOutputTypes['public']['Institution']['city'];
@@ -1210,6 +1217,7 @@ export namespace Models {
     accounts: public_Account[];
     auditEvents: public_AuditEvent[];
     creditWallet: public_CreditWallet | null;
+    fileAssets: public_FileAsset[];
     notifications: public_Notification[];
     payments: public_Payment[];
     projects: public_Project[];
@@ -1222,6 +1230,7 @@ export namespace Models {
       | 'accounts'
       | 'auditEvents'
       | 'creditWallet'
+      | 'fileAssets'
       | 'notifications'
       | 'payments'
       | 'projects'
@@ -2797,6 +2806,18 @@ type ContractBase = Omit<
                   };
                   readonly many: false;
                 };
+                readonly checksumSha256: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly clientToken: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
                 readonly createdAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-date@1';
@@ -2809,6 +2830,22 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly extractionError: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly extractionStatus: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
+                  };
                   readonly many: false;
                 };
                 readonly fileName: {
@@ -2857,9 +2894,25 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly uploadedByUserId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['s3Key'] }];
+              uniques: readonly [
+                { readonly columns: readonly ['s3Key'] },
+                { readonly columns: readonly ['clientToken'] },
+              ];
               indexes: readonly [
                 {
                   readonly name: 'FileAsset_projectId_category_idx_1031a685';
@@ -2868,9 +2921,21 @@ type ContractBase = Omit<
                   readonly unique: false;
                 },
                 {
+                  readonly name: 'FileAsset_projectId_createdAt_id_idx_efb29810';
+                  readonly prefix: 'FileAsset_projectId_createdAt_id_idx';
+                  readonly columns: readonly ['projectId', 'createdAt', 'id'];
+                  readonly unique: false;
+                },
+                {
                   readonly name: 'FileAsset_projectId_idx_a96e4d92';
                   readonly prefix: 'FileAsset_projectId_idx';
                   readonly columns: readonly ['projectId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'FileAsset_uploadedByUserId_idx_b9c62f4a';
+                  readonly prefix: 'FileAsset_uploadedByUserId_idx';
+                  readonly columns: readonly ['uploadedByUserId'];
                   readonly unique: false;
                 },
               ];
@@ -2884,6 +2949,18 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'Project';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'FileAsset';
+                    readonly columns: readonly ['uploadedByUserId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -7205,6 +7282,14 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly checksumSha256: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly clientToken: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -7215,6 +7300,14 @@ type ContractBase = Omit<
               };
               readonly extractedText: {
                 readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly extractionError: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly extractionStatus: {
+                readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly fileName: {
@@ -7245,6 +7338,18 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly uploadedByUserId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
             };
             readonly relations: {
               readonly project: {
@@ -7259,14 +7364,27 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
+              readonly uploader: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['uploadedByUserId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
             };
             readonly storage: {
               readonly table: 'FileAsset';
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly category: { readonly column: 'category' };
+                readonly checksumSha256: { readonly column: 'checksumSha256' };
+                readonly clientToken: { readonly column: 'clientToken' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly extractedText: { readonly column: 'extractedText' };
+                readonly extractionError: { readonly column: 'extractionError' };
+                readonly extractionStatus: { readonly column: 'extractionStatus' };
                 readonly fileName: { readonly column: 'fileName' };
                 readonly fileSize: { readonly column: 'fileSize' };
                 readonly id: { readonly column: 'id' };
@@ -7274,6 +7392,8 @@ type ContractBase = Omit<
                 readonly mimeType: { readonly column: 'mimeType' };
                 readonly projectId: { readonly column: 'projectId' };
                 readonly s3Key: { readonly column: 's3Key' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly uploadedByUserId: { readonly column: 'uploadedByUserId' };
               };
             };
           };
@@ -9547,6 +9667,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['userId'];
                 };
               };
+              readonly fileAssets: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'FileAsset';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['uploadedByUserId'];
+                };
+              };
               readonly notifications: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -10387,6 +10518,23 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'FileAsset';
             readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'FileAsset';
+            readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },

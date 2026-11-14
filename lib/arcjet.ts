@@ -85,6 +85,39 @@ const researchSaveLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
   : null;
 
+const filesRequestLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
+  : null;
+
+const filesCompleteLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 20, window: "1m" })] })
+  : null;
+
+const filesPreviewLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
+  : null;
+
+export type FilesRateLimitKind = "request" | "complete" | "preview";
+
+export async function checkFilesRateLimit(
+  req: Request,
+  kind: FilesRateLimitKind,
+): Promise<boolean> {
+  const limiter =
+    kind === "request"
+      ? filesRequestLimiter
+      : kind === "complete"
+        ? filesCompleteLimiter
+        : filesPreviewLimiter;
+  if (!limiter) return true;
+  const decision = await limiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn(`[arcjet] decision error on files-${kind}, failing open`);
+    return true;
+  }
+  return !decision.isDenied();
+}
+
 export async function checkWorkspaceRateLimit(req: Request): Promise<boolean> {
   if (!workspaceLimiter) return true;
   const decision = await workspaceLimiter.protect(req);
@@ -118,7 +151,8 @@ export async function checkResearchRateLimit(
   req: Request,
   kind: "search" | "save",
 ): Promise<boolean> {
-  const limiter = kind === "search" ? researchSearchLimiter : researchSaveLimiter;
+  const limiter =
+    kind === "search" ? researchSearchLimiter : researchSaveLimiter;
   if (!limiter) return true;
   const decision = await limiter.protect(req);
   if (decision.isErrored()) {

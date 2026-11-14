@@ -2586,6 +2586,20 @@
                   "plane": "domain"
                 }
               },
+              "checksumSha256": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "clientToken": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -2598,6 +2612,20 @@
               },
               "extractedText": {
                 "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "extractionError": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "extractionStatus": {
+                "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -2651,6 +2679,23 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "uploadedByUserId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -2669,6 +2714,22 @@
                   "model": "Project",
                   "namespace": "public"
                 }
+              },
+              "uploader": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "uploadedByUserId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -2676,11 +2737,23 @@
                 "category": {
                   "column": "category"
                 },
+                "checksumSha256": {
+                  "column": "checksumSha256"
+                },
+                "clientToken": {
+                  "column": "clientToken"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
                 "extractedText": {
                   "column": "extractedText"
+                },
+                "extractionError": {
+                  "column": "extractionError"
+                },
+                "extractionStatus": {
+                  "column": "extractionStatus"
                 },
                 "fileName": {
                   "column": "fileName"
@@ -2702,6 +2775,12 @@
                 },
                 "s3Key": {
                   "column": "s3Key"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "uploadedByUserId": {
+                  "column": "uploadedByUserId"
                 }
               },
               "namespaceId": "public",
@@ -6405,6 +6484,21 @@
                   "namespace": "public"
                 }
               },
+              "fileAssets": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "uploadedByUserId"
+                  ]
+                },
+                "to": {
+                  "model": "FileAsset",
+                  "namespace": "public"
+                }
+              },
               "notifications": {
                 "cardinality": "1:N",
                 "on": {
@@ -8783,6 +8877,16 @@
                     "plane": "storage"
                   }
                 },
+                "checksumSha256": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "clientToken": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
@@ -8799,6 +8903,20 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "extractionError": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "extractionStatus": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nullable": false
                 },
                 "fileName": {
                   "codecId": "pg/text@1",
@@ -8838,6 +8956,19 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "uploadedByUserId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -8860,6 +8991,26 @@
                     "namespaceId": "public",
                     "tableName": "Project"
                   }
+                },
+                {
+                  "index": {
+                    "name": "FileAsset_uploadedByUserId_idx_b9c62f4a"
+                  },
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "uploadedByUserId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "FileAsset"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
                 }
               ],
               "indexes": [
@@ -8874,10 +9025,28 @@
                 },
                 {
                   "columns": [
+                    "projectId",
+                    "createdAt",
+                    "id"
+                  ],
+                  "name": "FileAsset_projectId_createdAt_id_idx_efb29810",
+                  "prefix": "FileAsset_projectId_createdAt_id_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "projectId"
                   ],
                   "name": "FileAsset_projectId_idx_a96e4d92",
                   "prefix": "FileAsset_projectId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "uploadedByUserId"
+                  ],
+                  "name": "FileAsset_uploadedByUserId_idx_b9c62f4a",
+                  "prefix": "FileAsset_uploadedByUserId_idx",
                   "unique": false
                 }
               ],
@@ -8890,6 +9059,11 @@
                 {
                   "columns": [
                     "s3Key"
+                  ]
+                },
+                {
+                  "columns": [
+                    "clientToken"
                   ]
                 }
               ]
@@ -12434,10 +12608,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3277f2a2f8a7fad263f4393bd4385a068de04ebecf7419477b9cc8b5efa1a8b7"
+    "storageHash": "37a2b500fb48911c11d9548057d5d4f24531fabc82f285cf7a726054e4bf44a9"
   },
   "execution": {
-    "executionHash": "a932af8705bee8d856bbe964ff110d38c0242b048062f11ab69a34b8b48730f8",
+    "executionHash": "16bb9e09765036827f3f548752359687f4e71cc9cd583b89e9321a40edf2d966",
     "mutations": {
       "defaults": [
         {
@@ -12739,6 +12913,27 @@
           "ref": {
             "entry": "FileAsset",
             "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
+          "ref": {
+            "entry": "FileAsset",
+            "field": "updatedAt",
             "namespace": "public"
           }
         },

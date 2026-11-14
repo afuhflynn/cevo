@@ -1,0 +1,1493 @@
+[
+  {
+    "id": "table.AiAssistRun",
+    "label": "Create table \"AiAssistRun\"",
+    "summary": "Creates table \"AiAssistRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "AiAssistRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"AiAssistRun\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"AiAssistRun\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"AiAssistRun\"",
+        "sql": "CREATE TABLE \"public\".\"AiAssistRun\" (\n  \"actualCredits\" int4 DEFAULT 0 NOT NULL,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"estimateCredits\" int4 NOT NULL,\n  \"expiresAt\" timestamptz(3) NOT NULL,\n  \"id\" text NOT NULL,\n  \"idempotencyKey\" text NOT NULL,\n  \"inputChars\" int4 NOT NULL,\n  \"inputHash\" text NOT NULL,\n  \"inputText\" text NOT NULL,\n  \"modelId\" text,\n  \"operation\" text NOT NULL,\n  \"projectId\" text NOT NULL,\n  \"promptVersion\" text NOT NULL,\n  \"scope\" text NOT NULL,\n  \"sectionId\" text NOT NULL,\n  \"sectionVersion\" int4 NOT NULL,\n  \"status\" text DEFAULT 'held' NOT NULL,\n  \"tokenCost\" int4 DEFAULT 0 NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"AiAssistRun\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"AiAssistRun\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.AiSuggestion",
+    "label": "Create table \"AiSuggestion\"",
+    "summary": "Creates table \"AiSuggestion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "AiSuggestion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"AiSuggestion\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AiSuggestion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"AiSuggestion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"AiSuggestion\"",
+        "sql": "CREATE TABLE \"public\".\"AiSuggestion\" (\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"originalText\" text NOT NULL,\n  \"paragraphIndex\" int4 NOT NULL,\n  \"revisedText\" text NOT NULL,\n  \"runId\" text NOT NULL,\n  \"status\" text DEFAULT 'pending' NOT NULL,\n  \"warnings\" json,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"AiSuggestion\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"AiSuggestion\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"AiSuggestion\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "column.public.Citation.anchorId",
+    "label": "Add column \"anchorId\" to \"Citation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "anchorId",
+        "table": "Citation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"anchorId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "anchorId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"anchorId\" on \"Citation\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"anchorId\"",
+        "sql": "ALTER TABLE \"public\".\"Citation\" ADD COLUMN \"anchorId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"anchorId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "anchorId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"anchorId\" on \"Citation\""
+        }
+      },
+      {
+        "description": "verify column \"anchorId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "anchorId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Citation.formattedText",
+    "label": "Add column \"formattedText\" to \"Citation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "formattedText",
+        "table": "Citation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"formattedText\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "formattedText"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"formattedText\" on \"Citation\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"formattedText\"",
+        "sql": "ALTER TABLE \"public\".\"Citation\" ADD COLUMN \"formattedText\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"formattedText\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "formattedText"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"formattedText\" on \"Citation\""
+        }
+      },
+      {
+        "description": "verify column \"formattedText\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "formattedText",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Citation.style",
+    "label": "Add column \"style\" to \"Citation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "style",
+        "table": "Citation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"style\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "style"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"style\" on \"Citation\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"style\"",
+        "sql": "ALTER TABLE \"public\".\"Citation\" ADD COLUMN \"style\" text DEFAULT 'APA_7' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"style\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "style"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"style\" on \"Citation\""
+        }
+      },
+      {
+        "description": "verify column \"style\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "style",
+          "text"
+        ]
+      },
+      {
+        "description": "verify column \"style\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Citation",
+          "style",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.FileAsset.checksumSha256",
+    "label": "Add column \"checksumSha256\" to \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "checksumSha256",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"checksumSha256\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "checksumSha256"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"checksumSha256\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"checksumSha256\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"checksumSha256\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"checksumSha256\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "checksumSha256"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"checksumSha256\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"checksumSha256\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "checksumSha256",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.FileAsset.extractionError",
+    "label": "Add column \"extractionError\" to \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "extractionError",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"extractionError\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionError"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"extractionError\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"extractionError\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"extractionError\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"extractionError\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionError"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"extractionError\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"extractionError\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionError",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.FileAsset.extractionStatus",
+    "label": "Add column \"extractionStatus\" to \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "extractionStatus",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"extractionStatus\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionStatus"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"extractionStatus\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"extractionStatus\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"extractionStatus\" text DEFAULT 'PENDING' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"extractionStatus\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionStatus"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"extractionStatus\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"extractionStatus\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionStatus",
+          "text"
+        ]
+      },
+      {
+        "description": "verify column \"extractionStatus\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "extractionStatus",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ResearchSource.formattedApa",
+    "label": "Add column \"formattedApa\" to \"ResearchSource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "formattedApa",
+        "table": "ResearchSource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"formattedApa\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedApa"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"formattedApa\" on \"ResearchSource\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"formattedApa\"",
+        "sql": "ALTER TABLE \"public\".\"ResearchSource\" ADD COLUMN \"formattedApa\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"formattedApa\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedApa"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"formattedApa\" on \"ResearchSource\""
+        }
+      },
+      {
+        "description": "verify column \"formattedApa\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedApa",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ResearchSource.formattedHarvard",
+    "label": "Add column \"formattedHarvard\" to \"ResearchSource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "formattedHarvard",
+        "table": "ResearchSource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"formattedHarvard\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedHarvard"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"formattedHarvard\" on \"ResearchSource\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"formattedHarvard\"",
+        "sql": "ALTER TABLE \"public\".\"ResearchSource\" ADD COLUMN \"formattedHarvard\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"formattedHarvard\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedHarvard"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"formattedHarvard\" on \"ResearchSource\""
+        }
+      },
+      {
+        "description": "verify column \"formattedHarvard\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "formattedHarvard",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ResearchSource.lastVerifiedAt",
+    "label": "Add column \"lastVerifiedAt\" to \"ResearchSource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "lastVerifiedAt",
+        "table": "ResearchSource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"lastVerifiedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "lastVerifiedAt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"lastVerifiedAt\" on \"ResearchSource\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"lastVerifiedAt\"",
+        "sql": "ALTER TABLE \"public\".\"ResearchSource\" ADD COLUMN \"lastVerifiedAt\" timestamptz(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"lastVerifiedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "lastVerifiedAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"lastVerifiedAt\" on \"ResearchSource\""
+        }
+      },
+      {
+        "description": "verify column \"lastVerifiedAt\" has type \"timestamp(3) with time zone\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ResearchSource",
+          "lastVerifiedAt",
+          "timestamp(3) with time zone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.FileAsset.clientToken",
+    "label": "Add column clientToken to FileAsset",
+    "summary": "Adds column clientToken to table FileAsset",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientToken",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientToken\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "clientToken"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"clientToken\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "ensure table \"FileAsset\" is empty before adding NOT NULL column without default",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"FileAsset\" LIMIT 1) AS \"result\"",
+        "params": [],
+        "meta": {
+          "requiredColumn": {
+            "table": "FileAsset",
+            "column": "clientToken",
+            "reason": "newField"
+          }
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientToken\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"clientToken\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientToken\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "clientToken"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"clientToken\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"clientToken\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "clientToken",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"clientToken\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "clientToken",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.FileAsset.updatedAt",
+    "label": "Add column updatedAt to FileAsset",
+    "summary": "Adds column updatedAt to table FileAsset",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "FileAsset"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"updatedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "updatedAt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"updatedAt\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"updatedAt\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"updatedAt\" timestamptz(3) DEFAULT ('epoch') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"updatedAt\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ALTER COLUMN \"updatedAt\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"updatedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "updatedAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"updatedAt\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"updatedAt\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "updatedAt",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"updatedAt\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "updatedAt"
+        ]
+      },
+      {
+        "description": "verify column \"updatedAt\" has type \"timestamp(3) with time zone\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "updatedAt",
+          "timestamp(3) with time zone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.FileAsset.uploadedByUserId",
+    "label": "Add column uploadedByUserId to FileAsset",
+    "summary": "Adds column uploadedByUserId to table FileAsset",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "uploadedByUserId",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"uploadedByUserId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "uploadedByUserId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"uploadedByUserId\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "ensure table \"FileAsset\" is empty before adding NOT NULL column without default",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"FileAsset\" LIMIT 1) AS \"result\"",
+        "params": [],
+        "meta": {
+          "requiredColumn": {
+            "table": "FileAsset",
+            "column": "uploadedByUserId",
+            "reason": "newField"
+          }
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"uploadedByUserId\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD COLUMN \"uploadedByUserId\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"uploadedByUserId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "uploadedByUserId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"uploadedByUserId\" on \"FileAsset\""
+        }
+      },
+      {
+        "description": "verify column \"uploadedByUserId\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "uploadedByUserId",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"uploadedByUserId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "FileAsset",
+          "uploadedByUserId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.AiAssistRun.AiAssistRun_idempotencyKey_key",
+    "label": "Add unique constraint on \"AiAssistRun\" (idempotencyKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "AiAssistRun_idempotencyKey_key",
+        "table": "AiAssistRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"AiAssistRun_idempotencyKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "AiAssistRun_idempotencyKey_key",
+          "public",
+          "\"public\".\"AiAssistRun\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"AiAssistRun_idempotencyKey_key\" on \"AiAssistRun\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"AiAssistRun_idempotencyKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"AiAssistRun\" ADD CONSTRAINT \"AiAssistRun_idempotencyKey_key\" UNIQUE (\"idempotencyKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"AiAssistRun_idempotencyKey_key\" exists on (idempotencyKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "AiAssistRun_idempotencyKey_key",
+          "public",
+          "\"public\".\"AiAssistRun\"",
+          "u",
+          "[\"idempotencyKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.AiSuggestion.AiSuggestion_runId_paragraphIndex_key",
+    "label": "Add unique constraint on \"AiSuggestion\" (runId, paragraphIndex)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "AiSuggestion_runId_paragraphIndex_key",
+        "table": "AiSuggestion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"AiSuggestion_runId_paragraphIndex_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "AiSuggestion_runId_paragraphIndex_key",
+          "public",
+          "\"public\".\"AiSuggestion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"AiSuggestion_runId_paragraphIndex_key\" on \"AiSuggestion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"AiSuggestion_runId_paragraphIndex_key\"",
+        "sql": "ALTER TABLE \"public\".\"AiSuggestion\" ADD CONSTRAINT \"AiSuggestion_runId_paragraphIndex_key\" UNIQUE (\"runId\", \"paragraphIndex\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"AiSuggestion_runId_paragraphIndex_key\" exists on (runId, paragraphIndex)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "AiSuggestion_runId_paragraphIndex_key",
+          "public",
+          "\"public\".\"AiSuggestion\"",
+          "u",
+          "[\"runId\",\"paragraphIndex\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Citation.Citation_sectionId_sourceId_key",
+    "label": "Add unique constraint on \"Citation\" (sectionId, sourceId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Citation_sectionId_sourceId_key",
+        "table": "Citation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Citation_sectionId_sourceId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Citation_sectionId_sourceId_key",
+          "public",
+          "\"public\".\"Citation\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Citation_sectionId_sourceId_key\" on \"Citation\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Citation_sectionId_sourceId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Citation\" ADD CONSTRAINT \"Citation_sectionId_sourceId_key\" UNIQUE (\"sectionId\", \"sourceId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Citation_sectionId_sourceId_key\" exists on (sectionId, sourceId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Citation_sectionId_sourceId_key",
+          "public",
+          "\"public\".\"Citation\"",
+          "u",
+          "[\"sectionId\",\"sourceId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.FileAsset.FileAsset_clientToken_key",
+    "label": "Add unique constraint on \"FileAsset\" (clientToken)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "FileAsset_clientToken_key",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"FileAsset_clientToken_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FileAsset_clientToken_key",
+          "public",
+          "\"public\".\"FileAsset\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"FileAsset_clientToken_key\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"FileAsset_clientToken_key\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\" ADD CONSTRAINT \"FileAsset_clientToken_key\" UNIQUE (\"clientToken\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"FileAsset_clientToken_key\" exists on (clientToken)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "FileAsset_clientToken_key",
+          "public",
+          "\"public\".\"FileAsset\"",
+          "u",
+          "[\"clientToken\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.AiAssistRun.AiAssistRun_projectId_createdAt_idx_d2d6484f",
+    "label": "Create index \"AiAssistRun_projectId_createdAt_idx_d2d6484f\" on \"AiAssistRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "AiAssistRun_projectId_createdAt_idx_d2d6484f",
+        "table": "AiAssistRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"AiAssistRun_projectId_createdAt_idx_d2d6484f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun_projectId_createdAt_idx_d2d6484f\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"AiAssistRun_projectId_createdAt_idx_d2d6484f\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"AiAssistRun_projectId_createdAt_idx_d2d6484f\"",
+        "sql": "CREATE INDEX \"AiAssistRun_projectId_createdAt_idx_d2d6484f\" ON \"public\".\"AiAssistRun\" (\"projectId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"AiAssistRun_projectId_createdAt_idx_d2d6484f\" exists on \"AiAssistRun\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun_projectId_createdAt_idx_d2d6484f\"",
+          "i",
+          "I",
+          "\"public\".\"AiAssistRun\"",
+          "btree",
+          "[\"projectId\",\"createdAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.AiAssistRun.AiAssistRun_sectionId_createdAt_idx_9fabc30e",
+    "label": "Create index \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\" on \"AiAssistRun\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "AiAssistRun_sectionId_createdAt_idx_9fabc30e",
+        "table": "AiAssistRun"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun_sectionId_createdAt_idx_9fabc30e\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\"",
+        "sql": "CREATE INDEX \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\" ON \"public\".\"AiAssistRun\" (\"sectionId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"AiAssistRun_sectionId_createdAt_idx_9fabc30e\" exists on \"AiAssistRun\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"AiAssistRun_sectionId_createdAt_idx_9fabc30e\"",
+          "i",
+          "I",
+          "\"public\".\"AiAssistRun\"",
+          "btree",
+          "[\"sectionId\",\"createdAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.AiSuggestion.AiSuggestion_runId_idx_a6016437",
+    "label": "Create index \"AiSuggestion_runId_idx_a6016437\" on \"AiSuggestion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "AiSuggestion_runId_idx_a6016437",
+        "table": "AiSuggestion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"AiSuggestion_runId_idx_a6016437\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AiSuggestion_runId_idx_a6016437\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"AiSuggestion_runId_idx_a6016437\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"AiSuggestion_runId_idx_a6016437\"",
+        "sql": "CREATE INDEX \"AiSuggestion_runId_idx_a6016437\" ON \"public\".\"AiSuggestion\" (\"runId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"AiSuggestion_runId_idx_a6016437\" exists on \"AiSuggestion\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"AiSuggestion_runId_idx_a6016437\"",
+          "i",
+          "I",
+          "\"public\".\"AiSuggestion\"",
+          "btree",
+          "[\"runId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Citation.Citation_citationKey_idx_0e47c5aa",
+    "label": "Create index \"Citation_citationKey_idx_0e47c5aa\" on \"Citation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Citation_citationKey_idx_0e47c5aa",
+        "table": "Citation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Citation_citationKey_idx_0e47c5aa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Citation_citationKey_idx_0e47c5aa\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Citation_citationKey_idx_0e47c5aa\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Citation_citationKey_idx_0e47c5aa\"",
+        "sql": "CREATE INDEX \"Citation_citationKey_idx_0e47c5aa\" ON \"public\".\"Citation\" (\"citationKey\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Citation_citationKey_idx_0e47c5aa\" exists on \"Citation\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Citation_citationKey_idx_0e47c5aa\"",
+          "i",
+          "I",
+          "\"public\".\"Citation\"",
+          "btree",
+          "[\"citationKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.FileAsset.FileAsset_projectId_createdAt_id_idx_efb29810",
+    "label": "Create index \"FileAsset_projectId_createdAt_id_idx_efb29810\" on \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "FileAsset_projectId_createdAt_id_idx_efb29810",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"FileAsset_projectId_createdAt_id_idx_efb29810\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FileAsset_projectId_createdAt_id_idx_efb29810\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"FileAsset_projectId_createdAt_id_idx_efb29810\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"FileAsset_projectId_createdAt_id_idx_efb29810\"",
+        "sql": "CREATE INDEX \"FileAsset_projectId_createdAt_id_idx_efb29810\" ON \"public\".\"FileAsset\" (\"projectId\", \"createdAt\", \"id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"FileAsset_projectId_createdAt_id_idx_efb29810\" exists on \"FileAsset\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"FileAsset_projectId_createdAt_id_idx_efb29810\"",
+          "i",
+          "I",
+          "\"public\".\"FileAsset\"",
+          "btree",
+          "[\"projectId\",\"createdAt\",\"id\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.FileAsset.FileAsset_uploadedByUserId_idx_b9c62f4a",
+    "label": "Create index \"FileAsset_uploadedByUserId_idx_b9c62f4a\" on \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "FileAsset_uploadedByUserId_idx_b9c62f4a",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"FileAsset_uploadedByUserId_idx_b9c62f4a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"FileAsset_uploadedByUserId_idx_b9c62f4a\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"FileAsset_uploadedByUserId_idx_b9c62f4a\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"FileAsset_uploadedByUserId_idx_b9c62f4a\"",
+        "sql": "CREATE INDEX \"FileAsset_uploadedByUserId_idx_b9c62f4a\" ON \"public\".\"FileAsset\" (\"uploadedByUserId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"FileAsset_uploadedByUserId_idx_b9c62f4a\" exists on \"FileAsset\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"FileAsset_uploadedByUserId_idx_b9c62f4a\"",
+          "i",
+          "I",
+          "\"public\".\"FileAsset\"",
+          "btree",
+          "[\"uploadedByUserId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.AiSuggestion.AiSuggestion_runId_fkey",
+    "label": "Add foreign key \"AiSuggestion_runId_fkey\" on \"AiSuggestion\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "AiSuggestion_runId_fkey",
+        "table": "AiSuggestion"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"AiSuggestion_runId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "AiSuggestion_runId_fkey",
+          "public",
+          "\"public\".\"AiSuggestion\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"AiSuggestion_runId_fkey\" on \"AiSuggestion\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"AiSuggestion_runId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"AiSuggestion\"\nADD CONSTRAINT \"AiSuggestion_runId_fkey\"\nFOREIGN KEY (\"runId\")\nREFERENCES \"public\".\"AiAssistRun\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"AiSuggestion_runId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "AiSuggestion_runId_fkey",
+          "public",
+          "\"public\".\"AiSuggestion\"",
+          "f",
+          "[\"runId\"]",
+          "\"public\".\"AiAssistRun\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.FileAsset.FileAsset_uploadedByUserId_fkey",
+    "label": "Add foreign key \"FileAsset_uploadedByUserId_fkey\" on \"FileAsset\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "FileAsset_uploadedByUserId_fkey",
+        "table": "FileAsset"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"FileAsset_uploadedByUserId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "FileAsset_uploadedByUserId_fkey",
+          "public",
+          "\"public\".\"FileAsset\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"FileAsset_uploadedByUserId_fkey\" on \"FileAsset\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"FileAsset_uploadedByUserId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"FileAsset\"\nADD CONSTRAINT \"FileAsset_uploadedByUserId_fkey\"\nFOREIGN KEY (\"uploadedByUserId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"FileAsset_uploadedByUserId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "FileAsset_uploadedByUserId_fkey",
+          "public",
+          "\"public\".\"FileAsset\"",
+          "f",
+          "[\"uploadedByUserId\"]",
+          "\"public\".\"User\"",
+          "[\"id\"]",
+          "r",
+          "a"
+        ]
+      }
+    ]
+  }
+]
