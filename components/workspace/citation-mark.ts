@@ -3,6 +3,7 @@ import { Mark, mergeAttributes } from "@tiptap/core";
 export type CitationAttrs = {
   sourceId?: string | null;
   freeText?: string | null;
+  anchorId?: string | null;
 };
 
 declare module "@tiptap/core" {
@@ -21,6 +22,7 @@ export const CitationMark = Mark.create({
     return {
       sourceId: { default: null, parseHTML: (el: HTMLElement) => el.getAttribute("data-source-id"), renderHTML: (attrs: Record<string, unknown>) => (attrs["sourceId"] ? { "data-source-id": attrs["sourceId"] as string } : {}) },
       freeText: { default: null, parseHTML: (el: HTMLElement) => el.getAttribute("data-free-text"), renderHTML: (attrs: Record<string, unknown>) => (attrs["freeText"] ? { "data-free-text": attrs["freeText"] as string } : {}) },
+      anchorId: { default: null, parseHTML: (el: HTMLElement) => el.getAttribute("data-anchor-id"), renderHTML: (attrs: Record<string, unknown>) => (attrs["anchorId"] ? { "data-anchor-id": attrs["anchorId"] as string } : {}) },
     };
   },
   parseHTML() {

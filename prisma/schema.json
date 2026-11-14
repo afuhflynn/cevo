@@ -1585,6 +1585,13 @@
           },
           "Citation": {
             "fields": {
+              "anchorId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "citationKey": {
                 "nullable": false,
                 "type": {
@@ -1600,6 +1607,13 @@
                   "typeParams": {
                     "precision": 3
                   }
+                }
+              },
+              "formattedText": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "id": {
@@ -1624,6 +1638,13 @@
                 }
               },
               "sourceId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "style": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1667,11 +1688,17 @@
             },
             "storage": {
               "fields": {
+                "anchorId": {
+                  "column": "anchorId"
+                },
                 "citationKey": {
                   "column": "citationKey"
                 },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "formattedText": {
+                  "column": "formattedText"
                 },
                 "id": {
                   "column": "id"
@@ -1684,6 +1711,9 @@
                 },
                 "sourceId": {
                   "column": "sourceId"
+                },
+                "style": {
+                  "column": "style"
                 }
               },
               "namespaceId": "public",
@@ -5031,6 +5061,20 @@
                   "kind": "scalar"
                 }
               },
+              "formattedApa": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "formattedHarvard": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -5050,6 +5094,16 @@
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
+                }
+              },
+              "lastVerifiedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
                 }
               },
               "openAlexId": {
@@ -5192,6 +5246,12 @@
                 "doi": {
                   "column": "doi"
                 },
+                "formattedApa": {
+                  "column": "formattedApa"
+                },
+                "formattedHarvard": {
+                  "column": "formattedHarvard"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -5200,6 +5260,9 @@
                 },
                 "issue": {
                   "column": "issue"
+                },
+                "lastVerifiedAt": {
+                  "column": "lastVerifiedAt"
                 },
                 "openAlexId": {
                   "column": "openAlexId"
@@ -7877,6 +7940,11 @@
             },
             "Citation": {
               "columns": {
+                "anchorId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "citationKey": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -7893,6 +7961,11 @@
                   "typeParams": {
                     "precision": 3
                   }
+                },
+                "formattedText": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
                 },
                 "id": {
                   "codecId": "pg/text@1",
@@ -7912,6 +7985,15 @@
                 "sourceId": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
+                  "nullable": false
+                },
+                "style": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "APA_7"
+                  },
                   "nullable": false
                 }
               },
@@ -7960,6 +8042,14 @@
               "indexes": [
                 {
                   "columns": [
+                    "citationKey"
+                  ],
+                  "name": "Citation_citationKey_idx_0e47c5aa",
+                  "prefix": "Citation_citationKey_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "sectionId"
                   ],
                   "name": "Citation_sectionId_idx_5d1ea56b",
@@ -7980,7 +8070,14 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "sectionId",
+                    "sourceId"
+                  ]
+                }
+              ]
             },
             "CreditLedger": {
               "checks": [
@@ -10721,6 +10818,16 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
+                "formattedApa": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "formattedHarvard": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -10739,6 +10846,14 @@
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": true
+                },
+                "lastVerifiedAt": {
+                  "codecId": "pg/timestamptz-date@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
                 },
                 "openAlexId": {
                   "codecId": "pg/text@1",
@@ -12319,7 +12434,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3cddc7a5fb22161d07fb73e0ac43c5ed5303a9abebf881edf6792120c2035e0c"
+    "storageHash": "3277f2a2f8a7fad263f4393bd4385a068de04ebecf7419477b9cc8b5efa1a8b7"
   },
   "execution": {
     "executionHash": "a932af8705bee8d856bbe964ff110d38c0242b048062f11ab69a34b8b48730f8",

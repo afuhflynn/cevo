@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'3cddc7a5fb22161d07fb73e0ac43c5ed5303a9abebf881edf6792120c2035e0c'>;
+  StorageHashBase<'3277f2a2f8a7fad263f4393bd4385a068de04ebecf7419477b9cc8b5efa1a8b7'>;
 export type ExecutionHash =
   ExecutionHashBase<'a932af8705bee8d856bbe964ff110d38c0242b048062f11ab69a34b8b48730f8'>;
 export type ProfileHash =
@@ -724,12 +724,15 @@ export namespace Models {
     readonly [RelationKeys]?: 'brief';
   };
   export type public_Citation = {
+    anchorId: FieldOutputTypes['public']['Citation']['anchorId'];
     citationKey: FieldOutputTypes['public']['Citation']['citationKey'];
     createdAt: FieldOutputTypes['public']['Citation']['createdAt'];
+    formattedText: FieldOutputTypes['public']['Citation']['formattedText'];
     id: FieldOutputTypes['public']['Citation']['id'];
     inlineText: FieldOutputTypes['public']['Citation']['inlineText'];
     sectionId: FieldOutputTypes['public']['Citation']['sectionId'];
     sourceId: FieldOutputTypes['public']['Citation']['sourceId'];
+    style: FieldOutputTypes['public']['Citation']['style'];
     section: public_ProjectSection;
     source: public_ResearchSource;
     readonly [RelationKeys]?: 'section' | 'source';
@@ -1073,9 +1076,12 @@ export namespace Models {
     authors: FieldOutputTypes['public']['ResearchSource']['authors'];
     createdAt: FieldOutputTypes['public']['ResearchSource']['createdAt'];
     doi: FieldOutputTypes['public']['ResearchSource']['doi'];
+    formattedApa: FieldOutputTypes['public']['ResearchSource']['formattedApa'];
+    formattedHarvard: FieldOutputTypes['public']['ResearchSource']['formattedHarvard'];
     id: FieldOutputTypes['public']['ResearchSource']['id'];
     isOpenAccess: FieldOutputTypes['public']['ResearchSource']['isOpenAccess'];
     issue: FieldOutputTypes['public']['ResearchSource']['issue'];
+    lastVerifiedAt: FieldOutputTypes['public']['ResearchSource']['lastVerifiedAt'];
     openAlexId: FieldOutputTypes['public']['ResearchSource']['openAlexId'];
     pages: FieldOutputTypes['public']['ResearchSource']['pages'];
     pdfUrl: FieldOutputTypes['public']['ResearchSource']['pdfUrl'];
@@ -2139,6 +2145,12 @@ type ContractBase = Omit<
             };
             readonly Citation: {
               columns: {
+                readonly anchorId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
                 readonly citationKey: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -2151,6 +2163,12 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly formattedText: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly id: {
@@ -2177,10 +2195,26 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly style: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'APA_7'>;
+                  };
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
+              uniques: readonly [{ readonly columns: readonly ['sectionId', 'sourceId'] }];
               indexes: readonly [
+                {
+                  readonly name: 'Citation_citationKey_idx_0e47c5aa';
+                  readonly prefix: 'Citation_citationKey_idx';
+                  readonly columns: readonly ['citationKey'];
+                  readonly unique: false;
+                },
                 {
                   readonly name: 'Citation_sectionId_idx_5d1ea56b';
                   readonly prefix: 'Citation_sectionId_idx';
@@ -4413,6 +4447,18 @@ type ContractBase = Omit<
                   readonly nullable: true;
                   readonly many: false;
                 };
+                readonly formattedApa: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly formattedHarvard: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
                 readonly id: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -4433,6 +4479,13 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly lastVerifiedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: true;
+                  readonly typeParams: { readonly precision: 3 };
                   readonly many: false;
                 };
                 readonly openAlexId: {
@@ -6528,6 +6581,10 @@ type ContractBase = Omit<
           };
           readonly Citation: {
             readonly fields: {
+              readonly anchorId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly citationKey: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -6539,6 +6596,10 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-date@1';
                   readonly typeParams: { readonly precision: 3 };
                 };
+              };
+              readonly formattedText: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly id: {
                 readonly nullable: false;
@@ -6553,6 +6614,10 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly sourceId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly style: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
@@ -6587,12 +6652,15 @@ type ContractBase = Omit<
               readonly table: 'Citation';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly anchorId: { readonly column: 'anchorId' };
                 readonly citationKey: { readonly column: 'citationKey' };
                 readonly createdAt: { readonly column: 'createdAt' };
+                readonly formattedText: { readonly column: 'formattedText' };
                 readonly id: { readonly column: 'id' };
                 readonly inlineText: { readonly column: 'inlineText' };
                 readonly sectionId: { readonly column: 'sectionId' };
                 readonly sourceId: { readonly column: 'sourceId' };
+                readonly style: { readonly column: 'style' };
               };
             };
           };
@@ -8669,6 +8737,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly formattedApa: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly formattedHarvard: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly id: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -8680,6 +8756,14 @@ type ContractBase = Omit<
               readonly issue: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly lastVerifiedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
               };
               readonly openAlexId: {
                 readonly nullable: true;
@@ -8766,9 +8850,12 @@ type ContractBase = Omit<
                 readonly authors: { readonly column: 'authors' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly doi: { readonly column: 'doi' };
+                readonly formattedApa: { readonly column: 'formattedApa' };
+                readonly formattedHarvard: { readonly column: 'formattedHarvard' };
                 readonly id: { readonly column: 'id' };
                 readonly isOpenAccess: { readonly column: 'isOpenAccess' };
                 readonly issue: { readonly column: 'issue' };
+                readonly lastVerifiedAt: { readonly column: 'lastVerifiedAt' };
                 readonly openAlexId: { readonly column: 'openAlexId' };
                 readonly pages: { readonly column: 'pages' };
                 readonly pdfUrl: { readonly column: 'pdfUrl' };

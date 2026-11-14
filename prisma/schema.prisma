@@ -511,6 +511,9 @@ model ResearchSource {
   isOpenAccess      Boolean           @default(false)
   verificationState VerificationState @default(METADATA_VERIFIED)
   rawMetadata       Json?
+  formattedApa      Text?
+  formattedHarvard  Text?
+  lastVerifiedAt    DateTime?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @onCreate(now()) @onUpdate(now())
 
@@ -538,18 +541,23 @@ model ProjectSource {
 }
 
 model Citation {
-  id          String         @id @onCreate(cuid(2))
-  sectionId   String
-  sourceId    String
-  inlineText  String
-  citationKey String
-  createdAt   DateTime       @default(now())
+  id            String         @id @onCreate(cuid(2))
+  sectionId     String
+  sourceId      String
+  inlineText    String
+  citationKey   String
+  style         String         @default("APA_7")
+  formattedText Text?
+  anchorId      String?
+  createdAt     DateTime       @default(now())
 
   section     ProjectSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   source      ResearchSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 
+  @@unique([sectionId, sourceId])
   @@index([sectionId])
   @@index([sourceId])
+  @@index([citationKey])
 }
 
 model FileAsset {

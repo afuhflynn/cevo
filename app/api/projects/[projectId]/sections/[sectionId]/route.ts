@@ -8,6 +8,7 @@ import {
   logWorkspaceAudit,
 } from "@/lib/workspace";
 import { countWordsFromTiptap } from "@/lib/workspace-shared";
+import { collectCitationAnchors } from "@/lib/research";
 import {
   isValidTiptapDoc,
   sectionPatchSchema,
@@ -96,6 +97,28 @@ export async function PUT(request: Request, { params }: Ctx) {
     version: current.version + 1,
   });
   if (!updated) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  try {
+    const anchors = collectCitationAnchors(parsed.data.content);
+    const rows = await db.orm.public.Citation.select("id", "anchorId")
+      .where((r) => r.sectionId.eq(sectionId))
+      .limit(500)
+      .all();
+    for (const row of rows as unknown as { id: string; anchorId: string | null }[]) {
+      if (row.anchorId && !anchors.has(row.anchorId)) {
+        await db.orm.public.Citation.where({ id: row.id }).delete().catch(() => undefined);
+        await logWorkspaceAudit({
+          userId: user.id,
+          action: "citation.delete",
+          targetType: "Citation",
+          targetId: row.id,
+          details: { projectId, sectionId, reason: "orphan-prune" },
+          ipAddress: await clientIp(),
+        }).catch(() => undefined);
+      }
+    }
+  } catch {
+    /* orphan prune is best effort; a failed prune never fails the save */
+  }
   await logWorkspaceAudit({
     userId: user.id,
     action: "workspace.section.save",

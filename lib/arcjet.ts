@@ -77,6 +77,14 @@ const assistantHourlyLimiter = key
   ? arcjet({ key, rules: [fixedWindow({ mode, max: 10, window: "1h" })] })
   : null;
 
+const researchSearchLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 30, window: "1m" })] })
+  : null;
+
+const researchSaveLimiter = key
+  ? arcjet({ key, rules: [fixedWindow({ mode, max: 60, window: "1m" })] })
+  : null;
+
 export async function checkWorkspaceRateLimit(req: Request): Promise<boolean> {
   if (!workspaceLimiter) return true;
   const decision = await workspaceLimiter.protect(req);
@@ -104,6 +112,20 @@ export async function checkAssistantRateLimit(req: Request): Promise<boolean> {
     if (decision.isDenied()) return false;
   }
   return true;
+}
+
+export async function checkResearchRateLimit(
+  req: Request,
+  kind: "search" | "save",
+): Promise<boolean> {
+  const limiter = kind === "search" ? researchSearchLimiter : researchSaveLimiter;
+  if (!limiter) return true;
+  const decision = await limiter.protect(req);
+  if (decision.isErrored()) {
+    console.warn(`[arcjet] decision error on research-${kind}, failing open`);
+    return true;
+  }
+  return !decision.isDenied();
 }
 
 export type WizardRateLimitKind = "wizard-turn" | "wizard-synthesis";

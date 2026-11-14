@@ -20,7 +20,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 7 | Project Creation Wizard & Conversational Briefing | Slice 3 | in-progress |
 | 8 | Document Workspace & Tiptap Editor Canvas | Slice 4 | in-progress |
 | 9 | Contextual AI Assistant & Diff Previews | Slice 5 | in-progress |
-| 10 | Verified Research Discovery & Citations | Slice 6 | planned |
+| 10 | Verified Research Discovery & Citations | Slice 6 | in-progress |
 | 11 | File Management & Private Storage | Slice 7 | planned |
 | 12 | Institutional Template Engine & Rule Extraction | Slice 8 | planned |
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | planned |
@@ -202,10 +202,21 @@ Code in `prisma/schema.prisma`, `lib/assistant.ts`, `lib/assistant-prompts.ts`, 
 
 ## Slice 6: Verified Research Discovery & Citations
 
-### 10. Verified Research Discovery & Citations · needs a decision
+### 10. Verified Research Discovery & Citations · in-progress
 Connect to OpenAlex and Crossref to search legitimate academic papers, save sources with notes, and format citations deterministically in APA 7 and Harvard styles.
 **Done when:** students can search verified scholarly papers by DOI or topic, save them to project reference libraries, and insert deterministic citations directly into documents.
-- [ ] Design it (spec): `/solution-architect verified research discovery & citations`
+Spec: [0009](../specs/0009-verified-research-discovery-citations/index.md)
+- [x] Design it (spec): `/solution-architect verified research discovery & citations`
+- [x] Build it: `/feature-build verified research discovery & citations`
+  - [x] Migration plus formatter core with APA 7 plus Harvard Cite Them Right snapshots (Satisfies AC-4, AC-8)
+  - [x] Thin search thread with merge plus cache plus caps plus partial failure (Satisfies AC-1, AC-5, AC-7)
+  - [x] Save plus library thread with dedupe plus detail plus audit (Satisfies AC-2, AC-3, AC-6)
+  - [x] Insert plus bibliography thread with reuse plus orphan prune plus audit (Satisfies AC-4, AC-6)
+Code in `lib/research.ts`, `lib/research.test.ts`, `app/api/projects/[projectId]/research/`, `app/api/projects/[projectId]/sections/[sectionId]/citations/`, `components/workspace/research-tab.tsx`, `components/workspace/workspace-client.tsx`, `prisma/schema.prisma`
+- [ ] Verify it: /verify-release verified research discovery & citations
+- [ ] Test it: /test-engineer verified research discovery & citations
+- [ ] Review it (fresh model): /peer-review verified research discovery & citations
+- [ ] Document it: /tech-writer verified research discovery & citations
 
 ## Slice 7: File Management & Private Storage
 

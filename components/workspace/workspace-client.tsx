@@ -6,6 +6,7 @@ import { clearDraft, enqueueOp, readDraft, readQueue, removeOpsFor, writeDraft }
 import { AssistantTab } from "./assistant-tab";
 import { DocumentTree } from "./document-tree";
 import { EditorCanvas } from "./editor-canvas";
+import { ResearchTab } from "./research-tab";
 import { ConflictBanner, InspectorRail, type SaveState } from "./workspace-panels";
 
 type SectionPayload = {
@@ -46,7 +47,7 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
   const [readOnly, setReadOnly] = useState(!!initialReadOnly);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
-  const [rightTab, setRightTab] = useState<"inspector" | "assistant">("inspector");
+  const [rightTab, setRightTab] = useState<"inspector" | "assistant" | "research">("inspector");
   const versionRef = useRef(1);
   const sectionIdRef = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -232,6 +233,31 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
     loadTree();
   }, [loadTree]);
 
+  const insertResearchCitation = useCallback((sourceId: string, inlineText: string, anchorId: string) => {
+    if (readOnly) return;
+    const label = inlineText.slice(0, 60) || "(citation)";
+    setDraft((prev: unknown) => {
+      const doc = (prev ?? { type: "doc", content: [{ type: "paragraph" }] }) as Record<string, unknown>;
+      const content = Array.isArray(doc["content"]) ? [...(doc["content"] as unknown[])] : [];
+      content.push({ type: "paragraph", content: [{ type: "text", marks: [{ type: "citation", attrs: { sourceId, anchorId } }], text: label }] });
+      const next = { ...doc, content };
+      if (sectionIdRef.current) {
+        writeDraft(sectionIdRef.current, { content: next, version: versionRef.current, updatedAt: new Date().toISOString() });
+      }
+      return next;
+    });
+    if (sectionIdRef.current) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        const sid = sectionIdRef.current!;
+        setDraft((current: unknown) => {
+          void persist(sid, current, versionRef.current);
+          return current;
+        });
+      }, 800);
+    }
+  }, [readOnly, persist]);
+
   const insertCitation = useCallback(() => {
     const text = window.prompt("Citation note or source id (max 500 chars)", "");
     if (text === null) return;
@@ -399,16 +425,31 @@ export function WorkspaceClient({ projectId, initialReadOnly }: { projectId: str
               >
                 Assistant
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={rightTab === "research"}
+                onClick={() => setRightTab("research")}
+              >
+                Research
+              </button>
             </div>
             {rightTab === "inspector" ? (
               <InspectorRail headings={headings} liveWords={liveWords} storedWords={section?.wordCount ?? 0} saveState={saveState} onJump={() => { document.querySelector(".cevo-canvas-scroll")?.scrollBy({ top: 200, behavior: "smooth" }); }} />
-            ) : (
+            ) : rightTab === "assistant" ? (
               <AssistantTab
                 projectId={projectId}
                 sectionId={activeId}
                 sectionVersion={section?.version ?? versionRef.current}
                 getScopeText={getScopeText}
                 onApplied={handleAssistantApplied}
+                readOnly={readOnly}
+              />
+            ) : (
+              <ResearchTab
+                projectId={projectId}
+                sectionId={activeId}
+                onInsertCitation={insertResearchCitation}
                 readOnly={readOnly}
               />
             )}
