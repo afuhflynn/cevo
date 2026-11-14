@@ -805,6 +805,7 @@ model SupportTicket {
   category    String
   status      TicketStatus     @default(OPEN)
   priority    String           @default("NORMAL")
+  assigneeId  String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @onCreate(now()) @onUpdate(now())
 
@@ -812,6 +813,7 @@ model SupportTicket {
   messages    SupportMessage[]
 
   @@index([userId, status])
+  @@index([assigneeId])
 }
 
 model SupportMessage {

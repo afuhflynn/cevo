@@ -26,7 +26,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 13 | Pre-Submission Review & Academic Consistency | Slice 9 | in-progress |
 | 14 | High-Fidelity PDF & DOCX Export Engine | Slice 10 | in-progress |
 | 15 | Credit Ledger & Fapshi Mobile Money Checkout | Slice 11 | in-progress |
-| 16 | Administration Portal & Platform Telemetry | Slice 12 | planned |
+| 16 | Administration Portal & Platform Telemetry | Slice 12 | in-progress |
 | 17 | Public Website & Marketing Pages | Slice 13 | planned |
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 | 19 | Branded Transactional Email Templates | Foundation | in-progress |
@@ -307,10 +307,21 @@ Code in `lib/billing.ts`, `app/api/billing/`, `app/api/admin/billing/`, `app/api
 
 ## Slice 12: Administration Portal & Platform Telemetry
 
-### 16. Administration Portal & Platform Telemetry · needs a decision
+### 16. Administration Portal & Platform Telemetry · in-progress
 Provide a protected administrative dashboard to monitor registrations, payments, AI token expenditures, template publishing, and support tickets.
 **Done when:** administrators can inspect platform metrics, reconcile payments, review templates, and view audit events with strict role based access control.
-- [ ] Design it (spec): `/solution-architect administration portal & platform telemetry`
+Spec: [0015](../specs/0015-administration-portal-platform-telemetry/index.md)
+- [x] Design it (spec): `/solution-architect administration portal & platform telemetry`
+- [x] Build it: `/feature-build administration portal & platform telemetry`
+  - [x] Thin thread: shared nav plus guarded overview plus KPIs plus mismatch flag plus recent audit (Satisfies AC-1, AC-7, AC-8, AC-9)
+  - [x] Users plus payments: queues plus detail plus reconcile daily totals plus role and status actions (Satisfies AC-2, AC-3, AC-10)
+  - [x] AI usage plus audit viewer: run rows plus totals plus audit filters (Satisfies AC-4, AC-7, AC-10)
+  - [x] Tickets plus polish: thread plus assign and close and reopen plus skeletons and empty and freshness states in both themes (Satisfies AC-5, AC-6, AC-9)
+Code in `app/admin/`, `app/api/admin/overview/`, `app/api/admin/users/`, `app/api/admin/payments/`, `app/api/admin/reconcile/`, `app/api/admin/ai-usage/`, `app/api/admin/tickets/`, `app/api/admin/audit/`, `lib/admin.ts`, `prisma/schema.prisma` (SupportTicket.assigneeId)
+- [ ] Verify it: /verify-release administration portal & platform telemetry
+- [ ] Test it: /test-engineer administration portal & platform telemetry
+- [ ] Review it (fresh model): /peer-review administration portal & platform telemetry
+- [ ] Document it: /tech-writer administration portal & platform telemetry
 
 ## Slice 13: Public Website & Marketing Pages
 

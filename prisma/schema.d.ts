@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'b421e3294171b5b9ad93e8345f3a7472dd0067dad063e01cb1f8494e42ee1946'>;
+  StorageHashBase<'79efc624fb1fdccf6df4091c60c4b884940cca0d3e84e8d14bf2101efc209acf'>;
 export type ExecutionHash =
   ExecutionHashBase<'c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145'>;
 export type ProfileHash =
@@ -1191,6 +1191,7 @@ export namespace Models {
     readonly [RelationKeys]?: 'ticket';
   };
   export type public_SupportTicket = {
+    assigneeId: FieldOutputTypes['public']['SupportTicket']['assigneeId'];
     category: FieldOutputTypes['public']['SupportTicket']['category'];
     createdAt: FieldOutputTypes['public']['SupportTicket']['createdAt'];
     id: FieldOutputTypes['public']['SupportTicket']['id'];
@@ -5355,6 +5356,12 @@ type ContractBase = Omit<
             };
             readonly SupportTicket: {
               columns: {
+                readonly assigneeId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
                 readonly category: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
@@ -5418,6 +5425,12 @@ type ContractBase = Omit<
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
               indexes: readonly [
+                {
+                  readonly name: 'SupportTicket_assigneeId_idx_fd12ae38';
+                  readonly prefix: 'SupportTicket_assigneeId_idx';
+                  readonly columns: readonly ['assigneeId'];
+                  readonly unique: false;
+                },
                 {
                   readonly name: 'SupportTicket_userId_idx_a489d58a';
                   readonly prefix: 'SupportTicket_userId_idx';
@@ -10020,6 +10033,10 @@ type ContractBase = Omit<
           };
           readonly SupportTicket: {
             readonly fields: {
+              readonly assigneeId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly category: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -10087,6 +10104,7 @@ type ContractBase = Omit<
               readonly table: 'SupportTicket';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly assigneeId: { readonly column: 'assigneeId' };
                 readonly category: { readonly column: 'category' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly id: { readonly column: 'id' };

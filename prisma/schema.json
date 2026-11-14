@@ -6222,6 +6222,13 @@
           },
           "SupportTicket": {
             "fields": {
+              "assigneeId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "category": {
                 "nullable": false,
                 "type": {
@@ -6326,6 +6333,9 @@
             },
             "storage": {
               "fields": {
+                "assigneeId": {
+                  "column": "assigneeId"
+                },
                 "category": {
                   "column": "category"
                 },
@@ -12475,6 +12485,11 @@
                 }
               ],
               "columns": {
+                "assigneeId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "category": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -12563,6 +12578,14 @@
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "assigneeId"
+                  ],
+                  "name": "SupportTicket_assigneeId_idx_fd12ae38",
+                  "prefix": "SupportTicket_assigneeId_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "userId"
@@ -13725,7 +13748,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b421e3294171b5b9ad93e8345f3a7472dd0067dad063e01cb1f8494e42ee1946"
+    "storageHash": "79efc624fb1fdccf6df4091c60c4b884940cca0d3e84e8d14bf2101efc209acf"
   },
   "execution": {
     "executionHash": "c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145",
