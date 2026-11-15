@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth-helpers";
 
+export const instant = false;
+
 const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/users", label: "Users" },
