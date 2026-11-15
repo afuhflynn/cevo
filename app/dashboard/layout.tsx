@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { DashboardQueryProvider } from "@/components/dashboard/query-provider";
 import { requireUser } from "@/lib/auth-helpers";
 import { getOnboardingState } from "@/lib/onboarding";
@@ -14,5 +15,9 @@ export default async function DashboardLayout({
     const gap = state.gap ?? 1;
     redirect(`/onboarding?step=${gap}`);
   }
-  return <DashboardQueryProvider>{children}</DashboardQueryProvider>;
+  return (
+    <DashboardQueryProvider>
+      <NuqsAdapter>{children}</NuqsAdapter>
+    </DashboardQueryProvider>
+  );
 }
