@@ -1,0 +1,1046 @@
+[
+  {
+    "id": "column.public.ExportJob.attemptCount",
+    "label": "Add column \"attemptCount\" to \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "attemptCount",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"attemptCount\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "attemptCount"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"attemptCount\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"attemptCount\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD COLUMN \"attemptCount\" int4 DEFAULT 0 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"attemptCount\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "attemptCount"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"attemptCount\" on \"ExportJob\""
+        }
+      },
+      {
+        "description": "verify column \"attemptCount\" has type \"integer\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "attemptCount",
+          "integer"
+        ]
+      },
+      {
+        "description": "verify column \"attemptCount\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "attemptCount",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ExportJob.clientKey",
+    "label": "Add column \"clientKey\" to \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientKey",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "clientKey"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"clientKey\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientKey\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD COLUMN \"clientKey\" text DEFAULT 'legacy' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "clientKey"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"clientKey\" on \"ExportJob\""
+        }
+      },
+      {
+        "description": "verify column \"clientKey\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "clientKey",
+          "text"
+        ]
+      },
+      {
+        "description": "verify column \"clientKey\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "clientKey",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ExportJob.expiresAt",
+    "label": "Add column \"expiresAt\" to \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "expiresAt",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"expiresAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "expiresAt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"expiresAt\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"expiresAt\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD COLUMN \"expiresAt\" timestamptz(3) DEFAULT (now()) NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"expiresAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "expiresAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"expiresAt\" on \"ExportJob\""
+        }
+      },
+      {
+        "description": "verify column \"expiresAt\" has type \"timestamp(3) with time zone\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "expiresAt",
+          "timestamp(3) with time zone"
+        ]
+      },
+      {
+        "description": "verify column \"expiresAt\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "expiresAt",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ExportJob.requestedBy",
+    "label": "Add column \"requestedBy\" to \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "requestedBy",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"requestedBy\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "requestedBy"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"requestedBy\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"requestedBy\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD COLUMN \"requestedBy\" text DEFAULT 'unknown' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"requestedBy\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "requestedBy"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"requestedBy\" on \"ExportJob\""
+        }
+      },
+      {
+        "description": "verify column \"requestedBy\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "requestedBy",
+          "text"
+        ]
+      },
+      {
+        "description": "verify column \"requestedBy\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "requestedBy",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.ExportJob.templateVersionId",
+    "label": "Add column \"templateVersionId\" to \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "templateVersionId",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"templateVersionId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "templateVersionId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"templateVersionId\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"templateVersionId\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD COLUMN \"templateVersionId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"templateVersionId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "templateVersionId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"templateVersionId\" on \"ExportJob\""
+        }
+      },
+      {
+        "description": "verify column \"templateVersionId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "ExportJob",
+          "templateVersionId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Payment.webhookVerifiedAt",
+    "label": "Add column \"webhookVerifiedAt\" to \"Payment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "webhookVerifiedAt",
+        "table": "Payment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"webhookVerifiedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "webhookVerifiedAt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"webhookVerifiedAt\" on \"Payment\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"webhookVerifiedAt\"",
+        "sql": "ALTER TABLE \"public\".\"Payment\" ADD COLUMN \"webhookVerifiedAt\" timestamptz(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"webhookVerifiedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "webhookVerifiedAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"webhookVerifiedAt\" on \"Payment\""
+        }
+      },
+      {
+        "description": "verify column \"webhookVerifiedAt\" has type \"timestamp(3) with time zone\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "webhookVerifiedAt",
+          "timestamp(3) with time zone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.PaymentWebhookEvent.providerTransId",
+    "label": "Add column \"providerTransId\" to \"PaymentWebhookEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "providerTransId",
+        "table": "PaymentWebhookEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"providerTransId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "providerTransId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"providerTransId\" on \"PaymentWebhookEvent\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"providerTransId\"",
+        "sql": "ALTER TABLE \"public\".\"PaymentWebhookEvent\" ADD COLUMN \"providerTransId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"providerTransId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "providerTransId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"providerTransId\" on \"PaymentWebhookEvent\""
+        }
+      },
+      {
+        "description": "verify column \"providerTransId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "providerTransId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.PaymentWebhookEvent.signatureValid",
+    "label": "Add column \"signatureValid\" to \"PaymentWebhookEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "signatureValid",
+        "table": "PaymentWebhookEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"signatureValid\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "signatureValid"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"signatureValid\" on \"PaymentWebhookEvent\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"signatureValid\"",
+        "sql": "ALTER TABLE \"public\".\"PaymentWebhookEvent\" ADD COLUMN \"signatureValid\" bool DEFAULT false NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"signatureValid\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "signatureValid"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"signatureValid\" on \"PaymentWebhookEvent\""
+        }
+      },
+      {
+        "description": "verify column \"signatureValid\" has type \"boolean\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "signatureValid",
+          "boolean"
+        ]
+      },
+      {
+        "description": "verify column \"signatureValid\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "PaymentWebhookEvent",
+          "signatureValid",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.SupportTicket.assigneeId",
+    "label": "Add column \"assigneeId\" to \"SupportTicket\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "assigneeId",
+        "table": "SupportTicket"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"assigneeId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "SupportTicket",
+          "assigneeId"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"assigneeId\" on \"SupportTicket\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"assigneeId\"",
+        "sql": "ALTER TABLE \"public\".\"SupportTicket\" ADD COLUMN \"assigneeId\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"assigneeId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "SupportTicket",
+          "assigneeId"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"assigneeId\" on \"SupportTicket\""
+        }
+      },
+      {
+        "description": "verify column \"assigneeId\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "SupportTicket",
+          "assigneeId",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Payment.clientKey",
+    "label": "Add column clientKey to Payment",
+    "summary": "Adds column clientKey to table Payment",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "clientKey",
+        "table": "Payment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"clientKey\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "clientKey"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"clientKey\" on \"Payment\""
+        }
+      },
+      {
+        "description": "ensure table \"Payment\" is empty before adding NOT NULL column without default",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"Payment\" LIMIT 1) AS \"result\"",
+        "params": [],
+        "meta": {
+          "requiredColumn": {
+            "table": "Payment",
+            "column": "clientKey",
+            "reason": "newField"
+          }
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"clientKey\"",
+        "sql": "ALTER TABLE \"public\".\"Payment\" ADD COLUMN \"clientKey\" text NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"clientKey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "clientKey"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"clientKey\" on \"Payment\""
+        }
+      },
+      {
+        "description": "verify column \"clientKey\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "clientKey",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"clientKey\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "clientKey",
+          "text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Payment.expiresAt",
+    "label": "Add column expiresAt to Payment",
+    "summary": "Adds column expiresAt to table Payment",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Payment"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"expiresAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "expiresAt"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"expiresAt\" on \"Payment\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"expiresAt\"",
+        "sql": "ALTER TABLE \"public\".\"Payment\" ADD COLUMN \"expiresAt\" timestamptz(3) DEFAULT ('epoch') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"expiresAt\"",
+        "sql": "ALTER TABLE \"public\".\"Payment\" ALTER COLUMN \"expiresAt\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"expiresAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "expiresAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"expiresAt\" on \"Payment\""
+        }
+      },
+      {
+        "description": "verify column \"expiresAt\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "expiresAt",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"expiresAt\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "expiresAt"
+        ]
+      },
+      {
+        "description": "verify column \"expiresAt\" has type \"timestamp(3) with time zone\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Payment",
+          "expiresAt",
+          "timestamp(3) with time zone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.ExportJob.ExportJob_projectId_format_clientKey_key",
+    "label": "Add unique constraint on \"ExportJob\" (projectId, format, clientKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "ExportJob_projectId_format_clientKey_key",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"ExportJob_projectId_format_clientKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ExportJob_projectId_format_clientKey_key",
+          "public",
+          "\"public\".\"ExportJob\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"ExportJob_projectId_format_clientKey_key\" on \"ExportJob\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"ExportJob_projectId_format_clientKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"ExportJob\" ADD CONSTRAINT \"ExportJob_projectId_format_clientKey_key\" UNIQUE (\"projectId\", \"format\", \"clientKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"ExportJob_projectId_format_clientKey_key\" exists on (projectId, format, clientKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "ExportJob_projectId_format_clientKey_key",
+          "public",
+          "\"public\".\"ExportJob\"",
+          "u",
+          "[\"projectId\",\"format\",\"clientKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Payment.Payment_userId_clientKey_key",
+    "label": "Add unique constraint on \"Payment\" (userId, clientKey)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Payment_userId_clientKey_key",
+        "table": "Payment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Payment_userId_clientKey_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Payment_userId_clientKey_key",
+          "public",
+          "\"public\".\"Payment\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Payment_userId_clientKey_key\" on \"Payment\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Payment_userId_clientKey_key\"",
+        "sql": "ALTER TABLE \"public\".\"Payment\" ADD CONSTRAINT \"Payment_userId_clientKey_key\" UNIQUE (\"userId\", \"clientKey\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Payment_userId_clientKey_key\" exists on (userId, clientKey)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Payment_userId_clientKey_key",
+          "public",
+          "\"public\".\"Payment\"",
+          "u",
+          "[\"userId\",\"clientKey\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ExportJob.ExportJob_expiresAt_idx_6b6b8c10",
+    "label": "Create index \"ExportJob_expiresAt_idx_6b6b8c10\" on \"ExportJob\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ExportJob_expiresAt_idx_6b6b8c10",
+        "table": "ExportJob"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ExportJob_expiresAt_idx_6b6b8c10\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ExportJob_expiresAt_idx_6b6b8c10\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"ExportJob_expiresAt_idx_6b6b8c10\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ExportJob_expiresAt_idx_6b6b8c10\"",
+        "sql": "CREATE INDEX \"ExportJob_expiresAt_idx_6b6b8c10\" ON \"public\".\"ExportJob\" (\"expiresAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ExportJob_expiresAt_idx_6b6b8c10\" exists on \"ExportJob\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"ExportJob_expiresAt_idx_6b6b8c10\"",
+          "i",
+          "I",
+          "\"public\".\"ExportJob\"",
+          "btree",
+          "[\"expiresAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Payment.Payment_expiresAt_idx_6b6b8c10",
+    "label": "Create index \"Payment_expiresAt_idx_6b6b8c10\" on \"Payment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Payment_expiresAt_idx_6b6b8c10",
+        "table": "Payment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Payment_expiresAt_idx_6b6b8c10\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Payment_expiresAt_idx_6b6b8c10\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Payment_expiresAt_idx_6b6b8c10\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Payment_expiresAt_idx_6b6b8c10\"",
+        "sql": "CREATE INDEX \"Payment_expiresAt_idx_6b6b8c10\" ON \"public\".\"Payment\" (\"expiresAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Payment_expiresAt_idx_6b6b8c10\" exists on \"Payment\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Payment_expiresAt_idx_6b6b8c10\"",
+          "i",
+          "I",
+          "\"public\".\"Payment\"",
+          "btree",
+          "[\"expiresAt\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.PaymentWebhookEvent.PaymentWebhookEvent_providerTransId_idx_93e3c66d",
+    "label": "Create index \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\" on \"PaymentWebhookEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "PaymentWebhookEvent_providerTransId_idx_93e3c66d",
+        "table": "PaymentWebhookEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PaymentWebhookEvent_providerTransId_idx_93e3c66d\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\"",
+        "sql": "CREATE INDEX \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\" ON \"public\".\"PaymentWebhookEvent\" (\"providerTransId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"PaymentWebhookEvent_providerTransId_idx_93e3c66d\" exists on \"PaymentWebhookEvent\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"PaymentWebhookEvent_providerTransId_idx_93e3c66d\"",
+          "i",
+          "I",
+          "\"public\".\"PaymentWebhookEvent\"",
+          "btree",
+          "[\"providerTransId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.SupportTicket.SupportTicket_assigneeId_idx_fd12ae38",
+    "label": "Create index \"SupportTicket_assigneeId_idx_fd12ae38\" on \"SupportTicket\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "SupportTicket_assigneeId_idx_fd12ae38",
+        "table": "SupportTicket"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"SupportTicket_assigneeId_idx_fd12ae38\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"SupportTicket_assigneeId_idx_fd12ae38\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"SupportTicket_assigneeId_idx_fd12ae38\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"SupportTicket_assigneeId_idx_fd12ae38\"",
+        "sql": "CREATE INDEX \"SupportTicket_assigneeId_idx_fd12ae38\" ON \"public\".\"SupportTicket\" (\"assigneeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"SupportTicket_assigneeId_idx_fd12ae38\" exists on \"SupportTicket\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"SupportTicket_assigneeId_idx_fd12ae38\"",
+          "i",
+          "I",
+          "\"public\".\"SupportTicket\"",
+          "btree",
+          "[\"assigneeId\"]"
+        ]
+      }
+    ]
+  }
+]
