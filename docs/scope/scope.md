@@ -34,8 +34,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 21 | Onboarding Journey Polish | Journey A | in-progress |
 | 22 | Auth Pages Polish | Journey B | in-progress |
 | 23 | Dashboard Catalog Journey Polish | Journey C | in-progress |
-| 24 | Workspace and Future Pages Guardrails | Journey D | planned |
-| 25 | Public Site Polish | Journey E | planned |
+| 24 | Workspace and Future Pages Guardrails | Journey D | in-progress |
+| 25 | Public Site Polish | Journey E | in-progress |
 
 ## Foundations
 
@@ -399,17 +399,29 @@ Spec: [0020](../specs/0020-dashboard-catalog-journey-polish/index.md)
 
 ## Journey D: Workspace and Future Pages Complete
 
-### 24. Workspace and Future Pages Guardrails · Journey · Beta · needs a decision
+### 24. Workspace and Future Pages Guardrails · Journey · Beta · in-progress
 Set guardrails in `components/ui` plus shared layout so creation wizard plus document workspace plus assistant plus research plus files plus review plus export plus billing plus admin all start modern when built, reusing inputs plus pickers plus dialogs plus skeletons plus toasts from the foundation with no new visual language. Each future page spec will carry per page Firecrawl notes plus frontend skill guidance at build time.
 **Done when:** guardrail list names allowed primitives plus patterns plus motion limits, existing planned features point to it, and a new page can start from it with no custom styles.
-- [ ] Design it (spec): `/solution-architect workspace and future pages guardrails`
+Spec: [0021](../specs/0021-workspace-future-pages-guardrails.md)
+- [x] Design it (spec): `/solution-architect workspace and future pages guardrails`
+- [ ] Verify it: /verify-release workspace and future pages guardrails
+- [ ] Test it: /test-engineer workspace and future pages guardrails
 
 ## Journey E: Public Site Complete
 
-### 25. Public Site Polish · Journey · Beta · needs a decision
+### 25. Public Site Polish · Journey · Beta · in-progress
 Polish the full public path in `app/page.tsx` covering landing plus pricing plus nav plus legal, with responsive layout, honest previews, clear calls to join, and fast load using foundation patterns. Spec carries per page Firecrawl notes plus frontend skill guidance.
 **Done when:** landing tells the core promise in seconds, pricing guides to credits, nav routes cleanly to sign up, legal reads well on mobile plus desktop, and load feels instant.
-- [ ] Design it (spec): `/solution-architect public site polish`
+Spec: [0022](../specs/0022-public-site-polish/index.md)
+- [x] Design it (spec): `/solution-architect public site polish`
+- [x] Build it: `/feature-build public site polish`
+  - [x] Thin thread plus pricing with live package read and Buy routing (Satisfies AC-1, AC-3, AC-4, AC-7)
+  - [x] Proof band plus features plus teaser with Firecrawl notes (Satisfies AC-2, AC-12)
+  - [x] Legal trio plus responsive plus themes pass (Satisfies AC-5, AC-6)
+  - [x] Font plus auth alignment plus SEO plus edge plus motion pass (Satisfies AC-7, AC-8, AC-9, AC-10, AC-11)
+  - Code in `app/page.tsx`, `app/pricing/page.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/refunds/page.tsx`, `components/public/proof-mock.tsx`, `components/public/legal-article.tsx`, `components/public/pricing-cards.tsx`, `lib/public-pricing.ts`, `app/layout.tsx`, `app/globals.css`
+- [ ] Verify it: /verify-release public site polish
+- [ ] Test it: /test-engineer public site polish
 
 ## Deferred
 Out of scope for initial launch, recorded so the plan remains honest.

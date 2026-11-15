@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingCards } from "@/components/public/pricing-cards";
+import { ProofBand, TrustStats } from "@/components/public/proof-mock";
 import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 import { Badge } from "@/components/ui/badge";
@@ -23,10 +24,13 @@ import {
 } from "@/components/ui/card";
 import { getPublicPackages } from "@/lib/public-pricing";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Cevo — From idea to verified academic report",
   description:
     "Turn your project idea into a researched, verified, and exportable academic report. Transparent XAF pricing, mobile money checkout.",
+  alternates: { canonical: "/" },
 };
 
 const steps = [
@@ -87,9 +91,12 @@ export default async function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-16 px-4 py-10 sm:px-6 sm:py-14">
-        {/* Hero */}
-        <section aria-labelledby="hero-heading" className="flex flex-col gap-6">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-14 px-4 py-10 sm:gap-16 sm:px-6 sm:py-14">
+        {/* Hero: Docs calm, generous whitespace, one primary plus quiet secondary */}
+        <section
+          aria-labelledby="hero-heading"
+          className="flex flex-col gap-5 py-4 sm:py-8"
+        >
           <Badge variant="secondary" className="w-fit">
             Academic project workspace · Cameroon
           </Badge>
@@ -99,7 +106,7 @@ export default async function LandingPage() {
           >
             From idea to verified exportable report
           </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="max-w-2xl text-base leading-relaxed break-words text-muted-foreground sm:text-lg">
             Cevo guides you from a rough project idea to a structured,
             researched, verified report that follows your institutional
             guidelines. Research, writing, review, and export in one calm place.
@@ -119,6 +126,25 @@ export default async function LandingPage() {
           </p>
         </section>
 
+        {/* Proof: honest static mocks, mock stacks above copy on small screens */}
+        <section aria-labelledby="proof-heading" className="flex flex-col gap-5">
+          <div className="flex flex-col gap-1">
+            <h2
+              id="proof-heading"
+              className="text-2xl font-semibold tracking-tight text-balance"
+            >
+              See the workspace before you sign up
+            </h2>
+            <p className="max-w-2xl text-sm break-words text-muted-foreground">
+              Stylized previews of the real shapes. Chapters plus citation
+              chips plus export badges, in both themes, with no image weight for
+              slow networks.
+            </p>
+          </div>
+          <ProofBand />
+          <TrustStats />
+        </section>
+
         {/* How it works */}
         <section aria-labelledby="how-heading" className="flex flex-col gap-6">
           <div>
@@ -132,7 +158,7 @@ export default async function LandingPage() {
               Three steps from concept to submission ready document.
             </p>
           </div>
-          <ol className="grid gap-4 md:grid-cols-3">
+          <ol className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {steps.map((s) => (
               <li key={s.title}>
                 <Card className="h-full">
@@ -143,7 +169,7 @@ export default async function LandingPage() {
                     <CardTitle className="text-base">{s.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-sm leading-relaxed break-words text-muted-foreground">
                       {s.body}
                     </p>
                   </CardContent>
@@ -170,7 +196,7 @@ export default async function LandingPage() {
               source of truth.
             </p>
           </div>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => (
               <li key={f.title}>
                 <Card className="h-full">
@@ -181,7 +207,7 @@ export default async function LandingPage() {
                     <CardTitle className="text-sm">{f.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-sm leading-relaxed">
+                    <CardDescription className="text-sm leading-relaxed break-words">
                       {f.body}
                     </CardDescription>
                   </CardContent>
@@ -229,11 +255,11 @@ export default async function LandingPage() {
         >
           <h2
             id="cta-heading"
-            className="text-2xl font-semibold tracking-tight"
+            className="text-2xl font-semibold tracking-tight text-balance"
           >
             Ready when your idea is
           </h2>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-md text-sm leading-relaxed break-words text-muted-foreground">
             Create an account, complete onboarding, and brief your first
             project. Credits wait until you need AI help or export.
           </p>

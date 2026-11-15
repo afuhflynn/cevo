@@ -16,7 +16,11 @@ async function getCachedPackages(): Promise<BillingPackage[]> {
 export async function getPublicPackages(): Promise<PublicPackagesResult> {
   try {
     const packages = await getCachedPackages();
-    return { packages, stale: false, failed: false };
+    const ordered = [...packages].sort((a, b) => {
+      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+      return a.id.localeCompare(b.id);
+    });
+    return { packages: ordered, stale: false, failed: false };
   } catch {
     return { packages: [], stale: false, failed: true };
   }

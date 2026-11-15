@@ -23,7 +23,16 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
+function siteBase(): string {
+  const raw =
+    process.env["NEXT_PUBLIC_APP_URL"] ??
+    process.env["SITE_URL"] ??
+    "http://localhost:3000";
+  return raw.replace(/\/$/, "");
+}
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteBase()),
   title: {
     default: "Cevo — Academic Project Development Workspace",
     template: "%s | Cevo",

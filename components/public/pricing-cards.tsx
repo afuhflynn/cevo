@@ -17,6 +17,12 @@ import {
 import type { BillingPackage } from "@/lib/billing";
 import { formatXaf } from "@/lib/public-links";
 
+export function usageHintForPosition(index: number): string {
+  if (index === 0) return "Starter: try one brief plus a short review scan.";
+  if (index === 1) return "Standard: most projects brief, research, and draft.";
+  return "Large: long reports plus repeated reviews and exports.";
+}
+
 export function PricingCards({ packages }: { packages: BillingPackage[] }) {
   if (packages.length === 0) {
     return (
@@ -31,7 +37,7 @@ export function PricingCards({ packages }: { packages: BillingPackage[] }) {
         <p className="text-lg font-medium text-foreground">
           No credit packages are available right now
         </p>
-        <p className="max-w-md text-sm text-muted-foreground">
+        <p className="max-w-md text-sm break-words text-muted-foreground">
           Packages are being updated. Check back soon, or contact{" "}
           <a
             href="mailto:support@cevo.example"
@@ -48,47 +54,62 @@ export function PricingCards({ packages }: { packages: BillingPackage[] }) {
     );
   }
 
+  const ordered = [...packages].sort((a, b) => {
+    if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+    return a.id.localeCompare(b.id);
+  });
+  const popularId = ordered.find((p) => p.isPopular)?.id ?? null;
+
   return (
-    <ul className="grid gap-4 sm:grid-cols-3" aria-label="Credit packages">
-      {packages.map((p) => (
-        <li key={p.id}>
-          <Card
-            className={`relative flex h-full flex-col ${p.isPopular ? "border-primary shadow-sm" : ""}`}
-          >
-            {p.isPopular && (
-              <Badge className="absolute -top-2.5 left-4">Popular</Badge>
-            )}
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{p.name}</CardTitle>
-              <CardDescription>{p.credits} credits</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col gap-4">
-              <p className="text-3xl font-semibold tracking-tight">
-                {formatXaf(p.priceXaf)}
-              </p>
-              <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2Icon
-                    className="mt-0.5 size-4 shrink-0 text-emerald-600"
-                    aria-hidden="true"
-                  />
-                  {p.credits} AI credits for briefs, assistant, and review
-                </li>
-                <li className="flex items-start gap-2">
-                  <SmartphoneIcon
-                    className="mt-0.5 size-4 shrink-0"
-                    aria-hidden="true"
-                  />
-                  Pay with MTN MoMo or Orange Money
-                </li>
-              </ul>
-              <div className="mt-auto pt-2">
-                <BuyButton packageId={p.id} packageName={p.name} />
-              </div>
-            </CardContent>
-          </Card>
-        </li>
-      ))}
+    <ul
+      className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      aria-label="Credit packages"
+    >
+      {ordered.map((p, i) => {
+        const popular = popularId !== null && p.id === popularId;
+        return (
+          <li key={p.id}>
+            <Card
+              className={`relative flex h-full flex-col ${popular ? "border-primary shadow-sm" : ""}`}
+            >
+              {popular && (
+                <Badge className="absolute -top-2.5 left-4">Popular</Badge>
+              )}
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">{p.name}</CardTitle>
+                <CardDescription>{p.credits} credits</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-4">
+                <p className="text-3xl font-semibold tracking-tight">
+                  {formatXaf(p.priceXaf)}
+                </p>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {usageHintForPosition(i)}
+                </p>
+                <ul className="flex flex-col gap-2 text-sm break-words text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2Icon
+                      className="mt-0.5 size-4 shrink-0 text-emerald-600"
+                      aria-hidden="true"
+                    />
+                    {p.credits} AI credits for briefs, assistant, and review
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <SmartphoneIcon
+                      className="mt-0.5 size-4 shrink-0"
+                      aria-hidden="true"
+                    />
+                    Pay with MTN MoMo or Orange Money
+                  </li>
+                </ul>
+                <div className="mt-auto pt-2">
+                  <BuyButton packageId={p.id} packageName={p.name} />
+                </div>
+              </CardContent>
+            </Card>
+          </li>
+        );
+      })}
     </ul>
   );
 }

@@ -5,10 +5,13 @@ import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 import { getPublicPackages } from "@/lib/public-pricing";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Pricing — Credit packages in XAF",
   description:
     "Transparent prepaid credit packages in XAF. Pay with MTN MoMo or Orange Money. Credits allocate exactly once on confirmation.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default async function PricingPage() {
@@ -18,11 +21,11 @@ export default async function PricingPage() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">
+        <div className="flex flex-col gap-2 py-2">
+          <h1 className="text-3xl font-semibold tracking-tight text-balance">
             Credit packages
           </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          <p className="max-w-2xl text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
             Prepaid credits power AI briefs, assistant runs, review scans, and
             exports. Pay in XAF with MTN MoMo or Orange Money. Credits land
             exactly once when Fapshi confirms your payment.
@@ -32,7 +35,7 @@ export default async function PricingPage() {
         {stale && (
           <p
             role="status"
-            className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm"
+            className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm break-words"
           >
             Fresh prices could not load. Showing last known prices.
           </p>
@@ -40,9 +43,17 @@ export default async function PricingPage() {
         {failed && packages.length === 0 && (
           <p
             role="status"
-            className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
+            className="rounded-xl border border-border bg-card px-4 py-3 text-sm break-words text-muted-foreground"
           >
-            Pricing could not load right now. Check your connection and refresh.
+            Pricing could not load right now. Check your connection and refresh,
+            or contact{" "}
+            <a
+              href="mailto:support@cevo.example"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              support@cevo.example
+            </a>
+            .
           </p>
         )}
 
@@ -50,7 +61,7 @@ export default async function PricingPage() {
 
         <section
           aria-label="Payment notes"
-          className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-sm leading-relaxed"
+          className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-sm leading-relaxed break-words"
         >
           <h2 className="font-medium">Before you pay</h2>
           <ul className="flex list-disc flex-col gap-1.5 pl-5 text-muted-foreground">
