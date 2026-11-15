@@ -66,7 +66,7 @@ describe("SignInForm", () => {
       email: "Student@Example.com",
       password: "correct-horse-12",
     });
-    expect(fns.push).toHaveBeenCalledWith("/");
+    expect(fns.push).toHaveBeenCalledWith("/onboarding");
     expect(fns.refresh).toHaveBeenCalled();
   });
 
@@ -104,7 +104,7 @@ describe("SignInForm", () => {
     await fillAndSubmit("a@b.c", "x");
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByText(/too many attempts/i)).toBeInTheDocument();
+    expect(within(alert).getAllByText(/too many attempts/i).length).toBeGreaterThan(0);
   });
 
   it("AC-2: shows the account message when the server nests the envelope", async () => {
@@ -142,7 +142,7 @@ describe("SignInForm", () => {
     await fillAndSubmit("a@b.c", "x");
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByText(/too many attempts/i)).toBeInTheDocument();
+    expect(within(alert).getAllByText(/too many attempts/i).length).toBeGreaterThan(0);
   });
 
   it("moves focus through the form in order with the keyboard", async () => {
@@ -157,6 +157,8 @@ describe("SignInForm", () => {
     ).toHaveFocus();
     await user.tab();
     expect(screen.getByLabelText(/^password/i)).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: /show password/i })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("button", { name: "Sign in" })).toHaveFocus();
   });

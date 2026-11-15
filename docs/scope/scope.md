@@ -31,8 +31,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 18 | Local PostgreSQL via Docker Compose | Foundation | done |
 | 19 | Branded Transactional Email Templates | Foundation | in-progress |
 | 20 | UI Foundation Refresh and Primitive Audit | Foundation | in-progress |
-| 21 | Onboarding Journey Polish | Journey A | planned |
-| 22 | Auth Pages Polish | Journey B | planned |
+| 21 | Onboarding Journey Polish | Journey A | in-progress |
+| 22 | Auth Pages Polish | Journey B | in-progress |
 | 23 | Dashboard Catalog Journey Polish | Journey C | planned |
 | 24 | Workspace and Future Pages Guardrails | Journey D | planned |
 | 25 | Public Site Polish | Journey E | planned |
@@ -351,17 +351,34 @@ Spec: [0017](../specs/0017-ui-foundation-refresh-audit.md)
 
 ## Journey A: Onboarding Complete
 
-### 21. Onboarding Journey Polish · Journey · Beta · needs a decision
+### 21. Onboarding Journey Polish · Journey · Beta · in-progress
 Rebuild the full onboarding path in `app/onboarding/page.tsx` from start plus personal details plus academic pickers plus preferences to welcome plus resume, with calm progress, clear validation, sane suggest flow, and kind empty plus loading plus error states using shadcn skeletons. Each page spec carries per page Firecrawl notes from ChatGPT plus Claude plus Antigravity style research plus frontend skill guidance.
 **Done when:** a new student can complete onboarding with no confusion, progress saves and resumes, pickers filter cleanly, skeletons feel smooth, and each motion use has your approval recorded in the spec.
-- [ ] Design it (spec): `/solution-architect onboarding journey polish`
+Spec: [0018](../specs/0018-onboarding-journey-polish/index.md)
+- [x] Design it (spec): `/solution-architect onboarding journey polish`
+- [x] Build it: `/feature-build onboarding journey polish`
+  - [x] Shell plus progress plus start plus welcome plus resume wiring (Satisfies AC-1, AC-2, AC-7, AC-8)
+  - [x] Personal plus academic pickers plus inline suggest flow (Satisfies AC-3, AC-4, AC-6)
+  - [x] Preferences plus complete plus states plus motion pass (Satisfies AC-5, AC-7, AC-8)
+  - Code in `app/onboarding/page.tsx` plus `app/onboarding/wizard.tsx`
+- [ ] Verify it: /verify-release onboarding journey polish
+- [ ] Test it: /test-engineer onboarding journey polish
 
 ## Journey B: Auth Complete
 
-### 22. Auth Pages Polish · Journey · Beta · needs a decision
+### 22. Auth Pages Polish · Journey · Beta · in-progress
 Polish the full auth path in `app/(auth)/sign-in/page.tsx` plus sign up plus forgot plus reset plus verify, with consistent inputs plus password feedback plus show and hide plus clear error plus success plus loading states in both themes. Each page spec carries per page Firecrawl notes plus frontend skill guidance.
 **Done when:** sign in plus sign up plus reset plus verify all read as one family, errors guide recovery, loading uses skeletons or spinner patterns from the foundation, and no visual drift remains between auth pages.
-- [ ] Design it (spec): `/solution-architect auth pages polish`
+Spec: [0019](../specs/0019-auth-pages-polish/index.md)
+- [x] Design it (spec): `/solution-architect auth pages polish`
+- [x] Build it: `/feature-build auth pages polish`
+  - [x] Font plus shell plus shared card family with both themes pass (Satisfies AC-1, AC-2, AC-10)
+  - [x] Shared password field plus sign in plus sign up with meter plus checklist plus show and hide (Satisfies AC-3, AC-4)
+  - [x] Forgot plus reset plus inbox confirm plus verify notices with token states (Satisfies AC-6, AC-7, AC-8)
+  - [x] Errors plus loading plus redirect pass with copy tables and both themes check (Satisfies AC-5, AC-9, AC-10)
+  - Code in `app/(auth)/`, `app/layout.tsx`, `app/globals.css`
+- [ ] Verify it: /verify-release auth pages polish
+- [ ] Test it: /test-engineer auth pages polish
 
 ## Journey C: Dashboard Complete
 

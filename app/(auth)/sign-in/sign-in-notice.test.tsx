@@ -21,7 +21,7 @@ import { SignInNotice } from "./sign-in-notice";
 describe("SignInNotice", () => {
   it("AC-1: confirms a fresh verification", () => {
     render(<SignInNotice verified="1" error={null} />);
-    expect(screen.getByText(/email verified/i)).toBeInTheDocument();
+    expect(screen.getByText(/account verified/i)).toBeInTheDocument();
   });
 
   it("AC-2: asks unverified users to check their inbox first", () => {

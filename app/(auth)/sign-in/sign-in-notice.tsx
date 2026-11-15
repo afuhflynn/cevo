@@ -1,4 +1,4 @@
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon, CheckCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -9,12 +9,41 @@ export function SignInNotice({
   verified: string | null;
   error: string | null;
 }) {
-  if (verified === "1") {
+  if (verified === "1" || verified === "true") {
     return (
       <Alert className="mb-4 border-primary/30 bg-primary/5">
-        <AlertTitle>Email verified</AlertTitle>
+        <CheckCircle2Icon aria-hidden="true" className="text-primary" />
+        <AlertTitle>Account verified</AlertTitle>
+        <AlertDescription>Sign in to continue.</AlertDescription>
+      </Alert>
+    );
+  }
+  if (error === "expired") {
+    return (
+      <Alert className="mb-4" variant="destructive">
+        <AlertTriangleIcon aria-hidden="true" />
+        <AlertTitle>Link expired</AlertTitle>
         <AlertDescription>
-          Your address is confirmed. Sign in below to continue.
+          Request a new link from{" "}
+          <Link href="/forgot-password" className="underline underline-offset-2">
+            forgot password
+          </Link>
+          .
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  if (error === "invalid") {
+    return (
+      <Alert className="mb-4" variant="destructive">
+        <AlertTriangleIcon aria-hidden="true" />
+        <AlertTitle>Link invalid</AlertTitle>
+        <AlertDescription>
+          Request a new link from{" "}
+          <Link href="/forgot-password" className="underline underline-offset-2">
+            forgot password
+          </Link>
+          .
         </AlertDescription>
       </Alert>
     );

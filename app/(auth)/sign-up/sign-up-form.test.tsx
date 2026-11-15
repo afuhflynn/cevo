@@ -45,7 +45,7 @@ async function fillAndSubmit(name: string, email: string, password: string) {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText(/full name/i), name);
   await user.type(screen.getByLabelText(/email/i), email);
-  await user.type(screen.getByLabelText(/^password/i), password);
+  await user.type(screen.getByPlaceholderText(/at least 12/i), password);
   await user.click(screen.getByRole("button", { name: "Create account" }));
 }
 
@@ -53,19 +53,19 @@ describe("SignUpForm", () => {
   it("AC-1: explains the password rule next to the field", () => {
     render(<SignUpForm />);
     expect(screen.getByText(/at least 12 characters/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^password/i)).toHaveAccessibleDescription(
+    expect(screen.getByPlaceholderText(/at least 12/i)).toHaveAccessibleDescription(
       /at least 12 characters/i,
     );
   });
 
   it("AC-1: creates the account with trimmed values and asks for inbox check", async () => {
     render(<SignUpForm />);
-    await fillAndSubmit("  Ada  ", "  Ada@Example.com  ", "correct-horse-12");
+    await fillAndSubmit("  Ada  ", "  Ada@Example.com  ", "Correct-horse-12!");
 
     expect(fns.signUpEmail).toHaveBeenCalledWith({
       name: "Ada",
       email: "Ada@Example.com",
-      password: "correct-horse-12",
+      password: "Correct-horse-12!",
       callbackURL: "/sign-in?verified=1",
     });
     expect(await screen.findByText(/check your inbox/i)).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe("SignUpForm", () => {
   it("AC-1: offers a resend that targets the same address", async () => {
     const user = userEvent.setup();
     render(<SignUpForm />);
-    await fillAndSubmit("Ada", "ada@example.com", "correct-horse-12");
+    await fillAndSubmit("Ada", "ada@example.com", "Correct-horse-12!");
     await screen.findByText(/check your inbox/i);
 
     await user.click(
@@ -94,7 +94,7 @@ describe("SignUpForm", () => {
       error: { code: "RATE_LIMITED" },
     });
     render(<SignUpForm />);
-    await fillAndSubmit("Ada", "ada@example.com", "correct-horse-12");
+    await fillAndSubmit("Ada", "ada@example.com", "Correct-horse-12!");
 
     expect(await screen.findByText(/too many attempts/i)).toBeInTheDocument();
     expect(screen.queryByText(/check your inbox/i)).not.toBeInTheDocument();

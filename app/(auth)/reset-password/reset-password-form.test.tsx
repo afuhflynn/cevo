@@ -40,9 +40,8 @@ beforeEach(() => {
 
 async function fillAndSubmit(password: string, confirm: string) {
   const user = userEvent.setup();
-  const fields = screen.getAllByLabelText(/password/i);
-  await user.type(fields[0]!, password);
-  await user.type(fields[1]!, confirm);
+  await user.type(screen.getByPlaceholderText(/at least 12/i), password);
+  await user.type(screen.getByPlaceholderText(/repeat your new password/i), confirm);
   await user.click(screen.getByRole("button", { name: /update password/i }));
 }
 
@@ -58,7 +57,7 @@ describe("ResetPasswordForm", () => {
 
   it("AC-3: stops mismatched passwords before any request", async () => {
     render(<ResetPasswordForm token="tok" expired={false} />);
-    await fillAndSubmit("correct-horse-12", "different-horse-34");
+    await fillAndSubmit("Correct-horse-12!", "Different-horse-34!");
 
     expect(await screen.findByText(/do not match/i)).toBeInTheDocument();
     expect(fns.resetPassword).not.toHaveBeenCalled();
@@ -66,10 +65,10 @@ describe("ResetPasswordForm", () => {
 
   it("AC-3: sets the new password and confirms it", async () => {
     render(<ResetPasswordForm token="tok123" expired={false} />);
-    await fillAndSubmit("new-horse-99", "new-horse-99");
+    await fillAndSubmit("New-horse-99!", "New-horse-99!");
 
     expect(fns.resetPassword).toHaveBeenCalledWith({
-      newPassword: "new-horse-99",
+      newPassword: "New-horse-99!",
       token: "tok123",
     });
     expect(await screen.findByText(/password updated/i)).toBeInTheDocument();
@@ -80,7 +79,7 @@ describe("ResetPasswordForm", () => {
       error: { code: "INVALID_TOKEN", message: "Invalid token" },
     });
     render(<ResetPasswordForm token="stale" expired={false} />);
-    await fillAndSubmit("new-horse-99", "new-horse-99");
+    await fillAndSubmit("New-horse-99!", "New-horse-99!");
 
     expect(fns.push).toHaveBeenCalledWith("/reset-password?error=expired");
   });

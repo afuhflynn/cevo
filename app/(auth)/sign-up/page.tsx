@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
+import { AuthSkeleton } from "../_components/auth-skeleton";
 import { SignUpForm } from "./sign-up-form";
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export default function SignUpPage({
   searchParams: Promise<SearchParams>;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<AuthSkeleton lines={3} />}>
       <SignUpFormLoader searchParams={searchParams} />
     </Suspense>
   );

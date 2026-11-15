@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
 import { loadSignInSearchParams } from "@/lib/search-params";
+import { AuthSkeleton } from "../_components/auth-skeleton";
 import { SignInForm } from "./sign-in-form";
 import { SignInNotice } from "./sign-in-notice";
 
@@ -52,7 +53,7 @@ export default function SignInPage({
       <Suspense fallback={null}>
         <SignInNoticeLoader searchParams={searchParams} />
       </Suspense>
-      <Suspense fallback={null}>
+      <Suspense fallback={<AuthSkeleton lines={2} />}>
         <SignInFormLoader searchParams={searchParams} />
       </Suspense>
     </>

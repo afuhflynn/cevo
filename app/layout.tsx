@@ -1,10 +1,11 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import { JetBrains_Mono, Roboto, Source_Serif_4 } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const fontSans = Inter({
+const fontSans = Roboto({
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",

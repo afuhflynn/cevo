@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { loadResetPasswordSearchParams } from "@/lib/search-params";
+import { AuthSkeleton } from "../_components/auth-skeleton";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata: Metadata = {
@@ -26,15 +25,7 @@ export default function ResetPasswordPage({
   searchParams: Promise<SearchParams>;
 }) {
   return (
-    <Suspense
-      fallback={
-        <Card>
-          <CardContent className="flex items-center justify-center py-10">
-            <Spinner aria-label="Loading" />
-          </CardContent>
-        </Card>
-      }
-    >
+    <Suspense fallback={<AuthSkeleton lines={2} />}>
       <ResetPasswordLoader searchParams={searchParams} />
     </Suspense>
   );
