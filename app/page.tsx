@@ -24,8 +24,6 @@ import {
 } from "@/components/ui/card";
 import { getPublicPackages } from "@/lib/public-pricing";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "Cevo — From idea to verified academic report",
   description:

@@ -5,8 +5,6 @@ import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 import { getPublicPackages } from "@/lib/public-pricing";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "Pricing — Credit packages in XAF",
   description:

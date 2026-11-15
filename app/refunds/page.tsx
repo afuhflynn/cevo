@@ -3,8 +3,6 @@ import { LegalArticle } from "@/components/public/legal-article";
 import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "Refund policy",
   description: "When Cevo refunds credits or mobile money payments.",

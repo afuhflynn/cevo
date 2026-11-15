@@ -20,4 +20,4 @@ _Steps derived from spec 0022 acceptance criteria. `/verify-release` runs these;
 - [ ] `pnpm typecheck` → clean → AC-1 through AC-11
 ## Acceptance-criteria coverage
 - AC-1 … covered by landing order steps · AC-2 … covered by proof band steps · AC-3 … covered by pricing card plus hint steps · AC-4 … covered by header footer plus Buy routing steps · AC-5 … covered by legal steps · AC-6 … covered by responsive step · AC-7 … covered by revalidate plus SEO check below · AC-8 … covered by font step · AC-9 … covered by auth step · AC-10 … covered by empty plus failure steps · AC-11 … covered by motion step · AC-12 … covered by primitives step
-- AC-7 detail: `revalidate = 3600` on `/`, `/pricing`, `/terms`, `/privacy`, `/refunds`; metadataBase canonical plus title plus description per page; OG card; sitemap; robots
+- AC-7 detail: hourly cache via `cacheLife("hours")` in `lib/public-pricing.ts` (no `revalidate` export, incompatible with Cache Components); metadataBase canonical plus title plus description per page; OG card; sitemap; robots

@@ -3,8 +3,6 @@ import { LegalArticle } from "@/components/public/legal-article";
 import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "Privacy policy",
   description: "How Cevo handles your account, project, and payment data.",
