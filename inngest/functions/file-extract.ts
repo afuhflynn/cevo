@@ -4,8 +4,8 @@ export const extractFile = inngest.createFunction(
   {
     id: "file-extract",
     retries: 3,
+    triggers: { event: "file/extract.requested" },
   },
-  { event: "file/extract.requested" },
   async ({ event, step }) => {
     const { fileId } = event.data as { fileId: string; projectId: string };
     const { db } = await import("@/lib/prisma");

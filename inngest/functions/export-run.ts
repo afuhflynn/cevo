@@ -4,8 +4,8 @@ export const runExport = inngest.createFunction(
   {
     id: "export-run",
     retries: 3,
+    triggers: { event: "export/run" },
   },
-  { event: "export/run" },
   async ({ event, step }) => {
     const { exportId } = event.data as { exportId: string };
     const { db } = await import("@/lib/prisma");

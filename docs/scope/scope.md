@@ -33,7 +33,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 20 | UI Foundation Refresh and Primitive Audit | Foundation | in-progress |
 | 21 | Onboarding Journey Polish | Journey A | in-progress |
 | 22 | Auth Pages Polish | Journey B | in-progress |
-| 23 | Dashboard Catalog Journey Polish | Journey C | planned |
+| 23 | Dashboard Catalog Journey Polish | Journey C | in-progress |
 | 24 | Workspace and Future Pages Guardrails | Journey D | planned |
 | 25 | Public Site Polish | Journey E | planned |
 
@@ -382,10 +382,20 @@ Spec: [0019](../specs/0019-auth-pages-polish/index.md)
 
 ## Journey C: Dashboard Complete
 
-### 23. Dashboard Catalog Journey Polish · Journey · Beta · needs a decision
+### 23. Dashboard Catalog Journey Polish · Journey · Beta · in-progress
 Polish the full dashboard path in `app/dashboard/page.tsx` plus new plus archived plus project detail, covering stats plus catalog plus search plus filter plus pagination plus duplicate plus archive plus restore plus milestones plus credit display, with shadcn cards plus tables plus pagination plus skeletons for every loading pause. Each page spec carries per page Firecrawl notes plus frontend skill guidance.
 **Done when:** stats scan fast, search plus filter plus pagination feel instant with URL reflected, card actions confirm kindly, skeletons cover stats plus list plus detail, and empty plus error states guide next action.
-- [ ] Design it (spec): `/solution-architect dashboard catalog journey polish`
+Spec: [0020](../specs/0020-dashboard-catalog-journey-polish/index.md)
+- [x] Design it (spec): `/solution-architect dashboard catalog journey polish`
+- [x] Build it: `/feature-build dashboard catalog journey polish`
+  - [x] Inngest v4 upgrade alongside the slices: install `inngest@4.26.2`, triggers into options, `isDev` on client, typecheck plus dev server confirm (from spec Follow-up)
+  - [x] Stats header plus credit card with buy link and both themes pass (Satisfies AC-1, AC-7)
+  - [x] Catalog shell plus search plus filter plus pagination with URL state and archived twin (Satisfies AC-2)
+  - [x] Dialog confirms plus toasts plus cache refresh with detail header and task counts (Satisfies AC-3, AC-6)
+  - [x] Skeletons plus empty plus error pass with motion allow list and Firecrawl notes (Satisfies AC-4, AC-5, AC-8)
+  Code in `app/dashboard/`, `components/dashboard/dashboard-catalog.tsx`, `lib/inngest.ts`, `inngest/functions/`
+- [ ] Verify it: /verify-release dashboard catalog journey polish
+- [ ] Test it: /test-engineer dashboard catalog journey polish
 
 ## Journey D: Workspace and Future Pages Complete
 
