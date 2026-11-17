@@ -26,6 +26,44 @@ export type BillingPackage = {
 };
 
 /**
+ * File-based package defaults. Public surfaces render these whenever the
+ * database holds no active packages, so marketing never goes blank while
+ * admin configures billing. Keep in sync with seedBillingPackages below.
+ * Purchases always resolve against the database (see startPayment), so a
+ * fallback card whose id is missing from the DB degrades to the designed
+ * "package unavailable" message at checkout instead of transacting.
+ */
+export const DEFAULT_PACKAGES: BillingPackage[] = [
+  {
+    id: "fallback-starter",
+    name: "Starter",
+    priceXaf: 1000,
+    credits: 1000,
+    isPopular: false,
+    isActive: true,
+    sortOrder: 1,
+  },
+  {
+    id: "fallback-research",
+    name: "Research",
+    priceXaf: 2500,
+    credits: 2500,
+    isPopular: true,
+    isActive: true,
+    sortOrder: 2,
+  },
+  {
+    id: "fallback-project",
+    name: "Project",
+    priceXaf: 5000,
+    credits: 5000,
+    isPopular: false,
+    isActive: true,
+    sortOrder: 3,
+  },
+];
+
+/**
  * Normalize a Cameroonian phone number to 237XXXXXXXXX.
  * Accepts 9 digit local form (6XXXXXXXX) and 237 prefixed forms,
  * with spaces, dashes, plus signs, dots, and parentheses stripped.
@@ -106,21 +144,21 @@ export async function seedBillingPackages(): Promise<BillingPackage[]> {
     {
       name: "Starter",
       priceXaf: 1000,
-      credits: 50,
+      credits: 1000,
       isPopular: false,
       sortOrder: 1,
     },
     {
-      name: "Standard",
+      name: "Research",
       priceXaf: 2500,
-      credits: 150,
+      credits: 2500,
       isPopular: true,
       sortOrder: 2,
     },
     {
-      name: "Pro",
+      name: "Project",
       priceXaf: 5000,
-      credits: 350,
+      credits: 5000,
       isPopular: false,
       sortOrder: 3,
     },

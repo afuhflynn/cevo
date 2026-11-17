@@ -15,6 +15,7 @@ const PUBLIC_PREFIXES = [
   "/favicon",
   "/apple-touch",
   "/branding",
+  "/brands",
   "/robots.txt",
   "/sitemap.xml",
 ];

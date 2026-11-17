@@ -1,10 +1,16 @@
 import { cacheLife } from "next/cache";
-import { type BillingPackage, listActivePackages } from "./billing";
+import {
+  type BillingPackage,
+  DEFAULT_PACKAGES,
+  listActivePackages,
+} from "./billing";
 
 export type PublicPackagesResult = {
   packages: BillingPackage[];
   stale: boolean;
   failed: boolean;
+  /** True when packages came from DEFAULT_PACKAGES, not the database. */
+  fallback: boolean;
 };
 
 async function getCachedPackages(): Promise<BillingPackage[]> {
@@ -13,15 +19,31 @@ async function getCachedPackages(): Promise<BillingPackage[]> {
   return listActivePackages();
 }
 
+function orderPackages(packages: BillingPackage[]): BillingPackage[] {
+  return [...packages].sort((a, b) => {
+    if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+    return a.id.localeCompare(b.id);
+  });
+}
+
 export async function getPublicPackages(): Promise<PublicPackagesResult> {
   try {
     const packages = await getCachedPackages();
-    const ordered = [...packages].sort((a, b) => {
-      if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
-      return a.id.localeCompare(b.id);
-    });
-    return { packages: ordered, stale: false, failed: false };
+    if (packages.length > 0) {
+      return {
+        packages: orderPackages(packages),
+        stale: false,
+        failed: false,
+        fallback: false,
+      };
+    }
   } catch {
-    return { packages: [], stale: false, failed: true };
+    // Fall through to file-based defaults below.
   }
+  return {
+    packages: orderPackages(DEFAULT_PACKAGES),
+    stale: false,
+    failed: false,
+    fallback: true,
+  };
 }

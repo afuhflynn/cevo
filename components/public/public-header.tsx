@@ -3,44 +3,43 @@
 import Link from "next/link";
 import { useState } from "react";
 import { CevoLogo } from "@/components/cevo-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 
 const links = [
+  { href: "/#features", label: "Features" },
+  { href: "/#templates", label: "Templates" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <CevoLogo size="sm" href="/" priority />
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
+        <div className="flex justify-start">
+          <CevoLogo size="sm" href="/" priority />
+        </div>
         <nav aria-label="Public" className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <Link
-              key={l.href}
+              key={l.label}
               href={l.href}
-              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-md px-3 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
             >
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/sign-in"
-            className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Sign in
-          </Link>
-          <Link href="/sign-up" className="ml-1">
-            <Button size="sm">Get started</Button>
-          </Link>
-          <ThemeToggle className="ml-1 size-8" />
         </nav>
-        <div className="flex items-center gap-1 md:hidden">
-          <ThemeToggle className="size-8" />
+        <div className="hidden justify-end md:flex">
+          <Link href="/sign-up">
+            <Button size="sm" className="h-9 px-5">
+              Get started
+            </Button>
+          </Link>
+        </div>
+        <div className="flex justify-end md:hidden">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -61,7 +60,7 @@ export function PublicHeader() {
         >
           <ul className="flex flex-col gap-1">
             {[...links, { href: "/sign-in", label: "Sign in" }].map((l) => (
-              <li key={l.href}>
+              <li key={l.label}>
                 <Link
                   href={l.href}
                   onClick={() => setOpen(false)}

@@ -10,10 +10,14 @@ export function BuyButton({
   packageId,
   packageName,
   large = false,
+  label,
+  buttonClassName,
 }: {
   packageId: string;
   packageName: string;
   large?: boolean;
+  label?: string;
+  buttonClassName?: string;
 }) {
   const { data: session, isPending } = authClient.useSession();
   const [href, setHref] = useState(buildSignupHref(packageId));
@@ -31,8 +35,11 @@ export function BuyButton({
       aria-label={`Buy ${packageName} credits`}
       className="inline-flex w-full"
     >
-      <Button size={large ? "lg" : "default"} className="w-full">
-        Buy {packageName}
+      <Button
+        size={large ? "lg" : "default"}
+        className={buttonClassName ?? "w-full"}
+      >
+        {label ?? `Buy ${packageName}`}
       </Button>
     </Link>
   );

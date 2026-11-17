@@ -1,85 +1,117 @@
 import {
-  BookMarkedIcon,
-  FileDownIcon,
-  GraduationCapIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  DownloadIcon,
+  FileTextIcon,
+  LightbulbIcon,
   PenLineIcon,
-  SearchCheckIcon,
-  ShieldCheckIcon,
-  SmartphoneIcon,
+  PlayIcon,
+  PlusIcon,
+  SearchIcon,
+  TrendingUpIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { CevoLogo } from "@/components/cevo-logo";
+import { HeroIllustration } from "@/components/public/hero-illustration";
 import { PricingCards } from "@/components/public/pricing-cards";
-import { ProofBand, TrustStats } from "@/components/public/proof-mock";
+import { ProofBand } from "@/components/public/proof-mock";
 import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getPublicPackages } from "@/lib/public-pricing";
 
 export const metadata: Metadata = {
-  title: "Cevo — From idea to verified academic report",
+  title: "Your academic project, from idea to final report",
   description:
-    "Turn your project idea into a researched, verified, and exportable academic report. Transparent XAF pricing, mobile money checkout.",
+    "Plan your research, discover academic sources, develop your chapters and format your document according to your school's requirements.",
   alternates: { canonical: "/" },
 };
 
-const steps = [
+const faqs = [
   {
-    icon: PenLineIcon,
-    title: "1. Brief your idea",
-    body: "Answer a short guided conversation. Cevo turns it into aims, objectives, research questions, and a chapter plan you approve.",
+    q: "Is Cevo free to use?",
+    a: "Yes. Creating an account, completing onboarding, and briefing your first project is free. Credits are only used when you run AI assistance or export your report.",
   },
   {
-    icon: SearchCheckIcon,
-    title: "2. Research with proof",
-    body: "Search verified scholarly papers by DOI or topic, save them to your library, and insert deterministic APA 7 or Harvard citations.",
+    q: "What payment methods are accepted?",
+    a: "MTN Mobile Money and Orange Money in XAF (FCFA) via Fapshi. Credits allocate exactly once when your payment confirms.",
   },
   {
-    icon: FileDownIcon,
-    title: "3. Write and export",
-    body: "Draft in a calm editor with autosave, pass pre-submission review, then export publication quality PDF and DOCX.",
+    q: "Can I use Cevo for any institution?",
+    a: "Cevo ships with versioned templates for Cameroonian universities, and you can suggest your institution during onboarding. A standard default template covers everyone else.",
+  },
+  {
+    q: "How does the credit system work?",
+    a: "Buy prepaid credit packs, then spend credits on AI briefs, assistant runs, review scans, and exports. Your balance is always visible, and failed runs refund automatically.",
+  },
+  {
+    q: "Is my data secure?",
+    a: "Your documents are private to your account, files live in private storage with short-lived signed URLs, and every credit movement is recorded in an auditable ledger.",
   },
 ];
 
-const features = [
+const whyChoose = [
   {
-    icon: GraduationCapIcon,
-    title: "Built for Cameroonian universities",
-    body: "Onboarding captures your university, faculty, department, and citation style so templates match your institution.",
+    icon: LightbulbIcon,
+    title: "Plan & Organize",
+    body: "Structure your ideas with AI-powered guidance.",
   },
   {
-    icon: BookMarkedIcon,
-    title: "Verified research only",
-    body: "OpenAlex and Crossref sources with cached results and clear partial failure states. No invented references.",
-  },
-  {
-    icon: ShieldCheckIcon,
-    title: "Pre-submission review",
-    body: "Local plus semantic checks flag missing sections, uncited claims, and formatting drift before you submit.",
+    icon: SearchIcon,
+    title: "Discover Research",
+    body: "Find credible sources from trusted academic databases.",
   },
   {
     icon: PenLineIcon,
-    title: "AI assistant with diffs",
-    body: "Tone revision and paragraph polish with side by side diffs. You accept or discard. Nothing changes silently.",
+    title: "Write with AI",
+    body: "Get intelligent assistance throughout your project.",
   },
   {
-    icon: FileDownIcon,
-    title: "High fidelity export",
-    body: "Background jobs compile margins, headers, and numbering into PDF and DOCX without timing out your browser.",
+    icon: FileTextIcon,
+    title: "Follow Templates",
+    body: "Adhere to institutional formatting requirements.",
   },
   {
-    icon: SmartphoneIcon,
-    title: "Prepaid credits via MoMo",
-    body: "Buy credits in XAF with MTN MoMo or Orange Money. Exact allocation on payment confirmation, refunds on failed runs.",
+    icon: DownloadIcon,
+    title: "Export Easily",
+    body: "Download your work in PDF or DOCX format.",
   },
+  {
+    icon: TrendingUpIcon,
+    title: "Track Progress",
+    body: "Stay on schedule with smart progress tracking.",
+  },
+];
+
+const howSteps = [
+  {
+    icon: LightbulbIcon,
+    title: "Plan Your Project",
+    body: "Share your idea and get personalized guidance.",
+  },
+  {
+    icon: SearchIcon,
+    title: "Research & Gather",
+    body: "Find reliable sources and build your bibliography.",
+  },
+  {
+    icon: PenLineIcon,
+    title: "Develop Your Work",
+    body: "Write, refine and improve with AI assistance.",
+  },
+  {
+    icon: null,
+    title: "Export & Present",
+    body: "Download your project in the perfect format.",
+  },
+];
+
+const providers = [
+  { name: "OpenAlex", src: "/brands/openalex-mark.png" },
+  { name: "Crossref", src: "/brands/crossref-icon.svg" },
+  { name: "Semantic Scholar", src: "/brands/semantic-scholar-mark.svg" },
 ];
 
 export default async function LandingPage() {
@@ -90,153 +122,234 @@ export default async function LandingPage() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-14 px-4 py-10 sm:gap-16 sm:px-6 sm:py-14">
-        {/* Hero: Docs calm, generous whitespace, one primary plus quiet secondary */}
+        {/* Hero: headline left, bespoke illustration right */}
         <section
           aria-labelledby="hero-heading"
-          className="flex flex-col gap-5 py-4 sm:py-8"
+          className="grid items-center gap-10 py-4 sm:py-8 lg:grid-cols-2 lg:gap-6"
         >
-          <Badge variant="secondary" className="w-fit">
-            Academic project workspace · Cameroon
-          </Badge>
-          <h1
-            id="hero-heading"
-            className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
-          >
-            From idea to verified exportable report
-          </h1>
-          <p className="max-w-2xl text-base leading-relaxed break-words text-muted-foreground sm:text-lg">
-            Cevo guides you from a rough project idea to a structured,
-            researched, verified report that follows your institutional
-            guidelines. Research, writing, review, and export in one calm place.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/sign-up">
-              <Button size="lg">Start your project</Button>
-            </Link>
-            <Link href="/pricing">
-              <Button size="lg" variant="outline">
-                See pricing in XAF
+          <div className="flex flex-col gap-5">
+            <h1
+              id="hero-heading"
+              className="text-5xl font-bold tracking-tight text-balance sm:text-6xl lg:text-[4.25rem] lg:leading-[1.04]"
+            >
+              Your academic project, from{" "}
+              <span className="text-primary">idea</span> to{" "}
+              <span className="text-primary">final report.</span>
+            </h1>
+            <p className="max-w-xl text-base leading-relaxed break-words text-muted-foreground sm:text-lg">
+              Plan your research, discover academic sources, develop your
+              chapters and format your document according to your school&rsquo;s
+              requirements.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/sign-up">
+                <Button size="lg" className="h-12 rounded-xl px-7 text-[15px]">
+                  Get started
+                </Button>
+              </Link>
+              <Link href="/#how-it-works">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 gap-2 rounded-xl px-6 text-[15px]"
+                >
+                  <PlayIcon
+                    className="size-4 fill-primary text-primary"
+                    aria-hidden="true"
+                  />
+                  See how it works
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <HeroIllustration />
+        </section>
+
+        {/* Proof: workspace preview straight after the hero */}
+        <section aria-label="Workspace preview" className="flex flex-col gap-5">
+          <ProofBand />
+        </section>
+
+        {/* Why Choose Cevo */}
+        <section
+          aria-labelledby="why-heading"
+          id="features"
+          className="grid scroll-mt-20 items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+        >
+          <div className="flex flex-col items-start gap-4">
+            <p className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
+              <span aria-hidden="true" className="h-px w-6 bg-primary" />
+              Why Choose Cevo?
+            </p>
+            <h2
+              id="why-heading"
+              className="text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            >
+              A smarter way to build your academic success.
+            </h2>
+            <p className="max-w-md text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
+              Cevo combines the power of AI with academic expertise to help you
+              research, write and perfect your projects with confidence.
+            </p>
+            <Link href="/#templates">
+              <Button className="h-11 gap-2 rounded-xl px-6 text-sm">
+                Explore features
+                <ArrowRightIcon className="size-4" aria-hidden="true" />
               </Button>
             </Link>
           </div>
-          <p className="text-xs text-muted-foreground">
-            No payment to explore. Credits only when you run AI or export.
-          </p>
-        </section>
-
-        {/* Proof: honest static mocks, mock stacks above copy on small screens */}
-        <section aria-labelledby="proof-heading" className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
-            <h2
-              id="proof-heading"
-              className="text-2xl font-semibold tracking-tight text-balance"
-            >
-              See the workspace before you sign up
-            </h2>
-            <p className="max-w-2xl text-sm break-words text-muted-foreground">
-              Stylized previews of the real shapes. Chapters plus citation
-              chips plus export badges, in both themes, with no image weight for
-              slow networks.
-            </p>
-          </div>
-          <ProofBand />
-          <TrustStats />
-        </section>
-
-        {/* How it works */}
-        <section aria-labelledby="how-heading" className="flex flex-col gap-6">
-          <div>
-            <h2
-              id="how-heading"
-              className="text-2xl font-semibold tracking-tight"
-            >
-              How it works
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Three steps from concept to submission ready document.
-            </p>
-          </div>
-          <ol className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {steps.map((s) => (
-              <li key={s.title}>
-                <Card className="h-full">
-                  <CardHeader>
-                    <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <s.icon className="size-5" aria-hidden="true" />
-                    </span>
-                    <CardTitle className="text-base">{s.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm leading-relaxed break-words text-muted-foreground">
-                      {s.body}
-                    </p>
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* Features */}
-        <section
-          aria-labelledby="features-heading"
-          className="flex flex-col gap-6"
-        >
-          <div>
-            <h2
-              id="features-heading"
-              className="text-2xl font-semibold tracking-tight"
-            >
-              Everything a report needs
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Research, writing, review, files, templates, and export share one
-              source of truth.
-            </p>
-          </div>
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
-              <li key={f.title}>
-                <Card className="h-full">
-                  <CardHeader>
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-foreground">
-                      <f.icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <CardTitle className="text-sm">{f.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-sm leading-relaxed break-words">
-                      {f.body}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
+            {whyChoose.map((f) => (
+              <li key={f.title} className="flex flex-col gap-2">
+                <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <f.icon className="size-5" aria-hidden="true" />
+                </span>
+                <p className="text-sm font-bold">{f.title}</p>
+                <p className="text-[13px] leading-relaxed break-words text-muted-foreground">
+                  {f.body}
+                </p>
               </li>
             ))}
           </ul>
         </section>
 
+        {/* How It Works */}
+        <section
+          aria-labelledby="how-heading"
+          id="how-it-works"
+          className="flex scroll-mt-20 flex-col gap-8"
+        >
+          <div className="flex flex-col gap-3">
+            <p className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
+              <span aria-hidden="true" className="h-px w-6 bg-primary" />
+              How It Works
+            </p>
+            <h2
+              id="how-heading"
+              className="text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            >
+              From idea to final report in 4 simple steps.
+            </h2>
+          </div>
+          <ol className="relative flex flex-col gap-8 md:flex-row md:items-start md:gap-6">
+            <span
+              aria-hidden="true"
+              className="absolute top-7 right-0 left-0 hidden h-px bg-border md:block"
+            />
+            {howSteps.map((s) => (
+              <li key={s.title} className="relative flex flex-1 flex-col gap-2">
+                {s.icon ? (
+                  <span className="relative z-10 flex size-14 items-center justify-center rounded-full border border-border/60 bg-card text-foreground shadow-md">
+                    <s.icon className="size-5" aria-hidden="true" />
+                  </span>
+                ) : (
+                  <span className="relative z-10 flex size-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
+                    <CheckIcon className="size-5" aria-hidden="true" />
+                  </span>
+                )}
+                <p className="text-sm font-bold">{s.title}</p>
+                <p className="text-[13px] leading-relaxed break-words text-muted-foreground">
+                  {s.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Templates & Research */}
+        <section
+          aria-labelledby="templates-heading"
+          id="templates"
+          className="grid scroll-mt-20 items-center gap-10 lg:grid-cols-2"
+        >
+          <div className="flex flex-col items-start gap-4">
+            <p className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
+              <span aria-hidden="true" className="h-px w-6 bg-primary" />
+              Templates & Research
+            </p>
+            <h2
+              id="templates-heading"
+              className="text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            >
+              Institution-ready templates and verified academic sources.
+            </h2>
+            <p className="max-w-md text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
+              Access official templates from your institution and search through
+              trusted academic databases.
+            </p>
+            <Link href="/sign-up">
+              <Button className="h-11 gap-2 rounded-xl px-6 text-sm">
+                Browse templates
+                <ArrowRightIcon className="size-4" aria-hidden="true" />
+              </Button>
+            </Link>
+          </div>
+          <div
+            aria-hidden="true"
+            className="relative h-[340px] w-full select-none sm:h-[380px]"
+          >
+            <div className="absolute inset-x-10 top-10 bottom-10 rounded-full bg-primary/[0.07] blur-3xl" />
+            <div className="absolute top-24 right-6 h-52 w-52 rounded-[3rem] bg-gradient-to-b from-primary/25 to-primary/10 sm:right-12 sm:h-60 sm:w-60" />
+            <div className="absolute top-10 left-2 w-44 rotate-[8deg] rounded-[1.5rem] border border-border/70 bg-card p-4 shadow-[0_32px_60px_-24px_var(--color-primary)] sm:left-6 sm:w-52">
+              <div className="h-2.5 w-16 rounded-full bg-primary/30" />
+              <div className="mt-3 flex flex-col gap-2">
+                <div className="h-2 w-full rounded-full bg-primary/15" />
+                <div className="h-2 w-11/12 rounded-full bg-primary/15" />
+                <div className="h-2 w-4/5 rounded-full bg-primary/15" />
+                <div className="h-2 w-full rounded-full bg-primary/15" />
+              </div>
+              <div className="mt-4 h-12 rounded-xl bg-primary/10" />
+            </div>
+            <div className="absolute top-2 right-2 w-44 -rotate-[4deg] rounded-[1.5rem] border border-border/70 bg-card p-4 shadow-[0_32px_60px_-20px_var(--color-primary)] sm:right-8 sm:w-52">
+              <div className="h-2 w-full rounded-full bg-primary/15" />
+              <div className="mt-2 flex flex-col gap-2">
+                <div className="h-2 w-11/12 rounded-full bg-primary/15" />
+                <div className="h-2 w-4/5 rounded-full bg-primary/15" />
+              </div>
+              <div className="mt-3 flex flex-col gap-1 border-t border-border/60 pt-3 text-xs font-semibold">
+                <span>APA 7</span>
+                <span>Harvard</span>
+                <span>IEEE</span>
+                <span className="font-normal text-muted-foreground">
+                  and more...
+                </span>
+              </div>
+            </div>
+            <div className="absolute bottom-2 left-4 w-48 rounded-2xl border border-border/70 bg-card p-3 shadow-[0_24px_50px_-20px_var(--color-primary)] sm:left-10 sm:w-52">
+              {providers.map((p, idx) => (
+                <div
+                  key={p.name}
+                  className={`flex items-center gap-2.5 px-1.5 py-2 ${idx > 0 ? "border-t border-border/60" : ""}`}
+                >
+                  <Image
+                    src={p.src}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="size-5 shrink-0 object-contain"
+                  />
+                  <span className="text-xs font-semibold">{p.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Pricing teaser */}
         <section
           aria-labelledby="pricing-heading"
-          className="flex flex-col gap-6"
+          className="flex flex-col items-center gap-8 text-center"
         >
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2
-                id="pricing-heading"
-                className="text-2xl font-semibold tracking-tight"
-              >
-                Transparent pricing in XAF
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Prepaid credit packages. Pay with MTN MoMo or Orange Money.
-              </p>
-            </div>
-            <Link href="/pricing">
-              <Button variant="outline" size="sm">
-                Full pricing
-              </Button>
-            </Link>
+          <div className="flex flex-col items-center gap-2">
+            <h2
+              id="pricing-heading"
+              className="text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            >
+              Simple, flexible pricing
+            </h2>
+            <p className="max-w-xl text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
+              Get credits and unlock the full power of Cevo.
+            </p>
           </div>
           {stale && (
             <p role="status" className="text-xs text-muted-foreground">
@@ -246,31 +359,91 @@ export default async function LandingPage() {
           <PricingCards packages={teaser} />
         </section>
 
+        {/* FAQ */}
+        <section
+          aria-labelledby="faq-heading"
+          id="faq"
+          className="grid scroll-mt-20 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+        >
+          <div className="flex flex-col items-start gap-4 lg:sticky lg:top-24">
+            <p className="flex items-center gap-2 text-xs font-semibold tracking-wider text-primary uppercase">
+              <span aria-hidden="true" className="h-px w-6 bg-primary" />
+              Got Questions?
+            </p>
+            <h2
+              id="faq-heading"
+              className="text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            >
+              Find answers to common questions.
+            </h2>
+            <p className="max-w-md text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
+              Can&rsquo;t find what you&rsquo;re looking for? Contact our
+              support team.
+            </p>
+            <a href="mailto:support@cevo.example">
+              <Button
+                variant="outline"
+                className="h-11 gap-2 rounded-xl px-6 text-sm"
+              >
+                Contact Support
+                <ArrowRightIcon className="size-4" aria-hidden="true" />
+              </Button>
+            </a>
+          </div>
+          <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border/70 bg-card">
+            {faqs.map((f) => (
+              <details key={f.q} name="cevo-faq" className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                  <span className="text-[15px] font-medium">{f.q}</span>
+                  <PlusIcon
+                    className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-45"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <p className="px-5 pb-4 text-sm leading-relaxed break-words text-muted-foreground">
+                  {f.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         {/* Final call */}
         <section
           aria-labelledby="cta-heading"
-          className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-12 text-center"
+          className="relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-primary px-6 py-10 sm:px-10 sm:py-12 lg:flex-row lg:items-center"
         >
-          <h2
-            id="cta-heading"
-            className="text-2xl font-semibold tracking-tight text-balance"
-          >
-            Ready when your idea is
-          </h2>
-          <p className="max-w-md text-sm leading-relaxed break-words text-muted-foreground">
-            Create an account, complete onboarding, and brief your first
-            project. Credits wait until you need AI help or export.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/sign-up">
-              <Button size="lg">Get started free</Button>
-            </Link>
-            <Link href="/sign-in">
-              <Button size="lg" variant="ghost">
-                Sign in
-              </Button>
-            </Link>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-20 right-10 size-64 rounded-full bg-white/10 blur-2xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-24 left-1/3 size-72 rounded-full bg-white/[0.07] blur-2xl"
+          />
+          <CevoLogo
+            variant="icon"
+            size="xl"
+            className="relative shrink-0 brightness-0 invert"
+          />
+          <div className="relative flex flex-col gap-2 lg:flex-1">
+            <h2
+              id="cta-heading"
+              className="text-2xl font-bold tracking-tight text-balance text-white sm:text-3xl"
+            >
+              Ready to bring your ideas to life?
+            </h2>
+            <p className="max-w-xl text-sm leading-relaxed break-words text-white/80 sm:text-base">
+              Join thousands of students using Cevo to achieve academic
+              excellence.
+            </p>
           </div>
+          <Link href="/sign-up" className="relative shrink-0 lg:ml-auto">
+            <Button className="h-11 gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-primary hover:bg-white/90">
+              Get started
+              <ArrowRightIcon className="size-4" aria-hidden="true" />
+            </Button>
+          </Link>
         </section>
       </main>
       <PublicFooter />

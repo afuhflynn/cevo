@@ -1,26 +1,31 @@
-import {
-  CheckCircle2Icon,
-  MailQuestionMarkIcon,
-  SmartphoneIcon,
-} from "lucide-react";
+import { CheckIcon, MailQuestionMarkIcon } from "lucide-react";
 import Link from "next/link";
 import { BuyButton } from "@/components/public/buy-button";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BillingPackage } from "@/lib/billing";
-import { formatXaf } from "@/lib/public-links";
 
-export function usageHintForPosition(index: number): string {
-  if (index === 0) return "Starter: try one brief plus a short review scan.";
-  if (index === 1) return "Standard: most projects brief, research, and draft.";
-  return "Large: long reports plus repeated reviews and exports.";
+const tierCopy = [
+  {
+    tagline: "Ideal for small projects.",
+    features: ["Basic AI features", "Standard templates", "Community support"],
+  },
+  {
+    tagline: "Perfect for research projects.",
+    features: ["Advanced AI features", "Premium templates", "Priority support"],
+  },
+  {
+    tagline: "For serious academic work.",
+    features: ["Full features access", "All templates", "Dedicated support"],
+  },
+];
+
+function formatFcfa(priceXaf: number): string {
+  return `${priceXaf.toLocaleString("en-US")} FCFA`;
+}
+
+function formatCredits(credits: number): string {
+  return `~ ${credits.toLocaleString("en-US")} credits`;
 }
 
 export function PricingCards({ packages }: { packages: BillingPackage[] }) {
@@ -58,52 +63,71 @@ export function PricingCards({ packages }: { packages: BillingPackage[] }) {
     if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
     return a.id.localeCompare(b.id);
   });
-  const popularId = ordered.find((p) => p.isPopular)?.id ?? null;
+  const popularId =
+    ordered.find((p) => p.isPopular)?.id ??
+    (ordered.length === 3 ? ordered[1].id : null);
 
   return (
     <ul
-      className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid w-full max-w-5xl gap-6 pt-4 text-left sm:grid-cols-2 lg:grid-cols-3"
       aria-label="Credit packages"
     >
       {ordered.map((p, i) => {
         const popular = popularId !== null && p.id === popularId;
+        const copy = tierCopy[i] ?? {
+          tagline: "Flexible credits for your project.",
+          features: [
+            `${p.credits.toLocaleString("en-US")} AI credits`,
+            "All templates",
+            "Email support",
+          ],
+        };
         return (
-          <li key={p.id}>
+          <li key={p.id} className="h-full">
             <Card
-              className={`relative flex h-full flex-col ${popular ? "border-primary shadow-sm" : ""}`}
+              className={`relative flex h-full flex-col gap-5 overflow-visible p-8 ${
+                popular
+                  ? "border-2 border-primary shadow-[0_24px_60px_-28px_var(--color-primary)]"
+                  : ""
+              }`}
             >
               {popular && (
-                <Badge className="absolute -top-2.5 left-4">Popular</Badge>
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold whitespace-nowrap text-primary-foreground">
+                  Most Popular
+                </span>
               )}
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{p.name}</CardTitle>
-                <CardDescription>{p.credits} credits</CardDescription>
+              <CardHeader className="flex flex-col gap-2 p-0">
+                <CardTitle className="text-lg font-bold">{p.name}</CardTitle>
+                <p className="text-4xl font-extrabold tracking-tight">
+                  {formatFcfa(p.priceXaf)}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {formatCredits(p.credits)}
+                </p>
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col gap-4">
-                <p className="text-3xl font-semibold tracking-tight">
-                  {formatXaf(p.priceXaf)}
-                </p>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {usageHintForPosition(i)}
-                </p>
-                <ul className="flex flex-col gap-2 text-sm break-words text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2Icon
-                      className="mt-0.5 size-4 shrink-0 text-emerald-600"
-                      aria-hidden="true"
-                    />
-                    {p.credits} AI credits for briefs, assistant, and review
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <SmartphoneIcon
-                      className="mt-0.5 size-4 shrink-0"
-                      aria-hidden="true"
-                    />
-                    Pay with MTN MoMo or Orange Money
-                  </li>
+              <CardContent className="flex flex-1 flex-col gap-5 p-0">
+                <p className="text-sm font-semibold">{copy.tagline}</p>
+                <ul className="flex flex-col gap-2.5">
+                  {copy.features.map((feat) => (
+                    <li
+                      key={feat}
+                      className="flex items-start gap-2 text-sm font-medium text-foreground/75"
+                    >
+                      <CheckIcon
+                        className="mt-0.5 size-4 shrink-0 text-emerald-600"
+                        aria-hidden="true"
+                      />
+                      {feat}
+                    </li>
+                  ))}
                 </ul>
-                <div className="mt-auto pt-2">
-                  <BuyButton packageId={p.id} packageName={p.name} />
+                <div className="mt-auto pt-1">
+                  <BuyButton
+                    packageId={p.id}
+                    packageName={p.name}
+                    label="Get Started"
+                    buttonClassName="h-11 w-full rounded-lg text-[15px]"
+                  />
                 </div>
               </CardContent>
             </Card>

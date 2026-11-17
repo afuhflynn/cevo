@@ -180,6 +180,10 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
   ::selection {
     background: var(--primary);
     color: var(--primary-foreground);
