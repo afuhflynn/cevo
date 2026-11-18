@@ -5,8 +5,11 @@ import {
   canonicalDoi,
   computeSuffixGroups,
   extractDoiCandidate,
+  filterHitsByWorkType,
   isDoiQuery,
   makeCitationKey,
+  normalizeWorkType,
+  parseWorkTypeParam,
 } from "./research";
 
 describe("research doi helpers", () => {
@@ -100,5 +103,90 @@ describe("research formatter", () => {
     const k2 = makeCitationKey([{ family: "Smith" }], 2020, "s1", "p1");
     expect(k1).toBe(k2);
     expect(k1.startsWith("smith2020")).toBe(true);
+  });
+});
+
+describe("research work types", () => {
+  it("normalizes OpenAlex types into buckets", () => {
+    expect(normalizeWorkType({ type: "article" }, "openalex")).toBe("journal");
+    expect(normalizeWorkType({ type: "Review" }, "openalex")).toBe("journal");
+    expect(normalizeWorkType({ type: "proceedings-article" }, "openalex")).toBe(
+      "proceedings",
+    );
+    expect(normalizeWorkType({ type: "book" }, "openalex")).toBe("book");
+    expect(normalizeWorkType({ type: "book-chapter" }, "openalex")).toBe(
+      "book",
+    );
+    expect(normalizeWorkType({ type: "dataset" }, "openalex")).toBe("dataset");
+    expect(normalizeWorkType({ type: "dissertation" }, "openalex")).toBe(
+      "dissertation",
+    );
+    expect(normalizeWorkType({ type: "other" }, "openalex")).toBe("other");
+    expect(normalizeWorkType({}, "openalex")).toBe("other");
+  });
+  it("normalizes Crossref types into buckets", () => {
+    expect(normalizeWorkType({ type: "journal-article" }, "crossref")).toBe(
+      "journal",
+    );
+    expect(
+      normalizeWorkType({ type: "proceedings-article" }, "crossref"),
+    ).toBe("proceedings");
+    expect(normalizeWorkType({ type: "book-chapter" }, "crossref")).toBe(
+      "book",
+    );
+    expect(normalizeWorkType({ type: "dataset" }, "crossref")).toBe("dataset");
+    expect(normalizeWorkType({ type: "report" }, "crossref")).toBe("other");
+  });
+  it("prefers the OpenAlex side for merged payloads", () => {
+    expect(
+      normalizeWorkType(
+        {
+          openalex: { type: "article" },
+          crossref: { type: "proceedings-article" },
+        },
+        "merged",
+      ),
+    ).toBe("journal");
+    expect(normalizeWorkType({ crossref: { type: "book" } }, "merged")).toBe(
+      "book",
+    );
+    expect(normalizeWorkType({}, "merged")).toBe("other");
+  });
+  it("parses the type query param", () => {
+    expect(parseWorkTypeParam(null)).toBe("all");
+    expect(parseWorkTypeParam("")).toBe("all");
+    expect(parseWorkTypeParam("journal")).toBe("journal");
+    expect(parseWorkTypeParam("Proceedings")).toBe("proceedings");
+    expect(parseWorkTypeParam("bogus")).toBe("all");
+  });
+  it("filters hits by bucket", () => {
+    const base = {
+      doi: null,
+      openAlexId: null,
+      title: "T",
+      authors: [],
+      year: null,
+      venue: null,
+      volume: null,
+      issue: null,
+      pages: null,
+      publisher: null,
+      abstract: null,
+      pdfUrl: null,
+      isOpenAccess: false,
+      verificationState: "METADATA_VERIFIED",
+      providerOrigin: "openalex",
+      raw: {},
+    };
+    const hits = [
+      { ...base, workType: "journal" },
+      { ...base, workType: "proceedings" },
+      { ...base, workType: "book" },
+    ] as unknown as Parameters<typeof filterHitsByWorkType>[0];
+    expect(filterHitsByWorkType(hits, "all")).toHaveLength(3);
+    expect(filterHitsByWorkType(hits, "journal").map((h) => h.workType)).toEqual(
+      ["journal"],
+    );
+    expect(filterHitsByWorkType(hits, "other")).toHaveLength(0);
   });
 });

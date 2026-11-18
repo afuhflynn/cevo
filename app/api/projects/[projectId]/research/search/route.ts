@@ -40,6 +40,7 @@ function serializeHit(h: ResearchHit) {
     pdfUrl: h.pdfUrl,
     isOpenAccess: h.isOpenAccess,
     verificationState: h.verificationState,
+    workType: h.workType,
     providerOrigin:
       h.providerOrigin === "merged"
         ? "OpenAlex + Crossref"

@@ -31,8 +31,114 @@ export type ResearchHit = {
   isOpenAccess: boolean;
   verificationState: VerificationStateValue;
   providerOrigin: "openalex" | "crossref" | "merged";
+  workType: ResearchWorkType;
   raw: Record<string, unknown>;
 };
+
+export type ResearchWorkType =
+  | "journal"
+  | "proceedings"
+  | "book"
+  | "dataset"
+  | "dissertation"
+  | "other";
+
+export const RESEARCH_WORK_TYPE_LABELS: Record<ResearchWorkType, string> = {
+  journal: "Journal Article",
+  proceedings: "Conference Paper",
+  book: "Book",
+  dataset: "Dataset",
+  dissertation: "Thesis",
+  other: "Other",
+};
+
+const OPENALEX_TYPE_MAP: Record<string, ResearchWorkType> = {
+  article: "journal",
+  review: "journal",
+  editorial: "journal",
+  letter: "journal",
+  "proceedings-article": "proceedings",
+  proceedings: "proceedings",
+  book: "book",
+  "book-chapter": "book",
+  dataset: "dataset",
+  dissertation: "dissertation",
+  thesis: "dissertation",
+};
+
+const CROSSREF_TYPE_MAP: Record<string, ResearchWorkType> = {
+  "journal-article": "journal",
+  review: "journal",
+  "proceedings-article": "proceedings",
+  proceedings: "proceedings",
+  book: "book",
+  "book-chapter": "book",
+  "book-section": "book",
+  "edited-book": "book",
+  monograph: "book",
+  dataset: "dataset",
+  dissertation: "dissertation",
+  thesis: "dissertation",
+};
+
+function bucketFromRawValue(
+  value: unknown,
+  map: Record<string, ResearchWorkType>,
+): ResearchWorkType | null {
+  if (typeof value !== "string") return null;
+  return map[value.trim().toLowerCase()] ?? null;
+}
+
+function rawType(raw: Record<string, unknown>): unknown {
+  return raw.type;
+}
+
+export function normalizeWorkType(
+  raw: Record<string, unknown>,
+  providerOrigin: "openalex" | "crossref" | "merged",
+): ResearchWorkType {
+  if (providerOrigin === "merged") {
+    const openalex = raw.openalex as Record<string, unknown> | undefined;
+    const crossref = raw.crossref as Record<string, unknown> | undefined;
+    if (openalex && typeof openalex === "object") {
+      const bucket = bucketFromRawValue(rawType(openalex), OPENALEX_TYPE_MAP);
+      if (bucket) return bucket;
+    }
+    if (crossref && typeof crossref === "object") {
+      const bucket = bucketFromRawValue(rawType(crossref), CROSSREF_TYPE_MAP);
+      if (bucket) return bucket;
+    }
+    return "other";
+  }
+  const map =
+    providerOrigin === "openalex" ? OPENALEX_TYPE_MAP : CROSSREF_TYPE_MAP;
+  return bucketFromRawValue(rawType(raw), map) ?? "other";
+}
+
+export function filterHitsByWorkType(
+  hits: ResearchHit[],
+  type: ResearchWorkType | "all",
+): ResearchHit[] {
+  if (type === "all") return hits;
+  return hits.filter((h) => h.workType === type);
+}
+
+export function parseWorkTypeParam(value: unknown): ResearchWorkType | "all" {
+  if (typeof value !== "string") return "all";
+  const v = value.trim().toLowerCase();
+  if (v === "all" || v === "") return "all";
+  const buckets: ResearchWorkType[] = [
+    "journal",
+    "proceedings",
+    "book",
+    "dataset",
+    "dissertation",
+    "other",
+  ];
+  return (buckets as string[]).includes(v)
+    ? (v as ResearchWorkType)
+    : "all";
+}
 
 export const RESEARCH_SEARCH_PAGE_SIZE = 10;
 export const RESEARCH_MERGED_MAX = 20;
@@ -563,6 +669,7 @@ function openAlexToHit(work: Record<string, unknown>): ResearchHit {
       disagreement: false,
     }),
     providerOrigin: "openalex",
+    workType: normalizeWorkType(work, "openalex"),
     raw: work,
   };
 }
@@ -665,6 +772,7 @@ function crossrefToHit(item: Record<string, unknown>): ResearchHit {
       disagreement: false,
     }),
     providerOrigin: "crossref",
+    workType: normalizeWorkType(item, "crossref"),
     raw: item,
   };
 }
@@ -817,6 +925,12 @@ export function mergeHits(
       isOpenAccess: existing.isOpenAccess || h.isOpenAccess,
       providerOrigin: "merged",
       verificationState: reconcileVerification(existing, h),
+      workType:
+        existing.providerOrigin === "openalex"
+          ? existing.workType
+          : h.providerOrigin === "openalex"
+            ? h.workType
+            : existing.workType,
       raw: { openalex: existing.raw, crossref: h.raw },
     };
     byKey.set(key, merged);

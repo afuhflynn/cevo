@@ -2,11 +2,11 @@
 
 import {
   ChevronRightIcon,
+  FileSearchIcon,
   FolderIcon,
   HomeIcon,
   LayoutTemplateIcon,
   LifeBuoyIcon,
-  SearchIcon,
   SettingsIcon,
   WalletIcon,
 } from "lucide-react";
@@ -92,7 +92,6 @@ export function AppSidebar({
   projects: SidebarProject[];
 }) {
   const pathname = usePathname();
-  const inWorkspace = pathname.includes("/workspace");
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -135,12 +134,16 @@ export function AppSidebar({
                   <span>Projects</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <ProjectGroup
-                label="Research"
-                icon={SearchIcon}
-                projects={projects}
-                openByDefault={inWorkspace}
-              />
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/dashboard/research" />}
+                  isActive={pathname.startsWith("/dashboard/research")}
+                  tooltip="Research"
+                >
+                  <FileSearchIcon className="size-4" />
+                  <span>Research</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <ProjectGroup
                 label="Templates"
                 icon={LayoutTemplateIcon}
