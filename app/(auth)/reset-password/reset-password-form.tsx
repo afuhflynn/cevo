@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangleIcon, KeyRoundIcon } from "lucide-react";
+import { AlertTriangleIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -133,6 +133,7 @@ export function ResetPasswordForm({
           disabled={pending}
           withMeter
           withChecklist
+          inputClassName="h-12 rounded-xl"
         />
         <Field data-invalid={fieldError ? true : undefined}>
           <FieldLabel htmlFor="reset-password-confirm">Confirm new password</FieldLabel>
@@ -150,7 +151,7 @@ export function ResetPasswordForm({
               disabled={pending}
               aria-invalid={fieldError ? true : undefined}
               aria-describedby={fieldError ? "reset-confirm-error" : undefined}
-              className="pr-11"
+              className="h-12 rounded-xl pr-11"
             />
             <button
               type="button"
@@ -160,12 +161,16 @@ export function ResetPasswordForm({
               aria-pressed={showConfirm}
               className="absolute top-1/2 right-2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50"
             >
-              <span aria-hidden="true" className="text-xs font-medium">{showConfirm ? "Hide" : "Show"}</span>
+              {showConfirm ? (
+                <EyeOffIcon className="size-4" aria-hidden="true" />
+              ) : (
+                <EyeIcon className="size-4" aria-hidden="true" />
+              )}
             </button>
           </div>
           {fieldError && <FieldError id="reset-confirm-error">{fieldError}</FieldError>}
         </Field>
-        <Button type="submit" disabled={!canSubmit} aria-busy={pending}>
+        <Button type="submit" disabled={!canSubmit} aria-busy={pending} className="h-11 rounded-xl text-[15px]">
           {pending && <Spinner aria-hidden="true" />}
           {pending ? "Updating…" : "Update password"}
         </Button>

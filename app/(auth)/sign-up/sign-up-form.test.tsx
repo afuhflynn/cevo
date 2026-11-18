@@ -46,7 +46,7 @@ async function fillAndSubmit(name: string, email: string, password: string) {
   await user.type(screen.getByLabelText(/full name/i), name);
   await user.type(screen.getByLabelText(/email/i), email);
   await user.type(screen.getByPlaceholderText(/at least 12/i), password);
-  await user.click(screen.getByRole("button", { name: "Create account" }));
+  await user.click(screen.getByRole("button", { name: "Create Account" }));
 }
 
 describe("SignUpForm", () => {

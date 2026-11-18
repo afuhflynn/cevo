@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ThemeProvider } from "@/components/theme-provider";
 
 vi.mock("next/link", () => ({
   default: ({
@@ -27,29 +26,20 @@ vi.mock("next/image", () => ({
 import AuthLayout from "./layout";
 
 describe("AuthLayout", () => {
-  it("frames the form with brand, navigation home, and theme control", () => {
+  it("frames the form with brand in a centered layout", () => {
     render(
-      <ThemeProvider attribute="class">
-        <AuthLayout>
-          <p>Form goes here</p>
-        </AuthLayout>
-      </ThemeProvider>,
+      <AuthLayout>
+        <p>Form goes here</p>
+      </AuthLayout>,
     );
 
     expect(screen.getByRole("link", { name: /cevo home/i })).toHaveAttribute(
       "href",
       "/",
     );
-    expect(screen.getByRole("link", { name: /back home/i })).toHaveAttribute(
-      "href",
-      "/",
-    );
-    expect(
-      screen.getByRole("button", { name: /toggle theme/i }),
-    ).toBeInTheDocument();
     expect(screen.getByText("Form goes here")).toBeInTheDocument();
     expect(
-      screen.getByText(/guided from idea to submission/i),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /toggle theme/i }),
+    ).not.toBeInTheDocument();
   });
 });

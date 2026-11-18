@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, XIcon } from "lucide-react";
+import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -58,6 +58,7 @@ export function PasswordField({
   error,
   placeholder = "At least 12 characters",
   labelAction,
+  inputClassName,
 }: {
   id: string;
   label?: string;
@@ -71,6 +72,7 @@ export function PasswordField({
   error?: string | null;
   placeholder?: string;
   labelAction?: React.ReactNode;
+  inputClassName?: string;
 }) {
   const [show, setShow] = useState(false);
   const checks = getPasswordChecks(value);
@@ -101,7 +103,7 @@ export function PasswordField({
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
-          className="pr-11"
+          className={cn("h-12 rounded-xl pr-11", inputClassName)}
         />
         <button
           type="button"
@@ -111,7 +113,11 @@ export function PasswordField({
           aria-pressed={show}
           className="absolute top-1/2 right-2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50"
         >
-          {show ? <span aria-hidden="true" className="text-xs font-medium">Hide</span> : <span aria-hidden="true" className="text-xs font-medium">Show</span>}
+          {show ? (
+            <EyeOffIcon className="size-4" aria-hidden="true" />
+          ) : (
+            <EyeIcon className="size-4" aria-hidden="true" />
+          )}
         </button>
       </div>
       {withMeter && value.length > 0 && (

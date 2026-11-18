@@ -96,7 +96,7 @@ export function ForgotPasswordForm() {
       )}
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         <Field data-invalid={fieldError ? true : undefined}>
-          <FieldLabel htmlFor="forgot-email">Email</FieldLabel>
+          <FieldLabel htmlFor="forgot-email">Email Address</FieldLabel>
           <Input
             id="forgot-email"
             type="email"
@@ -108,10 +108,11 @@ export function ForgotPasswordForm() {
             disabled={pending}
             aria-invalid={fieldError ? true : undefined}
             aria-describedby={fieldError ? "forgot-email-error" : undefined}
+            className="h-12 rounded-xl"
           />
           {fieldError && <FieldError id="forgot-email-error">{fieldError}</FieldError>}
         </Field>
-        <Button type="submit" disabled={pending} aria-busy={pending}>
+        <Button type="submit" disabled={pending} aria-busy={pending} className="h-11 rounded-xl text-[15px]">
           {pending && <Spinner aria-hidden="true" />}
           {pending ? "Sending…" : "Send reset link"}
         </Button>

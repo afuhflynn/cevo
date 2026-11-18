@@ -125,7 +125,7 @@ export function SignInForm({
       )}
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         <Field data-invalid={fieldErrors.email || apiErrorActive ? true : undefined}>
-          <FieldLabel htmlFor="sign-in-email">Email</FieldLabel>
+          <FieldLabel htmlFor="sign-in-email">Email Address</FieldLabel>
           <Input
             id="sign-in-email"
             type="email"
@@ -137,6 +137,7 @@ export function SignInForm({
             disabled={pending}
             aria-invalid={fieldErrors.email || apiErrorActive ? true : undefined}
             aria-describedby={fieldErrors.email ? "sign-in-email-error" : apiErrorActive ? "sign-in-error" : undefined}
+            className="h-12 rounded-xl"
           />
           {fieldErrors.email && <FieldError id="sign-in-email-error">{fieldErrors.email}</FieldError>}
         </Field>
@@ -149,6 +150,7 @@ export function SignInForm({
           disabled={pending}
           placeholder="Your password"
           error={fieldErrors.password ?? null}
+          inputClassName="h-12 rounded-xl"
           labelAction={
             <Link
               href="/forgot-password"
@@ -164,7 +166,7 @@ export function SignInForm({
             {alert.body}
           </span>
         )}
-        <Button type="submit" disabled={pending} aria-busy={pending}>
+        <Button type="submit" disabled={pending} aria-busy={pending} className="h-11 rounded-xl text-[15px]">
           {pending && <Spinner aria-hidden="true" />}
           {pending ? "Signing in…" : "Sign in"}
         </Button>

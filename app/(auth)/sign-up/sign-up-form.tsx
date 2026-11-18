@@ -151,7 +151,7 @@ export function SignUpForm({
             <AlertDescription>{alert.body}</AlertDescription>
           </Alert>
         )}
-        <Button type="button" variant="outline" onClick={resend} disabled={resending || cooldown > 0} aria-busy={resending}>
+        <Button type="button" variant="outline" onClick={resend} disabled={resending || cooldown > 0} aria-busy={resending} className="h-11 rounded-xl text-[15px]">
           {resending && <Spinner aria-hidden="true" />}
           {resending ? "Sending…" : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend verification email"}
         </Button>
@@ -163,7 +163,7 @@ export function SignUpForm({
   return (
     <AuthCard
       title="Create your account"
-      description="One account for your projects, research, and exports."
+      description="Start your academic journey with Cevo"
       footer={
         <AuthFooterLink>
           Already have an account?{" "}
@@ -182,7 +182,7 @@ export function SignUpForm({
       )}
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         <Field data-invalid={fieldErrors.name ? true : undefined}>
-          <FieldLabel htmlFor="sign-up-name">Full name</FieldLabel>
+          <FieldLabel htmlFor="sign-up-name">Full Name</FieldLabel>
           <Input
             id="sign-up-name"
             type="text"
@@ -190,15 +190,16 @@ export function SignUpForm({
             required
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Your name"
+            placeholder="Enter your full name"
             disabled={pending}
             aria-invalid={fieldErrors.name ? true : undefined}
             aria-describedby={fieldErrors.name ? "sign-up-name-error" : undefined}
+            className="h-12 rounded-xl"
           />
           {fieldErrors.name && <FieldError id="sign-up-name-error">{fieldErrors.name}</FieldError>}
         </Field>
         <Field data-invalid={fieldErrors.email ? true : undefined}>
-          <FieldLabel htmlFor="sign-up-email">Email</FieldLabel>
+          <FieldLabel htmlFor="sign-up-email">Email Address</FieldLabel>
           <Input
             id="sign-up-email"
             type="email"
@@ -210,6 +211,7 @@ export function SignUpForm({
             disabled={pending}
             aria-invalid={fieldErrors.email ? true : undefined}
             aria-describedby={fieldErrors.email ? "sign-up-email-error" : undefined}
+            className="h-12 rounded-xl"
           />
           {fieldErrors.email && <FieldError id="sign-up-email-error">{fieldErrors.email}</FieldError>}
         </Field>
@@ -223,10 +225,11 @@ export function SignUpForm({
           withMeter
           withChecklist
           error={fieldErrors.password ?? null}
+          inputClassName="h-12 rounded-xl"
         />
-        <Button type="submit" disabled={pending || !passwordOk} aria-busy={pending} aria-describedby={!passwordOk ? "sign-up-password-hint" : undefined}>
+        <Button type="submit" disabled={pending || !passwordOk} aria-busy={pending} aria-describedby={!passwordOk ? "sign-up-password-hint" : undefined} className="h-11 rounded-xl text-[15px]">
           {pending && <Spinner aria-hidden="true" />}
-          {pending ? "Creating account…" : "Create account"}
+          {pending ? "Creating account…" : "Create Account"}
         </Button>
       </form>
     </AuthCard>
