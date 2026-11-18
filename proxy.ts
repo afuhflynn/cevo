@@ -23,6 +23,16 @@ const PUBLIC_PREFIXES = [
 export async function proxy(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
   const path = url.pathname;
+  // Public static assets (favicons, brand art, page illustrations) need no
+  // session — Next itself serves them openly, and the image optimizer fetches
+  // them internally without credentials.
+  if (
+    /\.(png|jpe?g|svg|webp|avif|gif|ico|css|js|woff2?|ttf|map|txt|xml)$/i.test(
+      path,
+    )
+  ) {
+    return NextResponse.next();
+  }
   if (
     path === "/" ||
     PUBLIC_PREFIXES.some(
