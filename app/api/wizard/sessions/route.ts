@@ -39,8 +39,12 @@ export async function POST(request: Request) {
     const project = await tx.orm.public.Project.create({
       userId: user.id,
       title: parsed.data.title,
+      projectType: parsed.data.projectType ?? "APPLIED_SOFTWARE",
       qualification: qualificationEnum as never,
       programmeName: parsed.data.programme,
+      submissionDeadline: parsed.data.submissionDeadline
+        ? new Date(`${parsed.data.submissionDeadline}T00:00:00`)
+        : undefined,
       status: "DRAFT",
       progressPercent: 0,
       isArchived: false,

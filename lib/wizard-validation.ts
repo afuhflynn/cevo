@@ -19,6 +19,19 @@ export const createSessionSchema = z.object({
   qualification: z.string().trim().max(50).optional(),
   department: z.string().trim().max(120).optional(),
   programme: z.string().trim().max(120).optional(),
+  projectType: z.enum(["RESEARCH_ACADEMIC", "APPLIED_SOFTWARE"]).optional(),
+  submissionDeadline: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
+    .refine(
+      (s) => {
+        const d = new Date(`${s}T00:00:00`);
+        return !Number.isNaN(d.getTime());
+      },
+      { message: "Enter a real calendar date" },
+    )
+    .optional(),
 });
 
 export const turnSchema = z.object({
