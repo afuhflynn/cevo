@@ -45,7 +45,7 @@ export function PublicHeader() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
-            className="inline-flex size-8 items-center justify-center rounded-md border border-border text-foreground"
+            className="inline-flex size-10 items-center justify-center rounded-md border border-border text-foreground"
           >
             <span aria-hidden="true" className="text-lg leading-none">
               {open ? "×" : "☰"}

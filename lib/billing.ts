@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { db } from "./prisma";
+import { db, withDbRetry } from "./prisma";
 
 export const LOW_BALANCE_THRESHOLD = Number.parseInt(
   process.env["LOW_BALANCE_THRESHOLD"] ?? "10",
@@ -113,7 +113,9 @@ export async function getBalance(userId: string): Promise<{
   balance: number;
   lowBalance: boolean;
 }> {
-  const wallet = await db.orm.public.CreditWallet.where({ userId }).first();
+  const wallet = await withDbRetry(() =>
+    db.orm.public.CreditWallet.where({ userId }).first(),
+  );
   const balance = wallet?.balance ?? 0;
   const threshold =
     Number.isFinite(LOW_BALANCE_THRESHOLD) && LOW_BALANCE_THRESHOLD > 0
@@ -123,19 +125,21 @@ export async function getBalance(userId: string): Promise<{
 }
 
 export async function listActivePackages(): Promise<BillingPackage[]> {
-  const rows = await db.orm.public.CreditPackage.select(
-    "id",
-    "name",
-    "priceXaf",
-    "credits",
-    "isPopular",
-    "isActive",
-    "sortOrder",
-  )
-    .where((r) => r.isActive.eq(true))
-    .orderBy((r) => r.sortOrder.asc())
-    .limit(100)
-    .all();
+  const rows = await withDbRetry(() =>
+    db.orm.public.CreditPackage.select(
+      "id",
+      "name",
+      "priceXaf",
+      "credits",
+      "isPopular",
+      "isActive",
+      "sortOrder",
+    )
+      .where((r) => r.isActive.eq(true))
+      .orderBy((r) => r.sortOrder.asc())
+      .limit(100)
+      .all(),
+  );
   return rows as unknown as BillingPackage[];
 }
 

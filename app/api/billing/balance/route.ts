@@ -7,6 +7,13 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
   }
-  const { balance, lowBalance } = await getBalance(user.id);
-  return NextResponse.json({ balance, lowBalance });
+  try {
+    const { balance, lowBalance } = await getBalance(user.id);
+    return NextResponse.json({ balance, lowBalance });
+  } catch {
+    return NextResponse.json(
+      { error: "BILLING_UNAVAILABLE" },
+      { status: 503 },
+    );
+  }
 }

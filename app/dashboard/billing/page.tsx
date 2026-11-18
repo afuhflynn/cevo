@@ -72,10 +72,20 @@ export default async function BillingPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const user = await requireUser();
-  const [packages, { balance, lowBalance }] = await Promise.all([
+  // Neon sleeps on inactivity and the first queries after wake can fail
+  // inside the ORM. Degrade to an empty catalog + notice instead of 500.
+  const [packagesResult, balanceResult] = await Promise.allSettled([
     listActivePackages(),
     getBalance(user.id),
   ]);
+  const packages =
+    packagesResult.status === "fulfilled" ? packagesResult.value : [];
+  const { balance, lowBalance } =
+    balanceResult.status === "fulfilled"
+      ? balanceResult.value
+      : { balance: 0, lowBalance: false };
+  const billingDown =
+    packagesResult.status === "rejected" || balanceResult.status === "rejected";
   const params = searchParams ? await searchParams : undefined;
   const rawPackageId = params?.["packageId"];
   const initialPackageId =
@@ -101,6 +111,16 @@ export default async function BillingPage({
           Balance: {balance} credits
         </p>
       </div>
+
+      {billingDown && (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm"
+        >
+          Billing is temporarily unreachable. Your balance and packages will
+          reappear on refresh — no credits were lost.
+        </p>
+      )}
 
       {lowBalance && (
         <p

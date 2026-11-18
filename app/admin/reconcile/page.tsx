@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { DatePicker } from "@/components/admin/date-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Rec = {
@@ -43,21 +43,44 @@ export default function AdminReconcilePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-serif text-2xl">Daily reconcile (UTC, zero tolerance)</h1>
-      <Input aria-label="Reconcile date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="max-w-48" />
-      {loading ? <div role="status" aria-label="Loading reconcile"><Skeleton className="h-32 w-full" /></div>
-        : error ? <p role="alert" className="text-sm text-destructive">{error}</p>
-        : data ? (
-          <Card><CardHeader><CardTitle>{data.date} {data.alert ? "· mismatch" : "· balanced"}</CardTitle></CardHeader>
-            <CardContent className="text-sm">
-              <p>Confirmed credits: {data.confirmedCredits} · XAF {data.confirmedXaf.toLocaleString("en-US")}</p>
-              <p>Allocated ledger: {data.allocatedSum}</p>
-              <p>Diff: {data.diff} {data.inGrace ? "(in 15 min grace; alert suppressed)" : ""}</p>
-              <p className="mt-2 text-muted-foreground">Payments: {data.paymentIds.join(", ") || "none"}</p>
-              <p className="text-muted-foreground">Ledger refs: {data.ledgerRefs.join(", ") || "none"}</p>
-            </CardContent>
-          </Card>
-        ) : null}
+      <h1 className="font-serif text-2xl">
+        Daily reconcile (UTC, zero tolerance)
+      </h1>
+      <DatePicker label="Reconcile date" value={date} onChange={setDate} />
+      {loading ? (
+        <div role="status" aria-label="Loading reconcile">
+          <Skeleton className="h-32 w-full" />
+        </div>
+      ) : error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : data ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {data.date} {data.alert ? "· mismatch" : "· balanced"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm">
+            <p>
+              Confirmed credits: {data.confirmedCredits} · XAF{" "}
+              {data.confirmedXaf.toLocaleString("en-US")}
+            </p>
+            <p>Allocated ledger: {data.allocatedSum}</p>
+            <p>
+              Diff: {data.diff}{" "}
+              {data.inGrace ? "(in 15 min grace; alert suppressed)" : ""}
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              Payments: {data.paymentIds.join(", ") || "none"}
+            </p>
+            <p className="text-muted-foreground">
+              Ledger refs: {data.ledgerRefs.join(", ") || "none"}
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

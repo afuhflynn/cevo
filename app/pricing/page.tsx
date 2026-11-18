@@ -6,9 +6,8 @@ import { PublicHeader } from "@/components/public/public-header";
 import { getPublicPackages } from "@/lib/public-pricing";
 
 export const metadata: Metadata = {
-  title: "Pricing — Credit packages in XAF",
-  description:
-    "Transparent prepaid credit packages in XAF. Pay with MTN MoMo or Orange Money. Credits allocate exactly once on confirmation.",
+  title: "Simple, flexible pricing",
+  description: "Get credits and unlock the full power of Cevo.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -18,15 +17,13 @@ export default async function PricingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
-        <div className="flex flex-col gap-2 py-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-balance">
-            Credit packages
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center gap-10 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+            Simple, flexible pricing
           </h1>
-          <p className="max-w-2xl text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
-            Prepaid credits power AI briefs, assistant runs, review scans, and
-            exports. Pay in XAF with MTN MoMo or Orange Money. Credits land
-            exactly once when Fapshi confirms your payment.
+          <p className="max-w-xl text-sm leading-relaxed break-words text-muted-foreground sm:text-base">
+            Get credits and unlock the full power of Cevo.
           </p>
         </div>
 
@@ -59,9 +56,9 @@ export default async function PricingPage() {
 
         <section
           aria-label="Payment notes"
-          className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-sm leading-relaxed break-words"
+          className="flex w-full max-w-5xl flex-col gap-3 rounded-2xl border border-border bg-card p-5 text-sm leading-relaxed break-words sm:p-6"
         >
-          <h2 className="font-medium">Before you pay</h2>
+          <h2 className="font-bold">Before you pay</h2>
           <ul className="flex list-disc flex-col gap-1.5 pl-5 text-muted-foreground">
             <li>
               After you tap Buy, approve the prompt on your phone with your MoMo

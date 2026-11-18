@@ -7,6 +7,10 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
   }
-  const packages = await listActivePackages();
-  return NextResponse.json({ packages });
+  try {
+    const packages = await listActivePackages();
+    return NextResponse.json({ packages });
+  } catch {
+    return NextResponse.json({ error: "BILLING_UNAVAILABLE" }, { status: 503 });
+  }
 }

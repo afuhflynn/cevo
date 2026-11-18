@@ -1,24 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
-  GraduationCapIcon,
   SearchIcon,
-  SparklesIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Combobox,
   ComboboxContent,
@@ -45,7 +36,6 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
@@ -99,11 +89,7 @@ type SearchResult = {
 };
 
 const STEPS = ["Personal details", "Academic place", "Preferences"];
-const STEP_DESCRIPTIONS = [
-  "Your name, country, and language",
-  "Your university, faculty, and department",
-  "Your citation style and final confirm",
-];
+const NODES = [...STEPS, "Done"];
 
 type View = "start" | 1 | 2 | 3 | "welcome";
 
@@ -141,14 +127,14 @@ function AcademicPicker({
   parentReady,
   parentHint,
   customParentActive,
+  allowCustom = true,
   selected,
   customText,
   onPick,
   onClear,
-  onSuggest,
+  onCustomText,
   doSearch,
   error,
-  suggestPending,
 }: {
   label: string;
   description: string;
@@ -157,14 +143,14 @@ function AcademicPicker({
   parentReady: boolean;
   parentHint: string;
   customParentActive: boolean;
+  allowCustom?: boolean;
   selected: Item | null;
   customText: string;
   onPick: (item: Item) => void;
   onClear: () => void;
-  onSuggest: (name: string) => void;
+  onCustomText?: (value: string) => void;
   doSearch: (query: string, page: number) => Promise<SearchResult>;
   error?: string;
-  suggestPending: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -174,10 +160,14 @@ function AcademicPicker({
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [suggestName, setSuggestName] = useState("");
+  const [typedMode, setTypedMode] = useState(false);
+  const [draft, setDraft] = useState(customText);
   const requestId = useRef(0);
 
   const searchAllowed = parentReady && !customParentActive;
+  const answered = !!selected || customText.trim().length > 0;
+  const selectedId = selected ? selected.id : null;
+  const showTyped = allowCustom && (customParentActive || typedMode);
 
   async function runQuery(q: string, p: number, append: boolean) {
     if (!searchAllowed) return;
@@ -188,7 +178,11 @@ function AcademicPicker({
       const r = await doSearch(q, p);
       if (requestId.current !== id) return;
       if (r.ok) {
-        setItems((prev) => (append ? [...prev, ...((r.items ?? []) as Item[])] : ((r.items ?? []) as Item[])));
+        setItems((prev) =>
+          append
+            ? [...prev, ...((r.items ?? []) as Item[])]
+            : ((r.items ?? []) as Item[]),
+        );
         setPage(p);
         setHasMore(!!r.hasMore);
         setSearched(true);
@@ -208,146 +202,196 @@ function AcademicPicker({
     }, 200);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, searchAllowed, open ]);
+  }, [query, searchAllowed, open]);
 
   const subtitle = selected ? itemSubtitle(selected) : null;
 
   return (
     <PickerShell label={label} description={description} error={error}>
-      {(selected || customText.trim()) && (
+      {answered ? (
         <div className="flex items-center justify-between gap-3 rounded-lg border bg-card px-3 py-2">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">
               {selected ? selected.name : customText.trim()}
             </p>
             {selected && subtitle ? (
-              <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {subtitle}
+              </p>
             ) : null}
             {!selected && customText.trim() ? (
               <p className="text-xs text-muted-foreground">
-                Suggested name, saved with this step
+                Your name, saved with this step
               </p>
             ) : null}
           </div>
-          <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onClear();
+              onCustomText?.("");
+              setTypedMode(false);
+              setDraft("");
+              setQuery("");
+            }}
+          >
             Change
           </Button>
         </div>
-      )}
+      ) : null}
 
-      {customParentActive ? (
-        <div className="rounded-lg border border-dashed px-3 py-3">
-          <p className="text-sm text-muted-foreground">
-            The level above uses a suggested name, so there is no list to
-            search here. Suggest the name below instead.
-          </p>
-        </div>
-      ) : !searchAllowed ? (
+      {!answered && !searchAllowed && !customParentActive ? (
         <div className="rounded-lg border border-dashed px-3 py-3">
           <p className="text-sm text-muted-foreground">{parentHint}</p>
         </div>
-      ) : (
-        <Combobox
-          value={selected ? selected.id : null}
-          onValueChange={(id: string | null) => {
-            if (!id) return;
-            const found = items.find((i) => i.id === id);
-            if (found) {
-              onPick(found);
-              setOpen(false);
-              setQuery("");
-            }
-          }}
-          inputValue={query}
-          onInputValueChange={(v: string) => setQuery(v)}
-          open={open}
-          onOpenChange={(o: boolean) => setOpen(o)}
-        >
-          <ComboboxInput
-            placeholder={selected ? searchPlaceholder : placeholder}
-            aria-label={label}
-            onFocus={() => {
-              setOpen(true);
-              if (!searched && !loading) void runQuery(query, 1, false);
-            }}
+      ) : null}
+
+      {!answered && showTyped ? (
+        <div className="flex flex-col gap-2">
+          <Input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={`Type the exact ${label.toLowerCase()} name`}
+            aria-label={`Type the ${label.toLowerCase()} name`}
+            maxLength={120}
+            className="h-12 rounded-xl"
           />
-          <ComboboxContent>
-            {loading ? (
-              <div className="flex flex-col gap-2 p-2" aria-live="polite">
-                <Skeleton className="h-9 w-full" />
-                <Skeleton className="h-9 w-full" />
-                <Skeleton className="h-9 w-full" />
-              </div>
-            ) : (
-              <ComboboxList>
-                {items.map((item) => (
-                  <ComboboxItem key={item.id} value={item.id}>
-                    <span className="flex min-w-0 flex-col">
-                      <span className="truncate">{item.name}</span>
-                      {itemSubtitle(item) ? (
-                        <span className="truncate text-xs text-muted-foreground">
-                          {itemSubtitle(item)}
-                        </span>
-                      ) : null}
-                    </span>
-                  </ComboboxItem>
-                ))}
-                <ComboboxEmpty>
-                  <Empty>
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <SearchIcon aria-hidden="true" />
-                      </EmptyMedia>
-                      <EmptyTitle>No matches found</EmptyTitle>
-                      <EmptyDescription>
-                        Nothing matches this search. Suggest the name below
-                        to continue without waiting.
-                      </EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
-                </ComboboxEmpty>
-              </ComboboxList>
-            )}
-            {!loading && hasMore ? (
-              <div className="border-t p-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">
+              {draft.trim().length < 2
+                ? "Type at least 2 characters, then confirm."
+                : "Look right? Confirm it to continue."}
+            </p>
+            <div className="flex shrink-0 items-center gap-1">
+              {searchAllowed ? (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="w-full"
-                  disabled={loadingMore}
-                  onClick={() => void runQuery(query, page + 1, true)}
+                  onClick={() => {
+                    setTypedMode(false);
+                    setDraft(customText);
+                  }}
                 >
-                  {loadingMore && <Spinner aria-hidden="true" />}
-                  {loadingMore ? "Loading more" : "Show more results"}
+                  Search the list instead
                 </Button>
-              </div>
-            ) : null}
-          </ComboboxContent>
-        </Combobox>
-      )}
+              ) : null}
+              <Button
+                type="button"
+                size="sm"
+                disabled={draft.trim().length < 2}
+                onClick={() => {
+                  onCustomText?.(draft.trim());
+                }}
+              >
+                Use this name
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="Suggest a missing name"
-          value={suggestName}
-          onChange={(e) => setSuggestName(e.target.value)}
-          aria-label={`Suggest a missing ${label.toLowerCase()}`}
-          maxLength={120}
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={suggestPending || suggestName.trim().length < 2}
-          onClick={() => {
-            onSuggest(suggestName.trim());
-            setSuggestName("");
-          }}
-        >
-          {suggestPending && <Spinner aria-hidden="true" />}
-          Suggest
-        </Button>
-      </div>
+      {!answered && customParentActive && !allowCustom ? (
+        <div className="rounded-lg border border-dashed px-3 py-3">
+          <p className="text-sm text-muted-foreground">{parentHint}</p>
+        </div>
+      ) : null}
+
+      {!answered && searchAllowed && !showTyped ? (
+        <>
+          <Combobox
+            value={selectedId}
+            onValueChange={(id: string | null) => {
+              if (!id) return;
+              const found = items.find((i) => i.id === id);
+              if (found) {
+                onPick(found);
+                setOpen(false);
+                setQuery("");
+              }
+            }}
+            inputValue={query}
+            onInputValueChange={(v: string) => setQuery(v)}
+            open={open}
+            onOpenChange={(o: boolean) => setOpen(o)}
+          >
+            <ComboboxInput
+              placeholder={selected ? searchPlaceholder : placeholder}
+              aria-label={label}
+              onFocus={() => {
+                setOpen(true);
+                if (!searched && !loading) void runQuery(query, 1, false);
+              }}
+            />
+            <ComboboxContent>
+              {loading ? (
+                <div className="flex flex-col gap-2 p-2" aria-live="polite">
+                  <Skeleton className="h-9 w-full" />
+                  <Skeleton className="h-9 w-full" />
+                  <Skeleton className="h-9 w-full" />
+                </div>
+              ) : (
+                <ComboboxList>
+                  {items.map((item) => (
+                    <ComboboxItem key={item.id} value={item.id}>
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate">{item.name}</span>
+                        {itemSubtitle(item) ? (
+                          <span className="truncate text-xs text-muted-foreground">
+                            {itemSubtitle(item)}
+                          </span>
+                        ) : null}
+                      </span>
+                    </ComboboxItem>
+                  ))}
+                  <ComboboxEmpty>
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <SearchIcon aria-hidden="true" />
+                        </EmptyMedia>
+                        <EmptyTitle>No matches found</EmptyTitle>
+                        <EmptyDescription>
+                          Nothing matches this search. Suggest the name below to
+                          continue without waiting.
+                        </EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </ComboboxEmpty>
+                </ComboboxList>
+              )}
+              {!loading && hasMore ? (
+                <div className="border-t p-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full"
+                    disabled={loadingMore}
+                    onClick={() => void runQuery(query, page + 1, true)}
+                  >
+                    {loadingMore && <Spinner aria-hidden="true" />}
+                    {loadingMore ? "Loading more" : "Show more results"}
+                  </Button>
+                </div>
+              ) : null}
+            </ComboboxContent>
+          </Combobox>
+          {allowCustom ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="self-start px-1 text-muted-foreground"
+              onClick={() => setTypedMode(true)}
+            >
+              Can&apos;t find it? Type the name instead
+            </Button>
+          ) : null}
+        </>
+      ) : null}
     </PickerShell>
   );
 }
@@ -369,9 +413,7 @@ export function OnboardingWizard({
     !!initialAcademic?.customInstitution?.trim();
   const [view, setView] = useState<View>(hasProgress ? initialStep : "start");
   const [pending, setPending] = useState(false);
-  const [suggestPending, setSuggestPending] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [notice, setNotice] = useState<string | null>(null);
   const [savedSteps, setSavedSteps] = useState<number[]>([]);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
@@ -427,7 +469,6 @@ export function OnboardingWizard({
     e.preventDefault();
     setPending(true);
     setErrors({});
-    setNotice(null);
     const r = await savePersonalStep({
       firstName,
       lastName,
@@ -436,7 +477,10 @@ export function OnboardingWizard({
     });
     setPending(false);
     if (!r.ok) {
-      fail("Could not save. Check the highlighted fields and try again.", r.fieldErrors);
+      fail(
+        "Could not save. Check the highlighted fields and try again.",
+        r.fieldErrors,
+      );
       return;
     }
     markSaved(1);
@@ -452,7 +496,24 @@ export function OnboardingWizard({
     e.preventDefault();
     setPending(true);
     setErrors({});
-    setNotice(null);
+    // Best-effort audit trail for typed-in names so admins learn which
+    // schools to add. Never blocks the save.
+    const customAudit: Promise<unknown>[] = [];
+    if (customInstitution.trim())
+      customAudit.push(
+        suggestInstitution({ name: customInstitution.trim() }).catch(
+          () => null,
+        ),
+      );
+    if (customFaculty.trim())
+      customAudit.push(
+        suggestFaculty({ name: customFaculty.trim() }).catch(() => null),
+      );
+    if (customDepartment.trim())
+      customAudit.push(
+        suggestDepartment({ name: customDepartment.trim() }).catch(() => null),
+      );
+    await Promise.allSettled(customAudit);
     const r = await saveAcademicStep({
       institutionId: institutionId || undefined,
       customInstitution: customInstitution || undefined,
@@ -487,7 +548,6 @@ export function OnboardingWizard({
     e.preventDefault();
     setPending(true);
     setErrors({});
-    setNotice(null);
     const pref = await savePreferencesStep({
       preferredStyle: style,
       preferredLanguage: language,
@@ -501,10 +561,7 @@ export function OnboardingWizard({
     const done = await completeOnboarding();
     setPending(false);
     if (!done.ok) {
-      fail(
-        "Complete the earlier steps first.",
-        done.fieldErrors,
-      );
+      fail("Complete the earlier steps first.", done.fieldErrors);
       if (done.error === "422") setView(2);
       return;
     }
@@ -513,115 +570,17 @@ export function OnboardingWizard({
     router.refresh();
   }
 
-  function suggestValue(
-    kind: "institution" | "faculty" | "department",
-    name: string,
-  ) {
-    const clean = name.trim();
-    if (clean.length < 2 || clean.length > 120) {
-      fail("Suggested names need 2 to 120 characters.", {
-        form: "Suggested names need 2 to 120 characters.",
-      });
-      return;
-    }
-    setSuggestPending(true);
-    const done = (saved: string) => {
-      setSuggestPending(false);
-      setNotice(`Saved suggestion ${saved}. It is kept when you save this step.`);
-      toast.success("Suggestion saved", {
-        description: `${saved} is kept when you save this step.`,
-        timeout: 4000,
-      });
-    };
-    if (kind === "institution") {
-      if (
-        customInstitution.trim().toLowerCase() === clean.toLowerCase() &&
-        customInstitution.trim()
-      ) {
-        setSuggestPending(false);
-        return;
-      }
-      const call = async () => {
-        const r = await suggestInstitution({ name: clean });
-        if (r.ok && r.name) {
-          setCustomInstitution(r.name);
-          setInstitutionId("");
-          setInstitution(null);
-          setFacultyId("");
-          setFaculty(null);
-          setDepartmentId("");
-          setDepartment(null);
-          setProgrammeId("");
-          setProgramme(null);
-          done(r.name);
-        } else {
-          setSuggestPending(false);
-          fail("Could not save that suggestion. Try again.", r.fieldErrors);
-        }
-      };
-      void call();
-    }
-    if (kind === "faculty") {
-      if (
-        customFaculty.trim().toLowerCase() === clean.toLowerCase() &&
-        customFaculty.trim()
-      ) {
-        setSuggestPending(false);
-        return;
-      }
-      const call = async () => {
-        const r = await suggestFaculty({ name: clean });
-        if (r.ok && r.name) {
-          setCustomFaculty(r.name);
-          setFacultyId("");
-          setFaculty(null);
-          setDepartmentId("");
-          setDepartment(null);
-          setProgrammeId("");
-          setProgramme(null);
-          done(r.name);
-        } else {
-          setSuggestPending(false);
-          fail("Could not save that suggestion. Try again.", r.fieldErrors);
-        }
-      };
-      void call();
-    }
-    if (kind === "department") {
-      if (
-        customDepartment.trim().toLowerCase() === clean.toLowerCase() &&
-        customDepartment.trim()
-      ) {
-        setSuggestPending(false);
-        return;
-      }
-      const call = async () => {
-        const r = await suggestDepartment({ name: clean });
-        if (r.ok && r.name) {
-          setCustomDepartment(r.name);
-          setDepartmentId("");
-          setDepartment(null);
-          setProgrammeId("");
-          setProgramme(null);
-          done(r.name);
-        } else {
-          setSuggestPending(false);
-          fail("Could not save that suggestion. Try again.", r.fieldErrors);
-        }
-      };
-      void call();
-    }
-  }
-
-  const stepNumber = view === "start" ? 0 : view === "welcome" ? 4 : view;
-  const progressValue =
-    view === "start" ? 5 : view === 1 ? 33 : view === 2 ? 66 : 100;
+  const activeIndex =
+    view === "start" ? 0 : view === "welcome" ? NODES.length : view - 1;
+  const uniDone = !!institution || customInstitution.trim().length > 0;
+  const facDone = !!faculty || customFaculty.trim().length > 0;
+  const depDone = !!department || customDepartment.trim().length > 0;
 
   const stepTitle =
     view === "start"
       ? "Welcome to Cevo"
       : view === 1
-        ? "Tell us who you are"
+        ? "Tell us about yourself"
         : view === 2
           ? "Where do you study?"
           : view === 3
@@ -632,570 +591,575 @@ export function OnboardingWizard({
     view === "start"
       ? "Three short steps stand between you and your workspace. Your answers shape your templates, and finishing adds 50 welcome credits once."
       : view === 1
-        ? "Step 1 of 3. This is the personalization that shapes everything after it."
+        ? "Help us personalize your experience"
         : view === 2
-          ? "Step 2 of 3. Pick from the lists or suggest a missing name to keep moving."
+          ? "Pick from the lists or suggest a missing name to keep moving."
           : view === 3
-            ? "Step 3 of 3. Confirm your citation style, then claim your credits."
+            ? "Confirm your citation style, then claim your credits."
             : "Onboarding is complete. Your workspace is ready.";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
-      <aside className="flex flex-col gap-5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <GraduationCapIcon className="size-5" aria-hidden="true" />
-          </span>
-          <div>
-            <p className="font-serif text-lg leading-none font-semibold">Cevo</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Academic project workspace
-            </p>
-          </div>
-        </div>
-
-        <nav aria-label="Onboarding progress">
-          <ol className="flex flex-col gap-1">
-            {STEPS.map((name, i) => {
-              const n = i + 1;
-              const active = stepNumber === n;
-              const done = savedSteps.includes(n) || stepNumber > n;
-              return (
-                <li
-                  key={name}
-                  aria-current={active ? "step" : undefined}
-                  className={`flex items-start gap-3 rounded-lg border px-3 py-2.5 ${
-                    active
-                      ? "border-primary/40 bg-accent"
-                      : "border-transparent"
+    <div className="flex w-full flex-col gap-8">
+      <nav aria-label="Onboarding progress" className="mx-auto w-full max-w-md">
+        <ol className="flex items-center">
+          {NODES.map((name, i) => {
+            const done = savedSteps.includes(i + 1) || activeIndex > i;
+            const active = activeIndex === i;
+            return (
+              <li
+                key={name}
+                aria-current={active ? "step" : undefined}
+                className={`flex items-center ${i < NODES.length - 1 ? "flex-1" : ""}`}
+              >
+                <span
+                  aria-hidden="true"
+                  key={done || active ? "on" : "off"}
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                    done || active
+                      ? "ob-pop bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
+                  {done ? <CheckIcon className="size-4" /> : i + 1}
+                </span>
+                {i < NODES.length - 1 ? (
                   <span
-                    className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-                      done
-                        ? "bg-primary text-primary-foreground"
-                        : active
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted text-muted-foreground"
-                    }`}
+                    aria-hidden="true"
+                    className="mx-1.5 h-0.5 flex-1 overflow-hidden rounded-full bg-muted"
+                  >
+                    <span
+                      className="block h-full rounded-full bg-primary transition-all duration-500 ease-out"
+                      style={{ width: activeIndex > i ? "100%" : "0%" }}
+                    />
+                  </span>
+                ) : null}
+                <span className="sr-only">{name}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+          {stepTitle}
+        </h1>
+        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {stepCopy}
+        </p>
+      </div>
+
+      <div key={view} className="ob-step-in">
+        {errors["form"] && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Check this step</AlertTitle>
+            <AlertDescription>{errors["form"]}</AlertDescription>
+            <div className="mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setErrors({})}
+              >
+                Try again
+              </Button>
+            </div>
+          </Alert>
+        )}
+
+        {view === "start" && (
+          <div className="flex flex-col gap-5">
+            <ul className="flex flex-col gap-3">
+              {[
+                {
+                  title: "Personal details first",
+                  body: "Your name, country, and language. One minute, and it personalizes every template after it.",
+                },
+                {
+                  title: "Your academic place next",
+                  body: "Searchable lists for university, faculty, and department. Missing yours? Suggest it inline and keep going.",
+                },
+                {
+                  title: "Preferences close it out",
+                  body: "Citation style plus confirm. Credits land once, then your dashboard opens.",
+                },
+              ].map((row) => (
+                <li
+                  key={row.title}
+                  className="flex items-start gap-3 rounded-lg border px-3 py-2.5"
+                >
+                  <span
+                    className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"
                     aria-hidden="true"
                   >
-                    {done ? <CheckIcon className="size-3.5" /> : n}
+                    <CheckIcon className="size-3.5" />
                   </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium">{name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {done && !active
-                        ? "Saved"
-                        : active
-                          ? STEP_DESCRIPTIONS[i]
-                          : STEP_DESCRIPTIONS[i]}
+                  <span>
+                    <span className="block text-sm font-medium">
+                      {row.title}
+                    </span>
+                    <span className="block text-sm text-muted-foreground">
+                      {row.body}
                     </span>
                   </span>
                 </li>
-              );
-            })}
-          </ol>
-        </nav>
-
-        <div className="rounded-xl border bg-card p-4">
-          <p className="flex items-center gap-2 text-sm font-medium">
-            <SparklesIcon className="size-4 text-primary" aria-hidden="true" />
-            50 welcome credits
-          </p>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Granted once when you finish all three steps. They fund your first
-            research and drafting runs.
-          </p>
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Progress saves as you complete each step. Leave any time and resume
-          where you stopped.
-        </p>
-      </aside>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif text-2xl">{stepTitle}</CardTitle>
-          <CardDescription>{stepCopy}</CardDescription>
-          <Progress
-            value={progressValue}
-            aria-label={
-              view === "welcome"
-                ? "Onboarding complete"
-                : view === "start"
-                  ? "Onboarding not started"
-                  : `Step ${stepNumber} of 3`
-            }
-          />
-        </CardHeader>
-        <CardContent>
-          {errors["form"] && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertTitle>Check this step</AlertTitle>
-              <AlertDescription>{errors["form"]}</AlertDescription>
-              <div className="mt-2">
+              ))}
+            </ul>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button
+                type="button"
+                className="h-11 flex-1 rounded-xl text-[15px]"
+                onClick={() => setView(initialStep)}
+              >
+                {hasProgress ? "Resume where I stopped" : "Start onboarding"}
+                <ArrowRightIcon aria-hidden="true" />
+              </Button>
+              {hasProgress && initialStep !== 1 && (
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
-                  onClick={() => setErrors({})}
+                  onClick={() => setView(1)}
+                  className="h-11 rounded-xl text-[15px]"
                 >
-                  Try again
+                  Review from the start
                 </Button>
-              </div>
-            </Alert>
-          )}
-          {notice && (
-            <Alert className="mb-4">
-              <AlertDescription>{notice}</AlertDescription>
-            </Alert>
-          )}
-
-          {view === "start" && (
-            <div className="flex flex-col gap-5">
-              <ul className="flex flex-col gap-3">
-                {[
-                  {
-                    title: "Personal details first",
-                    body: "Your name, country, and language. One minute, and it personalizes every template after it.",
-                  },
-                  {
-                    title: "Your academic place next",
-                    body: "Searchable lists for university, faculty, and department. Missing yours? Suggest it inline and keep going.",
-                  },
-                  {
-                    title: "Preferences close it out",
-                    body: "Citation style plus confirm. Credits land once, then your dashboard opens.",
-                  },
-                ].map((row) => (
-                  <li
-                    key={row.title}
-                    className="flex items-start gap-3 rounded-lg border px-3 py-2.5"
-                  >
-                    <span
-                      className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"
-                      aria-hidden="true"
-                    >
-                      <CheckIcon className="size-3.5" />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-medium">
-                        {row.title}
-                      </span>
-                      <span className="block text-sm text-muted-foreground">
-                        {row.body}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  className="flex-1"
-                  onClick={() => setView(initialStep)}
-                >
-                  {hasProgress ? "Resume where I stopped" : "Start onboarding"}
-                  <ArrowRightIcon aria-hidden="true" />
-                </Button>
-                {hasProgress && initialStep !== 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setView(1)}
-                  >
-                    Review from the start
-                  </Button>
-                )}
-              </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {view === 1 && (
-            <form onSubmit={submitPersonal} className="flex flex-col gap-4">
+        {view === 1 && (
+          <form onSubmit={submitPersonal} className="flex flex-col gap-4">
+            <h2 className="text-lg font-bold">Personal Information</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={errors["firstName"] ? true : undefined}>
-                <FieldLabel htmlFor="firstName">First name</FieldLabel>
+                <FieldLabel htmlFor="firstName">First Name</FieldLabel>
                 <Input
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   autoComplete="given-name"
                   aria-invalid={errors["firstName"] ? true : undefined}
+                  className="h-12 rounded-xl"
                 />
                 {errors["firstName"] && (
                   <FieldError>{errors["firstName"]}</FieldError>
                 )}
               </Field>
               <Field data-invalid={errors["lastName"] ? true : undefined}>
-                <FieldLabel htmlFor="lastName">Last name</FieldLabel>
+                <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
                 <Input
                   id="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   autoComplete="family-name"
                   aria-invalid={errors["lastName"] ? true : undefined}
+                  className="h-12 rounded-xl"
                 />
                 {errors["lastName"] && (
                   <FieldError>{errors["lastName"]}</FieldError>
                 )}
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={errors["country"] ? true : undefined}>
-                  <FieldLabel htmlFor="country">Country</FieldLabel>
-                  <Input
-                    id="country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    autoComplete="country-name"
-                    aria-invalid={errors["country"] ? true : undefined}
-                  />
-                  {errors["country"] && (
-                    <FieldError>{errors["country"]}</FieldError>
-                  )}
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="language">Preferred language</FieldLabel>
-                  <FieldDescription>
-                    Used for guidance text and templates.
-                  </FieldDescription>
-                  <NativeSelect
-                    id="language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <NativeSelectOption value="en">English</NativeSelectOption>
-                    <NativeSelectOption value="fr">French</NativeSelectOption>
-                  </NativeSelect>
-                </Field>
-              </div>
-              <Button type="submit" disabled={pending} aria-busy={pending}>
-                {pending && <Spinner aria-hidden="true" />}
-                Save and continue
-              </Button>
-            </form>
-          )}
-
-          {view === 2 && (
-            <form onSubmit={submitAcademic} className="flex flex-col gap-5">
-              <AcademicPicker
-                label="University"
-                description="Search the list, or suggest a missing school to continue."
-                placeholder="Search universities, for example Buea"
-                searchPlaceholder="Search again to change university"
-                parentReady
-                parentHint=""
-                customParentActive={false}
-                selected={institution}
-                customText={customInstitution}
-                error={errors["institutionId"] ?? errors["customInstitution"]}
-                suggestPending={suggestPending}
-                doSearch={(query, page) =>
-                  searchInstitutions({ query, page }) as Promise<SearchResult>
-                }
-                onPick={(item) => {
-                  setInstitution(item);
-                  setInstitutionId(item.id);
-                  setCustomInstitution("");
-                  setFaculty(null);
-                  setFacultyId("");
-                  setCustomFaculty("");
-                  setDepartment(null);
-                  setDepartmentId("");
-                  setCustomDepartment("");
-                  setProgramme(null);
-                  setProgrammeId("");
-                }}
-                onClear={() => {
-                  setInstitution(null);
-                  setInstitutionId("");
-                }}
-                onSuggest={(name) => suggestValue("institution", name)}
-              />
-              {customInstitution.trim() && (
-                <Field>
-                  <FieldLabel htmlFor="customInstitution">
-                    Suggested university
-                  </FieldLabel>
-                  <FieldDescription>
-                    Edit it here any time before you save this step.
-                  </FieldDescription>
-                  <Input
-                    id="customInstitution"
-                    value={customInstitution}
-                    onChange={(e) => setCustomInstitution(e.target.value)}
-                    maxLength={120}
-                  />
-                </Field>
-              )}
-
-              <AcademicPicker
-                label="Faculty"
-                description="Filtered by your university."
-                placeholder="Search faculties"
-                searchPlaceholder="Search again to change faculty"
-                parentReady={!!institutionId}
-                parentHint="Pick a university first, then search faculties here."
-                customParentActive={!institutionId && !!customInstitution.trim()}
-                selected={faculty}
-                customText={customFaculty}
-                error={errors["facultyId"] ?? errors["customFaculty"]}
-                suggestPending={suggestPending}
-                doSearch={(query, page) =>
-                  searchFaculties({ institutionId, query, page }) as Promise<SearchResult>
-                }
-                onPick={(item) => {
-                  setFaculty(item);
-                  setFacultyId(item.id);
-                  setCustomFaculty("");
-                  setDepartment(null);
-                  setDepartmentId("");
-                  setCustomDepartment("");
-                  setProgramme(null);
-                  setProgrammeId("");
-                }}
-                onClear={() => {
-                  setFaculty(null);
-                  setFacultyId("");
-                }}
-                onSuggest={(name) => suggestValue("faculty", name)}
-              />
-              {customFaculty.trim() && (
-                <Field>
-                  <FieldLabel htmlFor="customFaculty">
-                    Suggested faculty
-                  </FieldLabel>
-                  <Input
-                    id="customFaculty"
-                    value={customFaculty}
-                    onChange={(e) => setCustomFaculty(e.target.value)}
-                    maxLength={120}
-                  />
-                </Field>
-              )}
-
-              <AcademicPicker
-                label="Department"
-                description="Filtered by your faculty."
-                placeholder="Search departments"
-                searchPlaceholder="Search again to change department"
-                parentReady={!!facultyId}
-                parentHint="Pick a faculty first, then search departments here."
-                customParentActive={!facultyId && !!customFaculty.trim()}
-                selected={department}
-                customText={customDepartment}
-                error={errors["departmentId"] ?? errors["customDepartment"]}
-                suggestPending={suggestPending}
-                doSearch={(query, page) =>
-                  searchDepartments({ facultyId, query, page }) as Promise<SearchResult>
-                }
-                onPick={(item) => {
-                  setDepartment(item);
-                  setDepartmentId(item.id);
-                  setCustomDepartment("");
-                  setProgramme(null);
-                  setProgrammeId("");
-                }}
-                onClear={() => {
-                  setDepartment(null);
-                  setDepartmentId("");
-                }}
-                onSuggest={(name) => suggestValue("department", name)}
-              />
-              {customDepartment.trim() && (
-                <Field>
-                  <FieldLabel htmlFor="customDepartment">
-                    Suggested department
-                  </FieldLabel>
-                  <Input
-                    id="customDepartment"
-                    value={customDepartment}
-                    onChange={(e) => setCustomDepartment(e.target.value)}
-                    maxLength={120}
-                  />
-                </Field>
-              )}
-
-              <AcademicPicker
-                label="Programme (optional)"
-                description="Filtered by your department. Skip it if nothing fits."
-                placeholder="Search programmes"
-                searchPlaceholder="Search again to change programme"
-                parentReady={!!departmentId}
-                parentHint="Pick a department first, then optionally search programmes."
-                customParentActive={!departmentId && !!customDepartment.trim()}
-                selected={programme}
-                customText=""
-                error={errors["programmeId"]}
-                suggestPending={suggestPending}
-                doSearch={(query, page) =>
-                  searchProgrammes({ departmentId, query, page }) as Promise<SearchResult>
-                }
-                onPick={(item) => {
-                  setProgramme(item);
-                  setProgrammeId(item.id);
-                }}
-                onClear={() => {
-                  setProgramme(null);
-                  setProgrammeId("");
-                }}
-                onSuggest={() => undefined}
-              />
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field>
-                  <FieldLabel htmlFor="qualification">Qualification</FieldLabel>
-                  <NativeSelect
-                    id="qualification"
-                    value={qualification}
-                    onChange={(e) => setQualification(e.target.value)}
-                  >
-                    <NativeSelectOption value="HND">HND</NativeSelectOption>
-                    <NativeSelectOption value="BACHELORS">
-                      Bachelors
-                    </NativeSelectOption>
-                    <NativeSelectOption value="MASTERS">
-                      Masters
-                    </NativeSelectOption>
-                    <NativeSelectOption value="PHD">PhD</NativeSelectOption>
-                    <NativeSelectOption value="OTHER">Other</NativeSelectOption>
-                  </NativeSelect>
-                </Field>
-                <Field
-                  data-invalid={errors["academicSession"] ? true : undefined}
-                >
-                  <FieldLabel htmlFor="session">Academic session</FieldLabel>
-                  <FieldDescription>
-                    Format YYYY/YYYY, for example 2024/2025. Years 2000 to
-                    2030.
-                  </FieldDescription>
-                  <Input
-                    id="session"
-                    value={session}
-                    onChange={(e) => setSession(e.target.value)}
-                    placeholder="2024/2025"
-                    inputMode="numeric"
-                    aria-invalid={errors["academicSession"] ? true : undefined}
-                  />
-                  {errors["academicSession"] && (
-                    <FieldError>{errors["academicSession"]}</FieldError>
-                  )}
-                </Field>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setView(1)}
-                >
-                  <ArrowLeftIcon aria-hidden="true" />
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={pending}
-                  aria-busy={pending}
-                  className="flex-1"
-                >
-                  {pending && <Spinner aria-hidden="true" />}
-                  Save and continue
-                </Button>
-              </div>
-            </form>
-          )}
-
-          {view === 3 && (
-            <form onSubmit={submitPreferences} className="flex flex-col gap-4">
-              <Field>
-                <FieldLabel htmlFor="style">Citation style</FieldLabel>
-                <FieldDescription>
-                  Your department template follows this style by default.
-                </FieldDescription>
-                <NativeSelect
-                  id="style"
-                  value={style}
-                  onChange={(e) => setStyle(e.target.value)}
-                >
-                  <NativeSelectOption value="APA_7">APA 7</NativeSelectOption>
-                  <NativeSelectOption value="Harvard">Harvard</NativeSelectOption>
-                  <NativeSelectOption value="MLA">MLA</NativeSelectOption>
-                </NativeSelect>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="prefLang">Preferred language</FieldLabel>
-                <FieldDescription>
-                  Winning choice if it differs from step 1. Going back keeps
-                  this value in sync.
-                </FieldDescription>
-                <NativeSelect
-                  id="prefLang"
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  <NativeSelectOption value="en">English</NativeSelectOption>
-                  <NativeSelectOption value="fr">French</NativeSelectOption>
-                </NativeSelect>
-              </Field>
-              <Alert>
-                <AlertDescription>
-                  Completing this step grants 50 welcome credits once and takes
-                  you to your dashboard. Returning here later shows your
-                  current state with no extra grant.
-                </AlertDescription>
-              </Alert>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setView(2)}
-                >
-                  <ArrowLeftIcon aria-hidden="true" />
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={pending}
-                  aria-busy={pending}
-                  className="flex-1"
-                >
-                  {pending && <Spinner aria-hidden="true" />}
-                  Complete setup
-                </Button>
-              </div>
-            </form>
-          )}
-
-          {view === "welcome" && (
-            <div className="flex flex-col items-center gap-4 py-4 text-center">
-              <span
-                className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                aria-hidden="true"
+            </div>
+            <Field>
+              <FieldLabel htmlFor="language">Preferred Language</FieldLabel>
+              <NativeSelect
+                id="language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="h-12 rounded-xl"
               >
-                <CheckIcon className="size-6" />
-              </span>
-              <div>
-                <p className="font-serif text-xl font-semibold">
-                  {walletBalance ?? 50} welcome credits are yours
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Your profile, academic place, and preferences are saved.
-                  Your dashboard is ready when you are.
-                </p>
+                <NativeSelectOption value="en">English</NativeSelectOption>
+                <NativeSelectOption value="fr">French</NativeSelectOption>
+              </NativeSelect>
+            </Field>
+            <Field data-invalid={errors["country"] ? true : undefined}>
+              <FieldLabel htmlFor="country">Country</FieldLabel>
+              <Input
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                autoComplete="country-name"
+                aria-invalid={errors["country"] ? true : undefined}
+                className="h-12 rounded-xl"
+              />
+              {errors["country"] && (
+                <FieldError>{errors["country"]}</FieldError>
+              )}
+            </Field>
+            <Button
+              type="submit"
+              disabled={pending}
+              aria-busy={pending}
+              className="group h-12 rounded-xl text-[15px]"
+            >
+              {pending && <Spinner aria-hidden="true" />}
+              Continue
+              {!pending && (
+                <ArrowRightIcon
+                  aria-hidden="true"
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              )}
+            </Button>
+          </form>
+        )}
+
+        {view === 2 && (
+          <form onSubmit={submitAcademic} className="flex flex-col gap-5">
+            <AcademicPicker
+              label="University"
+              description="Search the list, or type a missing school to continue."
+              placeholder="Search universities, for example Buea"
+              searchPlaceholder="Search again to change university"
+              parentReady
+              parentHint=""
+              customParentActive={false}
+              selected={institution}
+              customText={customInstitution}
+              onCustomText={setCustomInstitution}
+              error={errors["institutionId"] ?? errors["customInstitution"]}
+              doSearch={(query, page) =>
+                searchInstitutions({ query, page }) as Promise<SearchResult>
+              }
+              onPick={(item) => {
+                setInstitution(item);
+                setInstitutionId(item.id);
+                setCustomInstitution("");
+                setFaculty(null);
+                setFacultyId("");
+                setCustomFaculty("");
+                setDepartment(null);
+                setDepartmentId("");
+                setCustomDepartment("");
+                setProgramme(null);
+                setProgrammeId("");
+              }}
+              onClear={() => {
+                setInstitution(null);
+                setInstitutionId("");
+                setCustomInstitution("");
+              }}
+            />
+
+            {uniDone ? (
+              <div className="ob-rise flex flex-col gap-5">
+                <AcademicPicker
+                  label="Faculty"
+                  description="Filtered by your university."
+                  placeholder="Search faculties"
+                  searchPlaceholder="Search again to change faculty"
+                  parentReady={!!institutionId}
+                  parentHint="Pick a university first, then search faculties here."
+                  customParentActive={
+                    !institutionId && !!customInstitution.trim()
+                  }
+                  selected={faculty}
+                  customText={customFaculty}
+                  onCustomText={setCustomFaculty}
+                  error={errors["facultyId"] ?? errors["customFaculty"]}
+                  doSearch={(query, page) =>
+                    searchFaculties({
+                      institutionId,
+                      query,
+                      page,
+                    }) as Promise<SearchResult>
+                  }
+                  onPick={(item) => {
+                    setFaculty(item);
+                    setFacultyId(item.id);
+                    setCustomFaculty("");
+                    setDepartment(null);
+                    setDepartmentId("");
+                    setCustomDepartment("");
+                    setProgramme(null);
+                    setProgrammeId("");
+                  }}
+                  onClear={() => {
+                    setFaculty(null);
+                    setFacultyId("");
+                    setCustomFaculty("");
+                  }}
+                />
               </div>
+            ) : null}
+
+            {facDone ? (
+              <div className="ob-rise flex flex-col gap-5">
+                <AcademicPicker
+                  label="Department"
+                  description="Filtered by your faculty."
+                  placeholder="Search departments"
+                  searchPlaceholder="Search again to change department"
+                  parentReady={!!facultyId}
+                  parentHint="Pick a faculty first, then search departments here."
+                  customParentActive={!facultyId && !!customFaculty.trim()}
+                  selected={department}
+                  customText={customDepartment}
+                  onCustomText={setCustomDepartment}
+                  error={errors["departmentId"] ?? errors["customDepartment"]}
+                  doSearch={(query, page) =>
+                    searchDepartments({
+                      facultyId,
+                      query,
+                      page,
+                    }) as Promise<SearchResult>
+                  }
+                  onPick={(item) => {
+                    setDepartment(item);
+                    setDepartmentId(item.id);
+                    setCustomDepartment("");
+                    setProgramme(null);
+                    setProgrammeId("");
+                  }}
+                  onClear={() => {
+                    setDepartment(null);
+                    setDepartmentId("");
+                    setCustomDepartment("");
+                  }}
+                />
+              </div>
+            ) : null}
+
+            {depDone ? (
+              <div className="ob-rise flex flex-col gap-5">
+                <AcademicPicker
+                  label="Programme (optional)"
+                  description="Filtered by your department. Skip it if nothing fits."
+                  placeholder="Search programmes"
+                  searchPlaceholder="Search again to change programme"
+                  parentReady={!!departmentId}
+                  parentHint="Pick a department first, then optionally search programmes."
+                  customParentActive={
+                    !departmentId && !!customDepartment.trim()
+                  }
+                  selected={programme}
+                  customText=""
+                  onCustomText={() => undefined}
+                  allowCustom={false}
+                  error={errors["programmeId"]}
+                  doSearch={(query, page) =>
+                    searchProgrammes({
+                      departmentId,
+                      query,
+                      page,
+                    }) as Promise<SearchResult>
+                  }
+                  onPick={(item) => {
+                    setProgramme(item);
+                    setProgrammeId(item.id);
+                  }}
+                  onClear={() => {
+                    setProgramme(null);
+                    setProgrammeId("");
+                  }}
+                />
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field>
+                    <FieldLabel htmlFor="qualification">
+                      Qualification
+                    </FieldLabel>
+                    <NativeSelect
+                      id="qualification"
+                      value={qualification}
+                      onChange={(e) => setQualification(e.target.value)}
+                      className="h-12 rounded-xl"
+                    >
+                      <NativeSelectOption value="HND">HND</NativeSelectOption>
+                      <NativeSelectOption value="BACHELORS">
+                        Bachelors
+                      </NativeSelectOption>
+                      <NativeSelectOption value="MASTERS">
+                        Masters
+                      </NativeSelectOption>
+                      <NativeSelectOption value="PHD">PhD</NativeSelectOption>
+                      <NativeSelectOption value="OTHER">
+                        Other
+                      </NativeSelectOption>
+                    </NativeSelect>
+                  </Field>
+                  <Field
+                    data-invalid={errors["academicSession"] ? true : undefined}
+                  >
+                    <FieldLabel htmlFor="session">Academic session</FieldLabel>
+                    <FieldDescription>
+                      Format YYYY/YYYY, for example 2024/2025. Years 2000 to
+                      2030.
+                    </FieldDescription>
+                    <Input
+                      id="session"
+                      value={session}
+                      onChange={(e) => setSession(e.target.value)}
+                      placeholder="2024/2025"
+                      inputMode="numeric"
+                      aria-invalid={
+                        errors["academicSession"] ? true : undefined
+                      }
+                      className="h-12 rounded-xl"
+                    />
+                    {errors["academicSession"] && (
+                      <FieldError>{errors["academicSession"]}</FieldError>
+                    )}
+                  </Field>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setView(1)}
+                    className="h-11 rounded-xl text-[15px]"
+                  >
+                    <ArrowLeftIcon aria-hidden="true" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={pending}
+                    aria-busy={pending}
+                    className="h-11 flex-1 rounded-xl text-[15px]"
+                  >
+                    {pending && <Spinner aria-hidden="true" />}
+                    Save and continue
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </form>
+        )}
+
+        {view === 3 && (
+          <form onSubmit={submitPreferences} className="flex flex-col gap-4">
+            <Field>
+              <FieldLabel htmlFor="style">Citation style</FieldLabel>
+              <FieldDescription>
+                Your department template follows this style by default.
+              </FieldDescription>
+              <NativeSelect
+                id="style"
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="h-12 rounded-xl"
+              >
+                <NativeSelectOption value="APA_7">APA 7</NativeSelectOption>
+                <NativeSelectOption value="Harvard">Harvard</NativeSelectOption>
+                <NativeSelectOption value="MLA">MLA</NativeSelectOption>
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="prefLang">Preferred language</FieldLabel>
+              <FieldDescription>
+                Winning choice if it differs from step 1. Going back keeps this
+                value in sync.
+              </FieldDescription>
+              <NativeSelect
+                id="prefLang"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="h-12 rounded-xl"
+              >
+                <NativeSelectOption value="en">English</NativeSelectOption>
+                <NativeSelectOption value="fr">French</NativeSelectOption>
+              </NativeSelect>
+            </Field>
+            <Alert>
+              <AlertDescription>
+                Completing this step grants 50 welcome credits once and takes
+                you to your dashboard. Returning here later shows your current
+                state with no extra grant.
+              </AlertDescription>
+            </Alert>
+            <div className="flex gap-2">
               <Button
                 type="button"
-                className="w-full sm:w-auto"
-                onClick={() => router.push("/dashboard")}
+                variant="outline"
+                onClick={() => setView(2)}
+                className="h-11 rounded-xl text-[15px]"
               >
-                Go to dashboard
-                <ArrowRightIcon aria-hidden="true" />
+                <ArrowLeftIcon aria-hidden="true" />
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={pending}
+                aria-busy={pending}
+                className="h-11 flex-1 rounded-xl text-[15px]"
+              >
+                {pending && <Spinner aria-hidden="true" />}
+                Complete setup
               </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </form>
+        )}
+
+        {view === "welcome" && (
+          <div className="flex flex-col items-center gap-4 py-4 text-center">
+            <svg
+              viewBox="0 0 56 56"
+              className="size-14"
+              role="img"
+              aria-label="Setup complete"
+            >
+              <circle
+                cx="28"
+                cy="28"
+                r="26"
+                fill="var(--primary)"
+                opacity="0.12"
+              />
+              <circle
+                cx="28"
+                cy="28"
+                r="26"
+                fill="none"
+                stroke="var(--primary)"
+                strokeWidth="2.5"
+                pathLength={1}
+                className="ob-draw"
+              />
+              <path
+                d="M18 29.5 25 36.5 39 21"
+                fill="none"
+                stroke="var(--primary)"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={1}
+                className="ob-draw"
+              />
+            </svg>
+            <div
+              className="ob-rise flex flex-col items-center gap-1"
+              style={{ animationDelay: "0.35s" }}
+            >
+              <p className="text-xl font-bold">
+                {walletBalance ?? 50} welcome credits are yours
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your profile, academic place, and preferences are saved. Your
+                dashboard is ready when you are.
+              </p>
+            </div>
+            <Button
+              type="button"
+              className="group h-11 rounded-xl text-[15px]"
+              onClick={() => router.push("/dashboard")}
+            >
+              <span
+                className="ob-rise inline-flex items-center gap-2"
+                style={{ animationDelay: "0.45s" }}
+              >
+                Go to dashboard
+                <ArrowRightIcon
+                  aria-hidden="true"
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </span>
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
