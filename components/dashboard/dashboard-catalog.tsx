@@ -83,14 +83,14 @@ import {
   dashboardSearchParams,
 } from "@/lib/search-params";
 
-type CatalogResponse = {
+export type CatalogResponse = {
   stats: DashboardStats;
   catalog: DashboardCatalog;
   activities: DashboardActivity[];
   walletBalance: number;
 };
 
-async function fetchCatalog(params: {
+export async function fetchCatalog(params: {
   search: string;
   status: string;
   page: number;
