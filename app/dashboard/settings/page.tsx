@@ -1,95 +1,162 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { SearchParams } from "nuqs/server";
+import { Suspense } from "react";
+import { SettingsTabs } from "@/components/dashboard/settings-tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth-helpers";
+import { getBalance } from "@/lib/billing";
+import { getNotificationPreferences } from "@/lib/notification-preferences";
 import { getOnboardingState } from "@/lib/onboarding";
+import { db } from "@/lib/prisma";
+import { loadSettingsSearchParams } from "@/lib/search-params";
 
 export const instant = false;
 
-function Row({ label, value }: { label: string; value: string }) {
+type LedgerEntry = {
+  id: string;
+  type: string;
+  amount: number;
+  balanceAfter: number;
+  description: string;
+  createdAt: string;
+};
+
+async function SettingsLoader({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const user = await requireUser();
+  const { tab } = await loadSettingsSearchParams(searchParams);
+  const [state, balanceResult, preferences, ledger] = await Promise.all([
+    getOnboardingState(user.id),
+    getBalance(user.id).catch(() => ({ balance: 0, lowBalance: false })),
+    getNotificationPreferences(user.id),
+    (async (): Promise<LedgerEntry[]> => {
+      try {
+        const wallet = await db.orm.public.CreditWallet.where({
+          userId: user.id,
+        }).first();
+        if (!wallet) return [];
+        const w = wallet as unknown as { id: string };
+        const rows = (await db.orm.public.CreditLedger.select(
+          "id",
+          "type",
+          "amount",
+          "balanceAfter",
+          "description",
+          "createdAt",
+        )
+          .where((r) => r.walletId.eq(w.id))
+          .orderBy((r) => r.createdAt.desc())
+          .limit(5)
+          .all()) as unknown as Array<{
+          id: string;
+          type: string;
+          amount: number;
+          balanceAfter: number;
+          description: string;
+          createdAt: Date | string;
+        }>;
+        return rows.map((e) => ({
+          id: e.id,
+          type: e.type,
+          amount: e.amount,
+          balanceAfter: e.balanceAfter,
+          description: e.description,
+          createdAt:
+            e.createdAt instanceof Date
+              ? e.createdAt.toISOString()
+              : new Date(e.createdAt).toISOString(),
+        }));
+      } catch {
+        return [];
+      }
+    })(),
+  ]);
+
+  const academic = state.academic;
+  const names = await (async () => {
+    const out: Record<string, string> = {};
+    async function nameOf(
+      table: "Institution" | "Faculty" | "Department" | "Programme",
+      id: string | null,
+    ) {
+      if (!id) return null;
+      try {
+        if (table === "Institution") {
+          const row = (await db.orm.public.Institution.where({
+            id,
+          }).first()) as unknown as { name: string } | null;
+          return row?.name ?? null;
+        }
+        if (table === "Faculty") {
+          const row = (await db.orm.public.Faculty.where({
+            id,
+          }).first()) as unknown as { name: string } | null;
+          return row?.name ?? null;
+        }
+        if (table === "Department") {
+          const row = (await db.orm.public.Department.where({
+            id,
+          }).first()) as unknown as { name: string } | null;
+          return row?.name ?? null;
+        }
+        const row = (await db.orm.public.Programme.where({
+          id,
+        }).first()) as unknown as { name: string } | null;
+        return row?.name ?? null;
+      } catch {
+        return null;
+      }
+    }
+    const [institution, faculty, department, programme] = await Promise.all([
+      nameOf("Institution", academic?.institutionId ?? null),
+      nameOf("Faculty", academic?.facultyId ?? null),
+      nameOf("Department", academic?.departmentId ?? null),
+      nameOf("Programme", academic?.programmeId ?? null),
+    ]);
+    if (institution) out.institution = institution;
+    if (faculty) out.faculty = faculty;
+    if (department) out.department = department;
+    if (programme) out.programme = programme;
+    return out;
+  })();
+
   return (
-    <div className="flex flex-col gap-0.5 border-b border-border/60 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
+      <SettingsTabs
+        initialTab={tab}
+        user={{
+          name: user.name,
+          email: user.email,
+          emailVerified: user.emailVerified,
+        }}
+        student={state.student}
+        academic={state.academic}
+        academicNames={names}
+        balance={balanceResult.balance}
+        preferences={preferences}
+        ledger={ledger}
+      />
     </div>
   );
 }
 
-export default async function SettingsPage() {
-  const user = await requireUser();
-  const state = await getOnboardingState(user.id);
-  const student = state.student;
-  const academic = state.academic;
-
+export default function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Settings
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your account and academic profile. Edit them in onboarding — your
-          progress is kept.
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Account</CardTitle>
-          <CardDescription>
-            Signed in as {user.email}. Email changes are not supported yet —
-            contact support if you need one.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <dl>
-            <Row label="Name" value={user.name || "—"} />
-            <Row label="Email" value={user.email} />
-          </dl>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Academic profile</CardTitle>
-          <CardDescription>
-            Used to match institutional templates and citation style.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <dl>
-            <Row
-              label="Name"
-              value={
-                [student?.firstName, student?.lastName]
-                  .filter(Boolean)
-                  .join(" ") || "—"
-              }
-            />
-            <Row label="Country" value={student?.country || "—"} />
-            <Row
-              label="Preferred language"
-              value={student?.preferredLanguage || "—"}
-            />
-            <Row label="Qualification" value={academic?.qualification ?? "—"} />
-            <Row
-              label="Academic session"
-              value={academic?.academicSession ?? "—"}
-            />
-          </dl>
-          <Link href="/onboarding" className="mt-4 inline-block">
-            <Button variant="outline" className="h-11 rounded-xl px-5 text-sm">
-              Edit in onboarding
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
+          <Skeleton className="h-11 w-full max-w-2xl rounded-xl" />
+          <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+      }
+    >
+      <SettingsLoader searchParams={searchParams} />
+    </Suspense>
   );
 }

@@ -31,6 +31,12 @@ export const templatesSearchParams = {
 
 export const loadTemplatesSearchParams = createLoader(templatesSearchParams);
 
+export const settingsSearchParams = {
+  tab: parseAsString.withDefault("profile"),
+};
+
+export const loadSettingsSearchParams = createLoader(settingsSearchParams);
+
 export const archivedSearchParams = {
   search: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),

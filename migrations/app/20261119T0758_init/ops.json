@@ -1,0 +1,151 @@
+[
+  {
+    "id": "table.NotificationPreference",
+    "label": "Create table \"NotificationPreference\"",
+    "summary": "Creates table \"NotificationPreference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "NotificationPreference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"NotificationPreference\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"NotificationPreference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"NotificationPreference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"NotificationPreference\"",
+        "sql": "CREATE TABLE \"public\".\"NotificationPreference\" (\n  \"billingAlerts\" bool DEFAULT true NOT NULL,\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"productUpdates\" bool DEFAULT true NOT NULL,\n  \"researchDigests\" bool DEFAULT false NOT NULL,\n  \"updatedAt\" timestamptz(3) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"NotificationPreference\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"NotificationPreference\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"NotificationPreference\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.NotificationPreference.NotificationPreference_userId_key",
+    "label": "Add unique constraint on \"NotificationPreference\" (userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "NotificationPreference_userId_key",
+        "table": "NotificationPreference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"NotificationPreference_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "NotificationPreference_userId_key",
+          "public",
+          "\"public\".\"NotificationPreference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"NotificationPreference_userId_key\" on \"NotificationPreference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"NotificationPreference_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"NotificationPreference\" ADD CONSTRAINT \"NotificationPreference_userId_key\" UNIQUE (\"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"NotificationPreference_userId_key\" exists on (userId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "NotificationPreference_userId_key",
+          "public",
+          "\"public\".\"NotificationPreference\"",
+          "u",
+          "[\"userId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.NotificationPreference.NotificationPreference_userId_fkey",
+    "label": "Add foreign key \"NotificationPreference_userId_fkey\" on \"NotificationPreference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "NotificationPreference_userId_fkey",
+        "table": "NotificationPreference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"NotificationPreference_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "NotificationPreference_userId_fkey",
+          "public",
+          "\"public\".\"NotificationPreference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"NotificationPreference_userId_fkey\" on \"NotificationPreference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"NotificationPreference_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"NotificationPreference\"\nADD CONSTRAINT \"NotificationPreference_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"NotificationPreference_userId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "NotificationPreference_userId_fkey",
+          "public",
+          "\"public\".\"NotificationPreference\"",
+          "f",
+          "[\"userId\"]",
+          "\"public\".\"User\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  }
+]

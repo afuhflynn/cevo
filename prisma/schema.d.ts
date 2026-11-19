@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'79efc624fb1fdccf6df4091c60c4b884940cca0d3e84e8d14bf2101efc209acf'>;
+  StorageHashBase<'c5359ae2ff69452c45c3195885bec3b07f023bf85a9f6f0807338d79200b9e1f'>;
 export type ExecutionHash =
-  ExecutionHashBase<'c9e8ba72adca929685ddbe93b8373e7decd3dff90a5d7171d6935e4c295f3145'>;
+  ExecutionHashBase<'1e7db6a77ce3fd2b0ece42693dbc72c1170e1ac5cc32058da76bf709b5691249'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -874,6 +874,17 @@ export namespace Models {
     user: public_User;
     readonly [RelationKeys]?: 'user';
   };
+  export type public_NotificationPreference = {
+    billingAlerts: FieldOutputTypes['public']['NotificationPreference']['billingAlerts'];
+    createdAt: FieldOutputTypes['public']['NotificationPreference']['createdAt'];
+    id: FieldOutputTypes['public']['NotificationPreference']['id'];
+    productUpdates: FieldOutputTypes['public']['NotificationPreference']['productUpdates'];
+    researchDigests: FieldOutputTypes['public']['NotificationPreference']['researchDigests'];
+    updatedAt: FieldOutputTypes['public']['NotificationPreference']['updatedAt'];
+    userId: FieldOutputTypes['public']['NotificationPreference']['userId'];
+    user: public_User;
+    readonly [RelationKeys]?: 'user';
+  };
   export type public_OperationPricing = {
     creditCost: FieldOutputTypes['public']['OperationPricing']['creditCost'];
     defaultModel: FieldOutputTypes['public']['OperationPricing']['defaultModel'];
@@ -1279,6 +1290,7 @@ export namespace Models {
     auditEvents: public_AuditEvent[];
     creditWallet: public_CreditWallet | null;
     fileAssets: public_FileAsset[];
+    notificationPreference: public_NotificationPreference | null;
     notifications: public_Notification[];
     payments: public_Payment[];
     projects: public_Project[];
@@ -1292,6 +1304,7 @@ export namespace Models {
       | 'auditEvents'
       | 'creditWallet'
       | 'fileAssets'
+      | 'notificationPreference'
       | 'notifications'
       | 'payments'
       | 'projects'
@@ -1366,6 +1379,7 @@ export declare const models: {
     FileAsset: Models.public_FileAsset;
     Institution: Models.public_Institution;
     Notification: Models.public_Notification;
+    NotificationPreference: Models.public_NotificationPreference;
     OperationPricing: Models.public_OperationPricing;
     Payment: Models.public_Payment;
     PaymentWebhookEvent: Models.public_PaymentWebhookEvent;
@@ -3230,6 +3244,84 @@ type ContractBase = Omit<
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'Notification';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly NotificationPreference: {
+              columns: {
+                readonly billingAlerts: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly productUpdates: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                  readonly many: false;
+                };
+                readonly researchDigests: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['userId'] }];
+              indexes: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'NotificationPreference';
                     readonly columns: readonly ['userId'];
                   };
                   readonly target: {
@@ -6461,6 +6553,10 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'Notification';
     };
+    readonly NotificationPreference: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'NotificationPreference';
+    };
     readonly OperationPricing: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'OperationPricing';
@@ -8122,6 +8218,70 @@ type ContractBase = Omit<
                 readonly linkUrl: { readonly column: 'linkUrl' };
                 readonly message: { readonly column: 'message' };
                 readonly title: { readonly column: 'title' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
+          readonly NotificationPreference: {
+            readonly fields: {
+              readonly billingAlerts: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly productUpdates: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly researchDigests: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'NotificationPreference';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly billingAlerts: { readonly column: 'billingAlerts' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly productUpdates: { readonly column: 'productUpdates' };
+                readonly researchDigests: { readonly column: 'researchDigests' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly userId: { readonly column: 'userId' };
               };
             };
@@ -10576,6 +10736,18 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['uploadedByUserId'];
                 };
               };
+              readonly notificationPreference: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'NotificationPreference';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
               readonly notifications: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -11466,6 +11638,31 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Notification';
             readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'cuid2'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'NotificationPreference';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'NotificationPreference';
+            readonly field: 'updatedAt';
             readonly namespace: 'public';
           };
         },

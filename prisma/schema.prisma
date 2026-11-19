@@ -122,6 +122,7 @@ model User {
   accounts      Account[]
   studentProfile   StudentProfile?
   academicProfile  AcademicProfile?
+  notificationPreference NotificationPreference?
   projects         Project[]
   creditWallet     CreditWallet?
   payments         Payment[]
@@ -796,6 +797,18 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
+}
+
+model NotificationPreference {
+  id               String   @id @onCreate(cuid(2))
+  userId           String   @unique
+  productUpdates   Boolean  @default(true)
+  billingAlerts    Boolean  @default(true)
+  researchDigests  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @onCreate(now()) @onUpdate(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SupportTicket {
