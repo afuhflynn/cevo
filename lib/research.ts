@@ -6,7 +6,7 @@ export type ResearchAuthor = {
   affiliation?: string;
 };
 
-export type CitationStyle = "APA_7" | "HARVARD";
+export type CitationStyle = "APA_7" | "HARVARD" | "MLA";
 
 export type VerificationStateValue =
   | "METADATA_VERIFIED"
@@ -274,6 +274,28 @@ export function inlineBaseHarvard(authors: ResearchAuthor[]): string {
   return `${familyShort(authors[0]!.family)} et al.`;
 }
 
+function mlaAuthorOne(a: ResearchAuthor): string {
+  if (!a.family.trim()) return "";
+  if (!a.given) return a.family;
+  return `${a.family}, ${a.given}`;
+}
+
+export function formatAuthorsMla(authors: ResearchAuthor[]): string {
+  if (authors.length === 0) return "";
+  if (authors.length === 1) return mlaAuthorOne(authors[0]!);
+  if (authors.length === 2)
+    return `${mlaAuthorOne(authors[0]!)} and ${authors[1]!.given ? `${authors[1]!.given} ` : ""}${authors[1]!.family}`.replace(/\s+/g, " ").trim();
+  return `${mlaAuthorOne(authors[0]!)}, et al.`;
+}
+
+export function inlineBaseMla(authors: ResearchAuthor[]): string {
+  if (authors.length === 0) return "Anon";
+  if (authors.length === 1) return familyShort(authors[0]!.family);
+  if (authors.length === 2)
+    return `${familyShort(authors[0]!.family)} and ${familyShort(authors[1]!.family)}`;
+  return `${familyShort(authors[0]!.family)} et al.`;
+}
+
 export function yearLabel(year: number | null): string {
   return year === null || !Number.isFinite(year) ? "n.d." : String(year);
 }
@@ -284,6 +306,14 @@ export function buildInlineText(
   year: number | null,
   suffix = "",
 ): string {
+  if (style === "MLA") {
+    // MLA in-text markers carry no year; same-author collisions are
+    // disambiguated by suffix letters grouped on the author alone
+    // (see computeSuffixGroups). Documented pipeline variant: the MLA
+    // Handbook uses shortened titles instead, which this pipeline cannot
+    // express.
+    return `(${inlineBaseMla(authors)}${suffix ? ` ${suffix}` : ""})`;
+  }
   const base =
     style === "APA_7" ? inlineBaseApa(authors) : inlineBaseHarvard(authors);
   return `(${base}, ${yearLabel(year)}${suffix})`;
@@ -327,6 +357,28 @@ function doiUrl(doi: string | null, pdfUrl: string | null): string {
   return "";
 }
 
+function mlaContainer(input: ReferenceInput): string {
+  const bits: string[] = [];
+  const venue = input.venue?.trim() || input.publisher?.trim() || "";
+  if (venue) bits.push(venue);
+  if (input.volume?.trim()) bits.push(`vol. ${input.volume.trim()}`);
+  if (input.issue?.trim()) bits.push(`no. ${input.issue.trim()}`);
+  bits.push(yearLabel(input.year));
+  if (input.pages?.trim()) bits.push(`pp. ${input.pages.trim()}`);
+  const joined = bits
+    .join(", ")
+    .replace(/\s+/g, " ")
+    .replace(/\.+$/, "");
+  return joined ? `${joined}.` : "";
+}
+
+function mlaPublisher(input: ReferenceInput): string {
+  const publisher = input.publisher?.trim() || "";
+  const venue = input.venue?.trim() || "";
+  if (!publisher || !venue || publisher === venue) return "";
+  return `${publisher},`;
+}
+
 export function buildReference(
   style: CitationStyle,
   input: ReferenceInput,
@@ -335,7 +387,9 @@ export function buildReference(
   const authors =
     style === "APA_7"
       ? formatAuthorsApa(input.authors)
-      : formatAuthorsHarvard(input.authors);
+      : style === "MLA"
+        ? formatAuthorsMla(input.authors)
+        : formatAuthorsHarvard(input.authors);
   const year = `${yearLabel(input.year)}${suffix}`;
   const title = cleanTitle(input.title);
   const tail = venuePart(input);
@@ -344,6 +398,15 @@ export function buildReference(
     const head = authors ? `${authors} (${year}).` : `(${year}).`;
     const parts = [head, title, tail].filter(Boolean).join(" ");
     return url ? `${parts} ${url}`.trim() : parts.trim();
+  }
+  if (style === "MLA") {
+    const head = authors ? `${authors}.` : "";
+    const quotedTitle = `"${cleanTitle(input.title).replace(/\.$/, "")}."`;
+    const container = mlaContainer(input);
+    const parts = [head, quotedTitle, container, mlaPublisher(input)]
+      .filter(Boolean)
+      .join(" ");
+    return url ? `${parts} ${url}.`.trim() : parts.trim();
   }
   const head = authors ? `${authors} (${year})` : `(${year})`;
   const quotedTitle = `'${cleanTitle(input.title).replace(/\.$/, "")}',`;
@@ -370,8 +433,16 @@ export function computeSuffixGroups(
     const base =
       item.style === "APA_7"
         ? inlineBaseApa(item.authors)
-        : inlineBaseHarvard(item.authors);
-    const key = `${base.toLowerCase()}|${yearLabel(item.year)}`;
+        : item.style === "MLA"
+          ? inlineBaseMla(item.authors)
+          : inlineBaseHarvard(item.authors);
+    // MLA markers carry no year, so same-author works collide across years:
+    // group on the author alone. Year-based grouping would leave identical
+    // markers ((Smith) vs (Smith)) without suffixes.
+    const key =
+      item.style === "MLA"
+        ? base.toLowerCase()
+        : `${base.toLowerCase()}|${yearLabel(item.year)}`;
     const list = groups.get(key) ?? [];
     list.push({ id: item.id, title: item.title });
     groups.set(key, list);
@@ -431,6 +502,7 @@ export function normalizeStyle(value: unknown): CitationStyle | null {
     value === "HARVARD_CITE_THE_RIGHT"
   )
     return "HARVARD";
+  if (value === "MLA" || value === "MLA9" || value === "MLA_9") return "MLA";
   return null;
 }
 

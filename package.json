@@ -15,6 +15,7 @@
     "db:push:reset": "prisma db push --force-reset",
     "db:studio": "prisma studio",
     "db:seed": "tsx scripts/seed-institutions.ts",
+    "db:seed:templates": "tsx scripts/seed-platform-template.ts && tsx scripts/seed-platform-template-harvard.ts && tsx scripts/seed-platform-template-mla.ts",
     "db:migrate": "prisma contract emit && prisma migration plan --name init && prisma db migrate --advance-ref db",
     "db:migrate:deploy": "prisma db migrate",
     "db:migrate:reset": "prisma migrate reset",

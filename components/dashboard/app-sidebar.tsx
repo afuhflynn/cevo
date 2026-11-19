@@ -144,12 +144,16 @@ export function AppSidebar({
                   <span>Research</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <ProjectGroup
-                label="Templates"
-                icon={LayoutTemplateIcon}
-                projects={projects}
-                openByDefault={false}
-              />
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/dashboard/templates" />}
+                  isActive={pathname.startsWith("/dashboard/templates")}
+                  tooltip="Templates"
+                >
+                  <LayoutTemplateIcon className="size-4" />
+                  <span>Templates</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <ProjectGroup
                 label="Files"
                 icon={FolderIcon}

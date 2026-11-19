@@ -11,7 +11,7 @@ import {
 } from "@/lib/wizard";
 import { getWalletBalance } from "@/lib/wizard-credits";
 import { loadOwnedWizardSession } from "@/lib/wizard-guards";
-import { suggestTemplateSafe } from "@/lib/wizard-session-view";
+import { resolveSessionTemplate } from "@/lib/wizard-session-view";
 
 export async function GET(
   _request: Request,
@@ -76,7 +76,7 @@ export async function GET(
   );
   const estimate = estimateSynthesisCredits(briefInput.length);
   const balance = await getWalletBalance(user.id);
-  const suggestion = await suggestTemplateSafe(session.id, user.id);
+  const suggestion = await resolveSessionTemplate(session, user.id);
 
   return NextResponse.json({
     session: {

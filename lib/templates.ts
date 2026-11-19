@@ -42,7 +42,7 @@ export const ruleSchema = z.object({
   heading1Style: z.string().trim().max(40),
   heading2FontPt: z.number().min(10).max(28),
   heading2Style: z.string().trim().max(40),
-  citationStyle: z.enum(["APA_7", "HARVARD"]),
+  citationStyle: z.enum(["APA_7", "HARVARD", "MLA"]),
   requirePrelims: z.record(z.string(), z.unknown()),
 });
 
@@ -66,7 +66,7 @@ export const extractPayloadSchema = z.object({
     .extend({
       pageSize: z.enum(["A4", "LETTER"]).nullable().optional(),
       fontFamily: z.string().max(80).nullable().optional(),
-      citationStyle: z.enum(["APA_7", "HARVARD"]).nullable().optional(),
+      citationStyle: z.enum(["APA_7", "HARVARD", "MLA"]).nullable().optional(),
     })
     .optional(),
   sections: z

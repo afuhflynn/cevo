@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   loadResetPasswordSearchParams,
   loadSignInSearchParams,
+  loadTemplatesSearchParams,
   paginationSearchParams,
   textSearchParam,
 } from "./search-params";
@@ -47,6 +48,24 @@ describe("reset password search params", () => {
     const parsed = await loadResetPasswordSearchParams({ error: "expired" });
     expect(parsed.token).toBeNull();
     expect(parsed.error).toBe("expired");
+  });
+});
+
+describe("templates search params", () => {
+  it("defaults to an unfiltered list", async () => {
+    expect(await loadTemplatesSearchParams({})).toEqual({
+      search: "",
+      institution: "all",
+    });
+  });
+
+  it("passes search text and institution through", async () => {
+    expect(
+      await loadTemplatesSearchParams({
+        search: "buea",
+        institution: "cm-ub",
+      }),
+    ).toEqual({ search: "buea", institution: "cm-ub" });
   });
 });
 

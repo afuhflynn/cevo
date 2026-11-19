@@ -35,6 +35,36 @@ export async function POST(request: Request) {
         | "OTHER")
     : "BACHELORS";
 
+  const requestedVersionId =
+    typeof parsed.data.templateVersionId === "string" &&
+    parsed.data.templateVersionId.trim().length > 0
+      ? parsed.data.templateVersionId.trim()
+      : null;
+  let explicitTemplate: {
+    templateId: string;
+    templateVersionId: string;
+  } | null = null;
+  if (requestedVersionId) {
+    const versionRow = (await db.orm.public.TemplateVersion.where({
+      id: requestedVersionId,
+    }).first()) as unknown as {
+      id: string;
+      templateId: string;
+      isPublished: boolean;
+    } | null;
+    if (versionRow?.isPublished) {
+      const templateRow = (await db.orm.public.ProjectTemplate.where({
+        id: versionRow.templateId,
+      }).first()) as unknown as { id: string; isActive: boolean } | null;
+      if (templateRow?.isActive) {
+        explicitTemplate = {
+          templateId: templateRow.id,
+          templateVersionId: versionRow.id,
+        };
+      }
+    }
+  }
+
   const created = await db.transaction(async (tx) => {
     const project = await tx.orm.public.Project.create({
       userId: user.id,
@@ -48,6 +78,12 @@ export async function POST(request: Request) {
       status: "DRAFT",
       progressPercent: 0,
       isArchived: false,
+      ...(explicitTemplate
+        ? {
+            templateId: explicitTemplate.templateId,
+            templateVersionId: explicitTemplate.templateVersionId,
+          }
+        : {}),
     });
     const brief = await tx.orm.public.ProjectBrief.create({
       projectId: project.id,

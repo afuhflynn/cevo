@@ -24,6 +24,13 @@ export const dashboardSearchParams = {
 
 export const loadDashboardSearchParams = createLoader(dashboardSearchParams);
 
+export const templatesSearchParams = {
+  search: parseAsString.withDefault(""),
+  institution: parseAsString.withDefault("all"),
+};
+
+export const loadTemplatesSearchParams = createLoader(templatesSearchParams);
+
 export const archivedSearchParams = {
   search: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),

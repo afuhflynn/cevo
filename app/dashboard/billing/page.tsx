@@ -1,5 +1,8 @@
+import { PlusIcon } from "lucide-react";
 import { Suspense } from "react";
 import { BillingCheckout } from "@/components/billing/billing-checkout";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth-helpers";
 import { getBalance, listActivePackages } from "@/lib/billing";
 import { db } from "@/lib/prisma";
@@ -33,15 +36,13 @@ async function LedgerPreview({ userId }: { userId: string }) {
   }>;
   if (rows.length === 0) return null;
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Recent activity</h2>
-      </div>
+    <section className="flex flex-col gap-3" aria-label="Payment history">
+      <h2 className="text-xl font-bold tracking-tight">Payment history</h2>
       <ul className="flex flex-col gap-2">
         {rows.map((e) => (
           <li
             key={e.id}
-            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 text-sm"
           >
             <span className="min-w-0">
               <span className="block truncate font-medium">
@@ -87,7 +88,7 @@ export default async function BillingPage({
   const billingDown =
     packagesResult.status === "rejected" || balanceResult.status === "rejected";
   const params = searchParams ? await searchParams : undefined;
-  const rawPackageId = params?.["packageId"];
+  const rawPackageId = params?.packageId;
   const initialPackageId =
     typeof rawPackageId === "string"
       ? rawPackageId
@@ -95,49 +96,68 @@ export default async function BillingPage({
         ? (rawPackageId[0] ?? null)
         : null;
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-8 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-serif text-3xl">Buy credits</h1>
-          <p className="text-sm text-muted-foreground">
-            Pay with MTN MoMo or Orange Money. Credits land when the payment
-            confirms.
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-6 sm:px-6 sm:py-8">
+      <section
+        aria-label="Your balance"
+        className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/60 bg-card p-6 sm:p-8"
+      >
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-muted-foreground">Your Balance</p>
+          <p
+            className="text-4xl font-extrabold tracking-tight tabular-nums"
+            aria-live="polite"
+          >
+            {balance.toLocaleString("en-US")} credits
           </p>
         </div>
-        <p
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-sm font-medium"
-          aria-live="polite"
+        <a
+          href="#packages"
+          className={buttonVariants({ className: "h-11 rounded-xl px-5" })}
         >
-          Balance: {balance} credits
-        </p>
-      </div>
+          Buy Credits
+          <PlusIcon aria-hidden="true" />
+        </a>
+      </section>
 
       {billingDown && (
-        <p
-          role="status"
-          className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm"
-        >
+        <output className="block rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm">
           Billing is temporarily unreachable. Your balance and packages will
           reappear on refresh — no credits were lost.
-        </p>
+        </output>
       )}
 
       {lowBalance && (
-        <p
-          role="status"
-          className="rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm"
-        >
+        <output className="block rounded-xl border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm">
           Your balance is under 10 credits. Top up below so long runs never
           stall halfway.
-        </p>
+        </output>
       )}
 
-      <Suspense fallback={null}>
-        <BillingCheckout
-          packages={packages}
-          initialPackageId={initialPackageId}
-        />
-      </Suspense>
+      <section
+        aria-labelledby="packages-heading"
+        className="flex flex-col gap-5"
+      >
+        <h2
+          id="packages-heading"
+          className="text-xl font-bold tracking-tight sm:text-2xl"
+        >
+          Available Packages
+        </h2>
+        <Suspense
+          fallback={
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {["a", "b", "c"].map((id) => (
+                <Skeleton key={id} className="h-72 w-full rounded-2xl" />
+              ))}
+            </div>
+          }
+        >
+          <BillingCheckout
+            packages={packages}
+            initialPackageId={initialPackageId}
+          />
+        </Suspense>
+      </section>
 
       <LedgerPreview userId={user.id} />
     </div>

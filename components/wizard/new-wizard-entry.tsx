@@ -8,7 +8,7 @@ import {
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -62,16 +62,51 @@ function BasicsIllustration() {
 
 export function NewWizardEntry() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [title, setTitle] = React.useState("");
   const [projectType, setProjectType] =
     React.useState<ProjectType>("RESEARCH_ACADEMIC");
   const [qualification, setQualification] = React.useState("");
   const [deadline, setDeadline] = React.useState("");
+  const [templateVersionId, setTemplateVersionId] = React.useState<
+    string | null
+  >(null);
+  const [templateTitle, setTemplateTitle] = React.useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>(
     {},
   );
   const [formError, setFormError] = React.useState<string | null>(null);
   const [creating, setCreating] = React.useState(false);
+
+  React.useEffect(() => {
+    const requested = searchParams.get("template")?.trim() || null;
+    if (!requested) return;
+    let cancelled = false;
+    void fetch(
+      `/api/dashboard/templates/versions/${encodeURIComponent(requested)}`,
+      {
+        cache: "no-store",
+      },
+    )
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        const payload = data as { versionId?: string; title?: string };
+        if (
+          typeof payload.versionId === "string" &&
+          typeof payload.title === "string"
+        ) {
+          setTemplateVersionId(payload.versionId);
+          setTemplateTitle(payload.title);
+        }
+      })
+      .catch(() => {
+        /* invalid template param → plain flow, never a blocker */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams]);
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
@@ -93,6 +128,7 @@ export function NewWizardEntry() {
           projectType,
           qualification: qualification || undefined,
           submissionDeadline: deadline || undefined,
+          templateVersionId: templateVersionId ?? undefined,
         }),
       });
       const data = await res.json().catch(() => null);
@@ -149,6 +185,23 @@ export function NewWizardEntry() {
               Let&rsquo;s start with the essential details about your project.
             </p>
           </div>
+
+          {templateTitle ? (
+            <output className="block rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+              <span className="font-medium">Starting from template:</span>{" "}
+              <span>{templateTitle}</span>{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setTemplateVersionId(null);
+                  setTemplateTitle(null);
+                }}
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Remove
+              </button>
+            </output>
+          ) : null}
 
           {formError ? (
             <Alert variant="destructive">

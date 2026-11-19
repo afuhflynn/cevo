@@ -32,6 +32,7 @@ export const createSessionSchema = z.object({
       { message: "Enter a real calendar date" },
     )
     .optional(),
+  templateVersionId: z.string().min(1).max(64).optional(),
 });
 
 export const turnSchema = z.object({

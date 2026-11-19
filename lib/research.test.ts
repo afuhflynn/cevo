@@ -6,8 +6,11 @@ import {
   computeSuffixGroups,
   extractDoiCandidate,
   filterHitsByWorkType,
+  formatAuthorsMla,
+  inlineBaseMla,
   isDoiQuery,
   makeCitationKey,
+  normalizeStyle,
   normalizeWorkType,
   parseWorkTypeParam,
 } from "./research";
@@ -103,6 +106,66 @@ describe("research formatter", () => {
     const k2 = makeCitationKey([{ family: "Smith" }], 2020, "s1", "p1");
     expect(k1).toBe(k2);
     expect(k1.startsWith("smith2020")).toBe(true);
+  });
+  it("normalizes MLA style variants", () => {
+    expect(normalizeStyle("MLA")).toBe("MLA");
+    expect(normalizeStyle("MLA9")).toBe("MLA");
+    expect(normalizeStyle("Chicago")).toBeNull();
+  });
+});
+
+describe("research MLA formatter", () => {
+  const authors = [
+    { family: "Smith", given: "John" },
+    { family: "Doe", given: "Jane A" },
+  ];
+  it("formats author lists MLA-style", () => {
+    expect(formatAuthorsMla([{ family: "Smith", given: "John" }])).toBe(
+      "Smith, John",
+    );
+    expect(formatAuthorsMla(authors)).toBe("Smith, John and Jane A Doe");
+    expect(
+      formatAuthorsMla([...authors, { family: "Roe", given: "R" }]),
+    ).toBe("Smith, John, et al.");
+    expect(formatAuthorsMla([])).toBe("");
+  });
+  it("renders year-free inline markers", () => {
+    expect(buildInlineText("MLA", authors, 2020)).toBe("(Smith and Doe)");
+    expect(buildInlineText("MLA", [{ family: "World Bank" }], null)).toBe(
+      "(World Bank)",
+    );
+    const many = Array.from({ length: 25 }, (_, i) => ({ family: `Fam${i}`, given: "G" }));
+    expect(buildInlineText("MLA", many, 2021)).toBe("(Fam0 et al.)");
+    expect(inlineBaseMla(authors)).toBe("Smith and Doe");
+  });
+  it("renders a Works Cited entry", () => {
+    const ref = buildReference("MLA", {
+      authors, year: 2020, title: "Learning with machines",
+      venue: "Journal of Testing", volume: "3", issue: "2", pages: "10-20",
+      publisher: "Test Press", doi: "10.1234/abc", pdfUrl: null,
+    });
+    expect(ref).toBe(
+      'Smith, John and Jane A Doe. "Learning with machines." Journal of Testing, vol. 3, no. 2, 2020, pp. 10-20. Test Press, https://doi.org/10.1234/abc.',
+    );
+  });
+  it("handles missing year and missing venue", () => {
+    const ref = buildReference("MLA", {
+      authors: [{ family: "World Bank" }], year: null, title: "Report",
+      venue: null, volume: null, issue: null, pages: null,
+      publisher: "World Bank", doi: null, pdfUrl: null,
+    });
+    expect(ref).toBe('World Bank. "Report." World Bank, n.d.');
+  });
+  it("suffixes same-author works across years", () => {
+    const suffix = computeSuffixGroups([
+      { id: "old", authors: [{ family: "Smith" }], year: 2019, title: "Zebra", style: "MLA" },
+      { id: "new", authors: [{ family: "Smith" }], year: 2020, title: "Apple", style: "MLA" },
+    ]);
+    expect(suffix.get("new")).toBe("a");
+    expect(suffix.get("old")).toBe("b");
+    expect(buildInlineText("MLA", [{ family: "Smith" }], 2020, "a")).toBe(
+      "(Smith a)",
+    );
   });
 });
 

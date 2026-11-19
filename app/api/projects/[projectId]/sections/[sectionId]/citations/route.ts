@@ -171,7 +171,7 @@ export async function POST(request: Request, { params }: Ctx) {
   const style =
     normalizeStyle((loaded.project as { referencingStyle?: string }).referencingStyle) ??
     "APA_7";
-  if (!["APA_7", "HARVARD"].includes(
+  if (!["APA_7", "HARVARD", "MLA"].includes(
     (loaded.project as { referencingStyle?: string }).referencingStyle ?? "APA_7",
   ) && normalizeStyle((loaded.project as { referencingStyle?: string }).referencingStyle) === null) {
     return NextResponse.json({ error: "UNKNOWN_STYLE" }, { status: 400 });
